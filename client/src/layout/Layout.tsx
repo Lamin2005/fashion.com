@@ -1,5 +1,6 @@
 import Navbar from "../components/Navbar";
 import { Outlet } from "react-router-dom";
+import Footer from "../components/Footer";
 
 function Layout() {
   return (
@@ -8,13 +9,7 @@ function Layout() {
       <main>
         <Outlet />
       </main>
-      <footer className="bg-zinc-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-zinc-400">
-            &copy; 2023 FASHION. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </section>
   );
 }
