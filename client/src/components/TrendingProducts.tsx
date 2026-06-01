@@ -92,7 +92,7 @@ const TrendingProducts = () => {
                   className="w-full h-full object-cover object-center transform transition-transform duration-500 group-hover:scale-105"
                 />
 
-                <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-zinc-900/40 to-transparent">
+                <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-linear-to-t from-zinc-900/40 to-transparent">
                   <button className="w-full bg-zinc-900 text-white text-xs font-medium py-3 px-4 flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors shadow-lg cursor-pointer">
                     <ShoppingBag size={14} />
                     Quick Add to Bag
