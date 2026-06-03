@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import { SlidersHorizontal, Star, Heart, ShoppingBag, X } from "lucide-react";
 
-
 interface Product {
   id: number;
   name: string;
@@ -11,7 +10,6 @@ interface Product {
   rating: number;
   isNew?: boolean;
 }
-
 
 const initialProducts: Product[] = [
   {
@@ -100,7 +98,6 @@ const categories = [
 ];
 
 const Shoppage = () => {
-  
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [maxPrice, setMaxPrice] = useState<number>(300);
   const [sortBy, setSortBy] = useState<string>("default");
@@ -140,7 +137,6 @@ const Shoppage = () => {
     return result;
   }, [selectedCategory, maxPrice, sortBy, searchQuery]);
 
-  // Filters အားလုံးကို မူလအတိုင်းပြန်လုပ်မည့် Logic (Reset Filters)
   const resetFilters = () => {
     setSelectedCategory("All");
     setMaxPrice(300);
@@ -337,7 +333,7 @@ const Shoppage = () => {
                     className="group relative flex flex-col justify-between"
                   >
                     {/* Image Box */}
-                    <div className="relative w-full aspect-[3/4] bg-zinc-50 overflow-hidden border border-zinc-100 shadow-sm mb-4">
+                    <div className="relative w-full aspect-3/4 bg-zinc-50 overflow-hidden border border-zinc-100 shadow-sm mb-4">
                       {product.isNew && (
                         <span className="absolute top-2.5 left-2.5 bg-zinc-900 text-white text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 z-10">
                           NEW
