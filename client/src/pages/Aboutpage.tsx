@@ -24,7 +24,6 @@ const Aboutpage = () => {
           </p>
         </div>
 
-        {/* Editorial Split Grid Photos */}
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-7 aspect-3/4 bg-zinc-100 overflow-hidden">
             <img
@@ -43,45 +42,54 @@ const Aboutpage = () => {
         </div>
       </section>
 
-      {/* Section 2: Numbers/Statistics Counter Area */}
-      <section className="w-full bg-zinc-950 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          <div className="space-y-1">
-            <p className="text-3xl sm:text-4xl font-mono font-bold text-amber-400">
-              2026
-            </p>
-            <p className="text-xs font-light text-zinc-400 uppercase tracking-widest">
-              Established
-            </p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-3xl sm:text-4xl font-mono font-bold text-white">
-              100%
-            </p>
-            <p className="text-xs font-light text-zinc-400 uppercase tracking-widest">
-              Organic Cotton
-            </p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-3xl sm:text-4xl font-mono font-bold text-white">
-              45K+
-            </p>
-            <p className="text-xs font-light text-zinc-400 uppercase tracking-widest">
-              Global Members
-            </p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-3xl sm:text-4xl font-mono font-bold text-white">
-              Free
-            </p>
-            <p className="text-xs font-light text-zinc-400 uppercase tracking-widest">
-              Domestic Returns
-            </p>
+      <section
+        className="w-full bg-zinc-950 bg-fixed bg-cover bg-center text-white"
+        style={{
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1529720317453-c8da503f2051?w=1600')",
+        }}
+      >
+        <div className="w-full h-full bg-black/50 py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div className="space-y-1">
+              <p className="text-3xl sm:text-4xl font-mono font-bold text-amber-400">
+                2026
+              </p>
+              <p className="text-xs font-light text-zinc-300 uppercase tracking-widest">
+                Established
+              </p>
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-3xl sm:text-4xl font-mono font-bold text-white">
+                100%
+              </p>
+              <p className="text-xs font-light text-zinc-300 uppercase tracking-widest">
+                Organic Cotton
+              </p>
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-3xl sm:text-4xl font-mono font-bold text-white">
+                45K+
+              </p>
+              <p className="text-xs font-light text-zinc-300 uppercase tracking-widest">
+                Global Members
+              </p>
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-3xl sm:text-4xl font-mono font-bold text-white">
+                Free
+              </p>
+              <p className="text-xs font-light text-zinc-300 uppercase tracking-widest">
+                Domestic Returns
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Section 3: Pillars of Value Grid Icons */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-12">
         <div className="text-center space-y-2">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900">
@@ -93,7 +101,6 @@ const Aboutpage = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pt-6">
-          {/* Pillar 1 */}
           <div className="space-y-3 p-6 border border-zinc-100 hover:border-zinc-900 transition-colors duration-300">
             <Leaf className="text-zinc-800" size={24} strokeWidth={1.5} />
             <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wider">
@@ -104,7 +111,7 @@ const Aboutpage = () => {
               linen that minimizes ecological footprint.
             </p>
           </div>
-          {/* Pillar 2 */}
+
           <div className="space-y-3 p-6 border border-zinc-100 hover:border-zinc-900 transition-colors duration-300">
             <ShieldCheck
               className="text-zinc-800"
@@ -119,7 +126,7 @@ const Aboutpage = () => {
               environments, and fair living wages.
             </p>
           </div>
-          {/* Pillar 3 */}
+
           <div className="space-y-3 p-6 border border-zinc-100 hover:border-zinc-900 transition-colors duration-300">
             <Compass className="text-zinc-800" size={24} strokeWidth={1.5} />
             <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wider">
@@ -130,7 +137,7 @@ const Aboutpage = () => {
               durability, outlasting standard trends.
             </p>
           </div>
-          {/* Pillar 4 */}
+
           <div className="space-y-3 p-6 border border-zinc-100 hover:border-zinc-900 transition-colors duration-300">
             <Globe className="text-zinc-800" size={24} strokeWidth={1.5} />
             <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wider">

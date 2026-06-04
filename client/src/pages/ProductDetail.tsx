@@ -126,21 +126,25 @@ const ProductDetail = () => {
                   Color:
                 </span>
                 <span className="text-xs font-light text-zinc-400">
-                  {selectedColor.name}
+                  {selectedColor?.name}
                 </span>
               </div>
-              <div className="flex space-x-3">
+
+              <div className="flex flex-wrap gap-3">
                 {productData.colors.map((color) => (
                   <button
-                    key={color.name}
+                    key={color.code}
                     onClick={() => setSelectedColor(color)}
                     className={`w-7 h-7 rounded-none p-0.5 border transition-all cursor-pointer ${
-                      selectedColor.name === color.name
+                      selectedColor?.code === color.code
                         ? "border-zinc-900 scale-105"
-                        : "border-transparent hover:scale-105"
+                        : "border-zinc-200 hover:border-zinc-400 hover:scale-105"
                     }`}
                   >
-                    <div className={`w-full h-full ${color.class}`} />
+                    <div
+                      className="w-full h-full"
+                      style={{ backgroundColor: color.code }}
+                    />
                   </button>
                 ))}
               </div>
