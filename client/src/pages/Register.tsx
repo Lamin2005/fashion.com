@@ -4,6 +4,7 @@ import { registerSchema } from "../schema/auth";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver as hookFormResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
 
 const Register = () => {
   type FomrData = z.infer<typeof registerSchema>;
@@ -149,12 +150,12 @@ const Register = () => {
         <div className="text-center pt-8 border-t border-zinc-100 mt-8">
           <p className="text-xs text-zinc-400 font-light">
             Already have an account?{" "}
-            <a
-              href="#"
+            <Link
+              to="/login"
               className="text-zinc-900 font-semibold underline underline-offset-4 hover:text-amber-600 transition-colors"
             >
               Log In
-            </a>
+            </Link>
           </p>
         </div>
       </div>

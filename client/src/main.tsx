@@ -9,6 +9,7 @@ import Collectionspage from "./pages/Collectionspage.tsx";
 import Aboutpage from "./pages/Aboutpage.tsx";
 import Login from "./pages/Login.tsx";
 import Register from "./pages/Register.tsx";
+import ProductDetail from "./pages/ProductDetail.tsx";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
         path: "/register",
         element: <Register />,
       },
+      {
+        path: "/shop/123",
+        element:<ProductDetail/>
+      }
     ],
   },
 ]);

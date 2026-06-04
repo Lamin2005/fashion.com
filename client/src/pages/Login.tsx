@@ -4,6 +4,7 @@ import { loginSchema } from "../schema/auth";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver as hookFormResolver } from "@hookform/resolvers/zod";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   type FomrData = z.infer<typeof loginSchema>;
@@ -125,12 +126,12 @@ const Login = () => {
         <div className="text-center pt-8 border-t border-zinc-100 mt-8">
           <p className="text-xs text-zinc-400 font-light">
             Don't have an account yet?{" "}
-            <a
-              href="#"
+            <Link
+              to="/register"
               className="text-zinc-900 font-semibold underline underline-offset-4 hover:text-amber-600 transition-colors"
             >
               Create Profile
-            </a>
+            </Link>
           </p>
         </div>
       </div>

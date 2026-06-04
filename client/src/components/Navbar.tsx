@@ -251,6 +251,7 @@ const Navbar: React.FC = () => {
         onClick={() => setIsCartOpen(false)}
       />
 
+      {/* Cart section */}
       <div
         className={`fixed top-0 right-0 h-full w-full sm:w-112.5 bg-white z-50 shadow-2xl flex flex-col justify-between transition-transform duration-300 ease-in-out transform ${
           isCartOpen ? "translate-x-0" : "translate-x-full"
