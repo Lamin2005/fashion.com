@@ -1,10 +1,12 @@
 import { model, Schema } from "mongoose";
+import bcrypt from "bcryptjs";
 
 interface IUser extends Document {
   name: string;
   email: string;
   password: string;
   role: "customer" | "admin";
+  comparePassword(enteredPassword: string): Promise<boolean>;
 }
 
 const userSchema = new Schema(
@@ -33,5 +35,18 @@ const userSchema = new Schema(
   { timestamps: true },
 );
 
-const User = model("User", userSchema);
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) {
+    return;
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+userSchema.methods.comparePassword = async function (enteredPassword: string) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+const User = model<IUser>("User", userSchema);
 export default User;
