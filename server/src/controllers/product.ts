@@ -26,23 +26,6 @@ export const createProduct = async (
 
   const user = req.user?._id;
 
-  if (
-    !name &&
-    !description &&
-    !price &&
-    !instock_count &&
-    !category &&
-    !sizes &&
-    !colors &&
-    !images &&
-    !is_new_arrival &&
-    !is_feature &&
-    !rating_count
-  ) {
-    res.status(400);
-    throw new Error("Please Fill all filed...");
-  }
-
   if (!user) {
     res.status(401);
     throw new Error("Unauthorized user...");

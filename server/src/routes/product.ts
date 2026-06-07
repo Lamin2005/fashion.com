@@ -8,11 +8,20 @@ import {
 } from "../controllers/product";
 import asyncHandler from "../utils/asyncHandler";
 import { authMiddleware, isAdmin } from "../middlewares/authmiddleware";
+import { createProductvalidator } from "../validator/products";
+import { validateRequest } from "../middlewares/validatorRequest";
 
 const router = Router();
 
 router.get("/", authMiddleware, isAdmin, asyncHandler(getAllProducts));
-router.post("/create", authMiddleware, isAdmin, asyncHandler(createProduct));
+router.post(
+  "/create",
+  authMiddleware,
+  isAdmin,
+  createProductvalidator,
+  validateRequest,
+  asyncHandler(createProduct),
+);
 router.put("/update/:id", authMiddleware, isAdmin, asyncHandler(updateProduct));
 router.delete(
   "/delete/:id",

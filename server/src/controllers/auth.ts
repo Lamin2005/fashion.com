@@ -9,21 +9,6 @@ import { generateToken } from "../utils/generateToken";
 export const register = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
 
-  if (!name || !email || !password) {
-    res.status(400);
-    throw new Error("Please provide name, email and password");
-  }
-
-  if (!/\S+@\S+\.\S+/.test(email)) {
-    res.status(400);
-    throw new Error("Please provide a valid email");
-  }
-
-  if (password.length < 6) {
-    res.status(400);
-    throw new Error("Password must be at least 6 characters");
-  }
-
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
@@ -49,11 +34,6 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
-
-  if (!email || !password) {
-    res.status(400);
-    throw new Error("Please provide email and password");
-  }
 
   const user = await User.findOne({ email });
 
