@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { connectDB } from "./db/db";
 import userRouter from "./routes/user";
 import errorHandler from "./middlewares/errorHandler";
+import productRouter from "./routes/product";
 
 dotenv.config({
   path: "./.env",
@@ -24,6 +25,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 8000;
 
 app.use("/api/users", userRouter);
+app.use("/api/product", productRouter);
 
 app.use(errorHandler);
 
