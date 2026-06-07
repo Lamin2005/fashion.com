@@ -25,7 +25,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 8000;
 
 app.use("/api/users", userRouter);
-app.use("/api/product", productRouter);
+app.use("/api/products", productRouter);
 
 app.use(errorHandler);
 

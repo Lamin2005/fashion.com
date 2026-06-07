@@ -2,12 +2,14 @@ import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import User from "../model/user";
 import { Types } from "mongoose";
+import asyncHandler from "../utils/asyncHandler";
 
 export interface AuthenticatedRequest extends Request {
   user?: {
     _id: Types.ObjectId;
     name: string;
     email: string;
+    role: "customer" | "admin";
   };
 }
 
@@ -28,8 +30,6 @@ export const authMiddleware = async (
 
     const decoded = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload;
 
-    console.log(decoded);
-
     const user = await User.findById(decoded.id).select("-password");
 
     if (!user) {
@@ -37,16 +37,23 @@ export const authMiddleware = async (
         message: "User not found Unauthorized",
       });
     }
-
-    console.log(user);
-    
     req.user = user;
 
     next();
   } catch (error) {
     return res.status(401).json({
       message: "User token not accessible Unauthorized",
-      errror: error instanceof Error ? error.message : "Unknown error",
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
+
+export const isAdmin = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (req.user && req.user.role === "admin") {
+      next();
+    } else {
+      res.status(403).json({ message: "Admin access required" });
+    }
+  },
+);
