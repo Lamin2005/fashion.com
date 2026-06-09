@@ -5,6 +5,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver as hookFormResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
+import { useRegisterMutation } from "@/store/slices/userApi";
 
 const Register = () => {
   type FomrData = z.infer<typeof registerSchema>;
@@ -12,16 +13,16 @@ const Register = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    reset,
   } = useForm<FomrData>({
     resolver: hookFormResolver(registerSchema),
   });
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [registerMutation, { isLoading }] = useRegisterMutation();
 
   const submit = (data: FomrData) => {
     console.log(data);
-    reset();
+    console.log(registerMutation);
   };
 
   return (
@@ -136,7 +137,7 @@ const Register = () => {
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting && isLoading}
             className="w-full bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold uppercase tracking-widest py-4 transition-colors duration-300 flex items-center justify-center gap-2 group cursor-pointer border border-zinc-900 mt-2"
           >
             Create Profile

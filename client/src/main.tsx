@@ -10,6 +10,8 @@ import Aboutpage from "./pages/Aboutpage.tsx";
 import Login from "./pages/Login.tsx";
 import Register from "./pages/Register.tsx";
 import ProductDetail from "./pages/ProductDetail.tsx";
+import { store } from "./store/index.ts";
+import { Provider } from "react-redux";
 
 const router = createBrowserRouter([
   {
@@ -42,14 +44,16 @@ const router = createBrowserRouter([
       },
       {
         path: "/shop/123",
-        element:<ProductDetail/>
-      }
+        element: <ProductDetail />,
+      },
     ],
   },
 ]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </StrictMode>,
 );
