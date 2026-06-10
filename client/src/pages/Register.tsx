@@ -20,9 +20,13 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [registerMutation, { isLoading }] = useRegisterMutation();
 
-  const submit = (data: FomrData) => {
-    console.log(data);
-    console.log(registerMutation);
+  const submit = async (data: FomrData) => {
+    try {
+      const response = await registerMutation(data).unwrap();
+      console.log("Registration successful:", response);
+    } catch (error) {
+      console.error("Registration failed:", error);
+    }
   };
 
   return (
