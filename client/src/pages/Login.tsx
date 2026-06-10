@@ -5,6 +5,8 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver as hookFormResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
+import { useLoginMutation } from "@/store/slices/userApi";
+import { toast } from "sonner";
 
 const Login = () => {
   type FomrData = z.infer<typeof loginSchema>;
@@ -17,10 +19,19 @@ const Login = () => {
     resolver: hookFormResolver(loginSchema),
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loginMutation] = useLoginMutation();
 
-  const submit = (data: FomrData) => {
-    console.log(data);
-    reset();
+  const submit = async (data: FomrData) => {
+    try {
+      const response = await loginMutation(data).unwrap();
+      toast.success(`${response.message}`);
+      console.log("Login successful:", response);
+    } catch (error) {
+      toast.error(`${(error as { data: { message: string } }).data.message}`);
+      console.error("Login failed:", error);
+    } finally {
+      reset();
+    }
   };
 
   return (

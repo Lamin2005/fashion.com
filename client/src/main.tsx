@@ -12,6 +12,7 @@ import Register from "./pages/Register.tsx";
 import ProductDetail from "./pages/ProductDetail.tsx";
 import { store } from "./store/index.ts";
 import { Provider } from "react-redux";
+import { Toaster } from "sonner";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,7 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
+      <Toaster position="top-right" richColors />
       <RouterProvider router={router} />
     </Provider>
   </StrictMode>,
