@@ -5,6 +5,7 @@ import { generateToken } from "../utils/generateToken";
 //@route POST /api/auth/register
 //@desc Register a new user
 //@access Public
+const isProduction = process.env.NODE_ENV === "production";
 
 export const register = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
@@ -53,8 +54,8 @@ export const login = async (req: Request, res: Response) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
@@ -72,8 +73,8 @@ export const login = async (req: Request, res: Response) => {
 export const logout = async (req: Request, res: Response) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
   });
   res.status(200).json({ message: "Logout successful" });
 };

@@ -7,6 +7,10 @@ import { zodResolver as hookFormResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
 import { useRegisterMutation } from "@/store/slices/userApi";
 import { toast } from "sonner";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const Register = () => {
   type FomrData = z.infer<typeof registerSchema>;
@@ -21,6 +25,14 @@ const Register = () => {
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [registerMutation] = useRegisterMutation();
+  const { userInfo } = useSelector((state: RootState) => state.auth);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/");
+    }
+  }, [navigate, userInfo]);
 
   const submit = async (data: FomrData) => {
     try {

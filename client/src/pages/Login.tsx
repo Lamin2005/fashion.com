@@ -7,6 +7,12 @@ import { zodResolver as hookFormResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
 import { useLoginMutation } from "@/store/slices/userApi";
 import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { setUserInfo } from "@/store/slices/auth";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const Login = () => {
   type FomrData = z.infer<typeof loginSchema>;
@@ -20,12 +26,22 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loginMutation] = useLoginMutation();
+  const dispatch = useDispatch();
+  const { userInfo } = useSelector((state: RootState) => state.auth);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/");
+    }
+  }, [navigate, userInfo]);
 
   const submit = async (data: FomrData) => {
     try {
       const response = await loginMutation(data).unwrap();
       toast.success(`${response.message}`);
       console.log("Login successful:", response);
+      dispatch(setUserInfo(response.user));
     } catch (error) {
       toast.error(`${(error as { data: { message: string } }).data.message}`);
       console.error("Login failed:", error);

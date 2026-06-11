@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   Search,
-  User,
+  LogIn,
   ShoppingBag,
   Menu,
   X,
@@ -136,7 +136,7 @@ const Navbar: React.FC = () => {
               </button>
 
               <button className="text-zinc-600 hover:text-zinc-900 transition-colors cursor-pointer">
-                <User size={20} strokeWidth={1.5} />
+                <LogIn size={20} strokeWidth={1.5} />
               </button>
 
               <button className="text-zinc-600 hover:text-zinc-900 transition-colors cursor-pointer relative">
@@ -157,7 +157,6 @@ const Navbar: React.FC = () => {
               </button>
             </div>
 
-            {/* Mobile Menu Button */}
             <div className="md:hidden flex items-center">
               <button
                 onClick={() => setIsOpen(!isOpen)}
@@ -198,7 +197,7 @@ const Navbar: React.FC = () => {
                 <Search size={20} /> <span className="text-sm">Search</span>
               </button>
               <button className="text-zinc-600 flex items-center gap-2">
-                <User size={20} /> <span className="text-sm">Account</span>
+                <LogIn size={20} /> <span className="text-sm">Account</span>
               </button>
               <button
                 onClick={() => {
