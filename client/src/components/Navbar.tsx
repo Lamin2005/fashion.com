@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   Search,
   LogIn,
+  User,
   ShoppingBag,
   Menu,
   X,
@@ -9,7 +10,24 @@ import {
   Plus,
   Minus,
   Trash2,
+  LogOutIcon,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/index.ts";
+import { useDispatch } from "react-redux";
+import { clearUserInfo } from "@/store/slices/auth";
+import { useLogoutMutation } from "@/store/slices/userApi";
+import { toast } from "sonner";
+import { Link } from "react-router";
 
 // Mock Data: Cart ထဲက ပစ္စည်းများကို နမူနာပြသရန်
 interface CartItem {
@@ -25,6 +43,9 @@ const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
+  const { userInfo } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
+  const [logoutMutation, { isLoading }] = useLogoutMutation();
 
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
 
@@ -94,6 +115,16 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const logoutHandler = async () => {
+    try {
+      const response = await logoutMutation({}).unwrap();
+      dispatch(clearUserInfo());
+      toast.success(`${response.message}`);
+    } catch (error) {
+      console.log("Logout Error : ", error);
+    }
+  };
+
   return (
     <>
       <nav
@@ -135,9 +166,42 @@ const Navbar: React.FC = () => {
                 <Search size={20} strokeWidth={1.5} />
               </button>
 
-              <button className="text-zinc-600 hover:text-zinc-900 transition-colors cursor-pointer">
-                <LogIn size={20} strokeWidth={1.5} />
-              </button>
+              {userInfo ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="text-zinc-600 flex items-center gap-2 cursor-pointer">
+                      <User size={20} /> <span className="text-sm" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuGroup>
+                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                      <DropdownMenuItem>Profile</DropdownMenuItem>
+                      <DropdownMenuItem>Order History</DropdownMenuItem>
+                      <DropdownMenuItem>Save Address</DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem
+                        className="cursor-pointer hover:bg-red-400"
+                        onClick={logoutHandler}
+                        disabled={isLoading}
+                      >
+                        {" "}
+                        <LogOutIcon size={18} className="text-red-400"/>
+                        <span className="text-red-400">Logout</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link
+                  to="/login"
+                  className="text-zinc-600 flex items-center gap-2 cursor-pointer"
+                >
+                  <LogIn size={20} /> <span className="text-sm" />
+                </Link>
+              )}
 
               <button className="text-zinc-600 hover:text-zinc-900 transition-colors cursor-pointer relative">
                 <Heart size={20} strokeWidth={1.5} />
@@ -196,9 +260,20 @@ const Navbar: React.FC = () => {
               >
                 <Search size={20} /> <span className="text-sm">Search</span>
               </button>
-              <button className="text-zinc-600 flex items-center gap-2">
-                <LogIn size={20} /> <span className="text-sm">Account</span>
-              </button>
+              {userInfo ? (
+                <button className="text-zinc-600 flex items-center gap-2 cursor-pointer">
+                  <User size={20} /> <span className="text-sm" />
+                  <span className="text-sm">Account</span>
+                </button>
+              ) : (
+                <Link
+                  className="text-zinc-600 flex items-center gap-2 cursor-pointer"
+                  to="/login"
+                >
+                  <LogIn size={20} /> <span className="text-sm" />
+                  <span className="text-sm">Login</span>
+                </Link>
+              )}
               <button
                 onClick={() => {
                   setIsOpen(false);
