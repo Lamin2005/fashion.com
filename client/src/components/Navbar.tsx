@@ -176,7 +176,7 @@ const Navbar: React.FC = () => {
                   <DropdownMenuContent align="end">
                     <DropdownMenuGroup>
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                      <DropdownMenuItem>Profile</DropdownMenuItem>
+                      <DropdownMenuItem> <Link to="/profile">Profile</Link></DropdownMenuItem>
                       <DropdownMenuItem>Order History</DropdownMenuItem>
                       <DropdownMenuItem>Save Address</DropdownMenuItem>
                     </DropdownMenuGroup>

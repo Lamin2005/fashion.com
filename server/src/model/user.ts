@@ -6,6 +6,10 @@ interface IUser extends Document {
   email: string;
   password: string;
   role: "customer" | "admin";
+  avatar?: {
+    image_url: string;
+    public_id: string;
+  };
   comparePassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -15,6 +19,14 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: true,
     },
+
+    avatar: {
+      type: {
+        image_url: String,
+        public_id: String,
+      },
+    },
+
     email: {
       type: String,
       required: true,

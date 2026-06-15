@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import User from "../model/user";
 import { generateToken } from "../utils/generateToken";
+import { AuthenticatedRequest } from "../middlewares/authmiddleware";
+import { uploadsigleImage } from "../utils/cloudinary";
 
 //@route POST /api/auth/register
 //@desc Register a new user
@@ -77,4 +79,27 @@ export const logout = async (req: Request, res: Response) => {
     sameSite: isProduction ? "none" : "lax",
   });
   res.status(200).json({ message: "Logout successful" });
+};
+
+// @route POST /api/auth/upload
+// @desc Upload user avatar
+// @access Private
+
+export const uploadAvatar = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  const user = req.user?._id;
+  const { image_url } = req.body;
+
+  const upload = await uploadsigleImage(image_url, "fashion.com/avatar");
+
+  const uploadImage = await User.findByIdAndUpdate(user, {
+    avatar: {
+      image_url: upload.image_url,
+      public_id: upload.public_id,
+    },
+  });
+
+  res.status(200).json({ message: "Successfully Uploaded Avatar..." });
 };
