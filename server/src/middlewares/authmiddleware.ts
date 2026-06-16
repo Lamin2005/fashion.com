@@ -10,6 +10,10 @@ export interface AuthenticatedRequest extends Request {
     name: string;
     email: string;
     role: "customer" | "admin";
+    avatar?: {
+      image_url: string;
+      public_id: string;
+    };
   };
 }
 

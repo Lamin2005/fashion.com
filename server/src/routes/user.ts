@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { register, login, logout, uploadAvatar } from "../controllers/auth";
+import {
+  register,
+  login,
+  logout,
+  uploadAvatar,
+  getProfile,
+} from "../controllers/auth";
 import asyncHandler from "../utils/asyncHandler";
 import {
   userRegisterValidator,
@@ -26,5 +32,6 @@ router.post(
   authMiddleware,
   asyncHandler(uploadAvatar),
 );
+router.get("/me", authMiddleware, asyncHandler(getProfile));
 
 export default router;

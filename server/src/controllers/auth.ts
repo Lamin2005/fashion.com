@@ -103,3 +103,15 @@ export const uploadAvatar = async (
 
   res.status(200).json({ message: "Successfully Uploaded Avatar..." });
 };
+
+// @route POST /api/auth/me
+// @desc get user data
+// @access Private
+
+export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
+  const user = req.user?._id;
+
+  const userdata = await User.findById(user).select("-password");
+
+  res.status(200).json({ message: "Successfully get Data...", user: userdata });
+};

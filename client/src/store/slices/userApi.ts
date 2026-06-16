@@ -1,3 +1,4 @@
+import type { User } from "@/types/user";
 import { apiSlice } from "./api";
 
 interface Login {
@@ -33,7 +34,19 @@ const userApi = apiSlice.injectEndpoints({
         method: "POST",
       }),
     }),
+
+    profile: builder.query<User, void>({
+      query: () => ({
+        url: "/me",
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useRegisterMutation, useLoginMutation, useLogoutMutation } = userApi;
+export const {
+  useRegisterMutation,
+  useLoginMutation,
+  useLogoutMutation,
+  useProfileQuery,
+} = userApi;
