@@ -10,6 +10,10 @@ interface Register extends Login {
   name: string;
 }
 
+interface avatarUpload {
+  image_url: string;
+}
+
 const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     register: builder.mutation({
@@ -41,6 +45,14 @@ const userApi = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+
+    upload: builder.mutation({
+      query: (data: avatarUpload) => ({
+        url: "/upload",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -49,4 +61,5 @@ export const {
   useLoginMutation,
   useLogoutMutation,
   useProfileQuery,
+  useUploadMutation,
 } = userApi;

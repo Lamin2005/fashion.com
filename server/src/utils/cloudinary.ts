@@ -25,3 +25,4 @@ export const deleteImage = async (public_id: string) => {
 
   return response?.result === "ok";
 };
+

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import User from "../model/user";
 import { generateToken } from "../utils/generateToken";
 import { AuthenticatedRequest } from "../middlewares/authmiddleware";
-import { uploadsigleImage } from "../utils/cloudinary";
+import { deleteImage, uploadsigleImage } from "../utils/cloudinary";
 
 //@route POST /api/auth/register
 //@desc Register a new user
@@ -91,6 +91,12 @@ export const uploadAvatar = async (
 ) => {
   const user = req.user?._id;
   const { image_url } = req.body;
+
+  const existingUser = await User.findById(user);
+
+  if (existingUser?.avatar?.public_id) {
+    await deleteImage(existingUser?.avatar?.public_id);
+  }
 
   const upload = await uploadsigleImage(image_url, "fashion.com/avatar");
 

@@ -9,10 +9,49 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useProfileQuery } from "@/store/slices/userApi";
+import { useProfileQuery, useUploadMutation } from "@/store/slices/userApi";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 function AccountSettings() {
-  const { data: userInfo } = useProfileQuery();
+  const { data: userInfo, refetch } = useProfileQuery();
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [uploadmutation, { isLoading }] = useUploadMutation();
+  const ref = useRef<HTMLInputElement>(null);
+
+  const imageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (reader.readyState === 2) {
+        setAvatar(reader.result as string);
+      }
+    };
+
+    reader.readAsDataURL(e.target.files![0]);
+  };
+
+  const resetImage = () => {
+    setAvatar(null);
+    if (ref.current) {
+      ref.current.value = "";
+    }
+  };
+
+  const avatarHandler = async () => {
+    try {
+      if (!avatar) {
+        toast.error("Please Upload Photo...");
+        return;
+      }
+      const res = await uploadmutation({ image_url: avatar }).unwrap();
+      resetImage();
+      refetch();
+      toast.success(`${res.message}`);
+    } catch (error) {
+      toast.error(`${(error as { data: { message: string } }).data.message}`);
+    }
+  };
 
   return (
     <section className="w-full min-h-screen bg-zinc-50 flex items-center justify-center pt-28 pb-16 px-4">
@@ -32,8 +71,12 @@ function AccountSettings() {
             <div className="grid lg:grid-cols-[320px_1fr]">
               <div className="border-b lg:border-b-0 lg:border-r border-gray-200 p-8 flex flex-col items-center justify-center">
                 <Avatar className="w-32 h-32 border-4 border-gray-200">
-                  <AvatarImage src={userInfo?.user?.avatar?.image_url} />
-                  <AvatarFallback className="text-3xl">JD</AvatarFallback>
+                  <AvatarImage
+                    src={avatar ? avatar : userInfo?.user?.avatar?.image_url}
+                  />
+                  <AvatarFallback className="text-3xl text-white bg-blue-400">
+                    {userInfo?.user?.name.slice(0, 2)}
+                  </AvatarFallback>
                 </Avatar>
 
                 <h3 className="mt-5 text-xl font-semibold">
@@ -42,8 +85,20 @@ function AccountSettings() {
 
                 <p className="text-sm text-gray-500">{userInfo?.user?.email}</p>
 
-                <Button variant="outline" className="mt-6 w-full">
-                  Change Profile Photo
+                <Input
+                  placeholder=" Change Profile Photo"
+                  type="file"
+                  className="mt-6 w-full cursor-pointer"
+                  onChange={imageHandler}
+                  ref={ref}
+                />
+
+                <Button
+                  className={`w-[80%]  mt-2 ${isLoading ? "cursor-not-allowed" : "cursor-pointer"}`}
+                  onClick={avatarHandler}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Uploading Image" : "Upload Image"}
                 </Button>
               </div>
 
