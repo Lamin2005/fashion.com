@@ -5,12 +5,16 @@ import {
   logout,
   uploadAvatar,
   getProfile,
+  emailUpdate,
+  nameUpdate,
 } from "../controllers/auth";
 import asyncHandler from "../utils/asyncHandler";
 import {
   userRegisterValidator,
   userLoginValidator,
   uploadImageValidator,
+  emailUpdateValidator,
+  nameUpdateValidator,
 } from "../validator/users";
 import { validateRequest } from "../middlewares/validatorRequest";
 import { authMiddleware } from "../middlewares/authmiddleware";
@@ -33,5 +37,19 @@ router.post(
   asyncHandler(uploadAvatar),
 );
 router.get("/me", authMiddleware, asyncHandler(getProfile));
+router.post(
+  "/email-update",
+  emailUpdateValidator,
+  validateRequest,
+  authMiddleware,
+  asyncHandler(emailUpdate),
+);
+router.post(
+  "/name-update",
+  nameUpdateValidator,
+  validateRequest,
+  authMiddleware,
+  asyncHandler(nameUpdate),
+);
 
 export default router;

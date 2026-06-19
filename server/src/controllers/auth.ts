@@ -121,3 +121,50 @@ export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
 
   res.status(200).json({ message: "Successfully get Data...", user: userdata });
 };
+
+// @route POST /api/auth/email-update
+// @desc update user's email
+// @access Private
+
+export const emailUpdate = async (req: AuthenticatedRequest, res: Response) => {
+  const id = req.user?._id;
+  const { email } = req.body;
+
+  const existingUser = await User.findOne({ email });
+
+  if (existingUser) {
+    res.status(400);
+    throw new Error("User already exists with this email");
+  }
+
+  const emailupdate = await User.findByIdAndUpdate(id, { email });
+
+  res.status(200).json({ message: "Email Update Successfully." });
+};
+
+// @route POST /api/auth/name-update
+// @desc update user's name
+// @access Private
+
+export const nameUpdate = async (req: AuthenticatedRequest, res: Response) => {
+  const id = req.user?._id;
+  const { name } = req.body;
+
+  const emailupdate = await User.findByIdAndUpdate(id, { name });
+
+  res.status(200).json({ message: "Name Update Successfully." });
+};
+
+// @route POST /api/auth/password-update
+// @desc update user's password
+// @access Private
+
+export const passwordUpdate = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  const id = req.user?._id;
+  const { oldpassword, password } = req.body;
+
+  res.status(200).json({ message: "Name Update Successfully." });
+};
