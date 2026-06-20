@@ -7,11 +7,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useProfileQuery, useUploadMutation } from "@/store/slices/userApi";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import EmailUpdateForm from "@/components/profile/EmailUpdateForm";
+import NameUpdateForm from "@/components/profile/NameUpdateForm";
+import PasswordUpdateForm from "@/components/profile/PasswordUpdateFrom";
 
 function AccountSettings() {
   const { data: userInfo, refetch } = useProfileQuery();
@@ -104,56 +106,44 @@ function AccountSettings() {
 
               <div className="p-8 space-y-8">
                 <div>
-                  <h2 className="text-xl font-semibold mb-5">
+                  <h2 className="text-xl font-semibold">
                     Personal Information
                   </h2>
-
-                  <div className="grid md:grid-cols-2 gap-5">
-                    <div className="space-y-2">
-                      <Label>Full Name</Label>
-                      <Input placeholder="John Doe" className="h-11" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Email</Label>
-                      <Input
-                        type="email"
-                        placeholder="john@example.com"
-                        className="h-11"
-                      />
-                    </div>
-                  </div>
                 </div>
 
-                <div className="border-t pt-8">
-                  <h2 className="text-xl font-semibold mb-5">
-                    Change Password
-                  </h2>
-
-                  <div className="space-y-5">
-                    <div className="space-y-2">
-                      <Label>Current Password</Label>
-                      <Input type="password" className="h-11" />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                  {/* LEFT SIDE */}
+                  <div className="space-y-6">
+                    <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4 hover:shadow-md transition">
+                      <h3 className="text-sm font-medium text-gray-500">
+                        Update Name
+                      </h3>
+                      <NameUpdateForm />
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-5">
-                      <div className="space-y-2">
-                        <Label>New Password</Label>
-                        <Input type="password" className="h-11" />
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Confirm Password</Label>
-                        <Input type="password" className="h-11" />
-                      </div>
+                    <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4 hover:shadow-md transition">
+                      <h3 className="text-sm font-medium text-gray-500">
+                        Update Email
+                      </h3>
+                      <EmailUpdateForm />
                     </div>
                   </div>
-                </div>
 
-                <div className="flex justify-end">
-                  <Button className="bg-black text-white hover:bg-zinc-800 px-8">
-                    Save Changes
-                  </Button>
+                  {/* RIGHT SIDE */}
+                  <div className="space-y-6">
+                    <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4 hover:shadow-md transition">
+                      <h3 className="text-sm font-medium text-gray-500">
+                        Change Password
+                      </h3>
+                      <PasswordUpdateForm />
+                    </div>
+
+                    <div className="flex justify-end">
+                      <Button className="bg-black text-white hover:bg-zinc-800 px-8">
+                        Back
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

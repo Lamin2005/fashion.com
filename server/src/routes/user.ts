@@ -7,6 +7,7 @@ import {
   getProfile,
   emailUpdate,
   nameUpdate,
+  passwordUpdate,
 } from "../controllers/auth";
 import asyncHandler from "../utils/asyncHandler";
 import {
@@ -15,6 +16,7 @@ import {
   uploadImageValidator,
   emailUpdateValidator,
   nameUpdateValidator,
+  passwordUpdateValidator,
 } from "../validator/users";
 import { validateRequest } from "../middlewares/validatorRequest";
 import { authMiddleware } from "../middlewares/authmiddleware";
@@ -50,6 +52,13 @@ router.post(
   validateRequest,
   authMiddleware,
   asyncHandler(nameUpdate),
+);
+router.post(
+  "/password-update",
+  passwordUpdateValidator,
+  validateRequest,
+  authMiddleware,
+  asyncHandler(passwordUpdate),
 );
 
 export default router;

@@ -26,3 +26,12 @@ export const emailUpdateValidator = [
 export const nameUpdateValidator = [
   body("name").notEmpty().withMessage("Name is required"),
 ];
+
+export const passwordUpdateValidator = [
+  body("oldPassword").notEmpty().withMessage("Password is required"),
+  body("password")
+    .notEmpty()
+    .withMessage("Password is required")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters"),
+];

@@ -164,7 +164,30 @@ export const passwordUpdate = async (
   res: Response,
 ) => {
   const id = req.user?._id;
-  const { oldpassword, password } = req.body;
+  const { oldPassword, password } = req.body;
 
-  res.status(200).json({ message: "Name Update Successfully." });
+  const existingUser = await User.findById(id);
+
+  if (!existingUser) {
+    res.status(400);
+    throw new Error("User Not Found.");
+  }
+
+  const isMatched = await existingUser.comparePassword(oldPassword);
+
+  if (!isMatched) {
+    res.status(400);
+    throw new Error("Invalid Old Password.");
+  }
+
+  if (oldPassword === password) {
+    res.status(400);
+    throw new Error("New password must be different from old password.");
+  }
+
+  existingUser.password = password;
+
+  await existingUser.save();
+
+  res.status(200).json({ message: "Password Update Successfully." });
 };
