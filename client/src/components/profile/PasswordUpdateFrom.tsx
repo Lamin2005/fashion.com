@@ -61,7 +61,7 @@ export default function PasswordUpdateForm() {
         )}
       />
 
-      <Button type="submit">Update password</Button>
+      <Button type="submit" className="cursor-pointer">Update password</Button>
     </form>
   );
 }

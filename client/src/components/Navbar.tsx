@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   LogIn,
@@ -29,7 +29,6 @@ import { useLogoutMutation } from "@/store/slices/userApi";
 import { toast } from "sonner";
 import { Link } from "react-router";
 
-// Mock Data: Cart ထဲက ပစ္စည်းများကို နမူနာပြသရန်
 interface CartItem {
   id: number;
   name: string;
@@ -39,7 +38,7 @@ interface CartItem {
   quantity: number;
 }
 
-const Navbar: React.FC = () => {
+const Navbar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
@@ -176,7 +175,10 @@ const Navbar: React.FC = () => {
                   <DropdownMenuContent align="end">
                     <DropdownMenuGroup>
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                      <DropdownMenuItem> <Link to="/profile">Profile</Link></DropdownMenuItem>
+                      <DropdownMenuItem>
+                        {" "}
+                        <Link to="/profile">Profile</Link>
+                      </DropdownMenuItem>
                       <DropdownMenuItem>Order History</DropdownMenuItem>
                       <DropdownMenuItem>Save Address</DropdownMenuItem>
                     </DropdownMenuGroup>
@@ -188,7 +190,7 @@ const Navbar: React.FC = () => {
                         disabled={isLoading}
                       >
                         {" "}
-                        <LogOutIcon size={18} className="text-red-400"/>
+                        <LogOutIcon size={18} className="text-red-400" />
                         <span className="text-red-400">Logout</span>
                       </DropdownMenuItem>
                     </DropdownMenuGroup>

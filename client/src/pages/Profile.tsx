@@ -16,9 +16,9 @@ import NameUpdateForm from "@/components/profile/NameUpdateForm";
 import PasswordUpdateForm from "@/components/profile/PasswordUpdateFrom";
 
 function AccountSettings() {
-  const { data: userInfo, refetch } = useProfileQuery();
+  const { data: userInfo, refetch, isLoading } = useProfileQuery();
   const [avatar, setAvatar] = useState<string | null>(null);
-  const [uploadmutation, { isLoading }] = useUploadMutation();
+  const [uploadmutation, { isLoading: isMutation }] = useUploadMutation();
   const ref = useRef<HTMLInputElement>(null);
 
   const imageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,6 +54,14 @@ function AccountSettings() {
       toast.error(`${(error as { data: { message: string } }).data.message}`);
     }
   };
+
+  if (isLoading) {
+    return (
+      <>
+        <p>Loading...</p>
+      </>
+    );
+  }
 
   return (
     <section className="w-full min-h-screen bg-zinc-50 flex items-center justify-center pt-28 pb-16 px-4">
@@ -100,7 +108,7 @@ function AccountSettings() {
                   onClick={avatarHandler}
                   disabled={isLoading}
                 >
-                  {isLoading ? "Uploading Image" : "Upload Image"}
+                  {isMutation ? "Uploading Image" : "Upload Image"}
                 </Button>
               </div>
 
@@ -112,24 +120,22 @@ function AccountSettings() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-                  {/* LEFT SIDE */}
                   <div className="space-y-6">
                     <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4 hover:shadow-md transition">
                       <h3 className="text-sm font-medium text-gray-500">
                         Update Name
                       </h3>
-                      <NameUpdateForm />
+                      <NameUpdateForm name={userInfo?.user?.name ?? ""} />
                     </div>
 
                     <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4 hover:shadow-md transition">
                       <h3 className="text-sm font-medium text-gray-500">
                         Update Email
                       </h3>
-                      <EmailUpdateForm />
+                      <EmailUpdateForm email={userInfo?.user?.email ?? ""} />
                     </div>
                   </div>
 
-                  {/* RIGHT SIDE */}
                   <div className="space-y-6">
                     <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4 hover:shadow-md transition">
                       <h3 className="text-sm font-medium text-gray-500">
@@ -139,7 +145,7 @@ function AccountSettings() {
                     </div>
 
                     <div className="flex justify-end">
-                      <Button className="bg-black text-white hover:bg-zinc-800 px-8">
+                      <Button className="bg-black cursor-pointer text-white hover:bg-zinc-800 px-8">
                         Back
                       </Button>
                     </div>

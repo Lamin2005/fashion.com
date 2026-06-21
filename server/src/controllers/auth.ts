@@ -129,6 +129,12 @@ export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
 export const emailUpdate = async (req: AuthenticatedRequest, res: Response) => {
   const id = req.user?._id;
   const { email } = req.body;
+  const oldemail = req.user?.email;
+
+  if (oldemail === email) {
+    res.status(400);
+    throw new Error("Use Different email to Update.");
+  }
 
   const existingUser = await User.findOne({ email });
 

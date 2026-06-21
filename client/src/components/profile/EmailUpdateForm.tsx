@@ -4,26 +4,38 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import z from "zod";
 import type { emailSchma } from "@/schema/auth";
+import { useUpdateEmailMutation } from "@/store/slices/userApi";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 type FormValues = z.infer<typeof emailSchma>;
 
-export default function EmailUpdateForm() {
+interface EmailUpdateForm {
+  email: string;
+}
+
+export default function EmailUpdateForm({ email }: EmailUpdateForm) {
   const form = useForm<FormValues>({
     defaultValues: {
-      email: "",
+      email,
     },
   });
 
-  const onSubmit = async (values: FormValues) => {
-    console.log("Updated Email:", values.email);
+  const [updateEmailMutation] = useUpdateEmailMutation();
 
-    // Example API call
-    // await fetch("/api/update-email", {
-    //   method: "PUT",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(values),
-    // });
+  const onSubmit = async (data: FormValues) => {
+    try {
+      const response = await updateEmailMutation(data).unwrap();
+      toast.success(`${response.message}`);
+    } catch (error) {
+      console.log("Update Email Error : ", error);
+      toast.error(`${(error as { data: { message: string } }).data.message}`);
+    }
   };
+
+  useEffect(() => {
+    form.reset({ email });
+  }, [email, form]);
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-md">
@@ -43,7 +55,9 @@ export default function EmailUpdateForm() {
         )}
       />
 
-      <Button type="submit">Update Email</Button>
+      <Button type="submit" className="cursor-pointer">
+        Update Email
+      </Button>
     </form>
   );
 }
