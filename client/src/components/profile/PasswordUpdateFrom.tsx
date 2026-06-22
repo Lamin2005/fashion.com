@@ -3,20 +3,34 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import z from "zod";
-import type { passwordSchma } from "@/schema/auth";
+import { passwordSchma } from "@/schema/auth";
+import { useUpdatePasswordMutation } from "@/store/slices/userApi";
+import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type FormValues = z.infer<typeof passwordSchma>;
 
 export default function PasswordUpdateForm() {
   const form = useForm<FormValues>({
+    resolver : zodResolver(passwordSchma),
     defaultValues: {
       oldPassword: "",
       password: "",
     },
   });
 
-  const onSubmit = async (values: FormValues) => {
-    console.log("Updated password:", values.password);
+  const [updatePasswordMutation, { isLoading }] = useUpdatePasswordMutation();
+
+  const onSubmit = async (data: FormValues) => {
+    try {
+      const response = await updatePasswordMutation(data).unwrap();
+      toast.success(`${response.message}`);
+    } catch (error) {
+      console.log("Password Update Error : ", error);
+      toast.error(`${(error as { data: { message: string } }).data.message}`);
+    } finally {
+      form.reset();
+    }
   };
 
   return (
@@ -61,7 +75,9 @@ export default function PasswordUpdateForm() {
         )}
       />
 
-      <Button type="submit" className="cursor-pointer">Update password</Button>
+      <Button type="submit" className="cursor-pointer" disabled={isLoading}>
+        Update password
+      </Button>
     </form>
   );
 }

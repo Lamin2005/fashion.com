@@ -3,10 +3,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import z from "zod";
-import type { nameSchma } from "@/schema/auth";
+import { nameSchma } from "@/schema/auth";
 import { useUpdateNameMutation } from "@/store/slices/userApi";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type FormValues = z.infer<typeof nameSchma>;
 
@@ -16,12 +17,13 @@ interface NameUpdateForm {
 
 export default function NameUpdateForm({ name }: NameUpdateForm) {
   const form = useForm<FormValues>({
+    resolver: zodResolver(nameSchma),
     defaultValues: {
       name,
     },
   });
 
-  const [updateNameMutation] = useUpdateNameMutation();
+  const [updateNameMutation, { isLoading }] = useUpdateNameMutation();
 
   const onSubmit = async (data: FormValues) => {
     try {
@@ -33,9 +35,9 @@ export default function NameUpdateForm({ name }: NameUpdateForm) {
     }
   };
 
-  useEffect(()=>{
-    form.reset({name});
-  },[name,form])
+  useEffect(() => {
+    form.reset({ name });
+  }, [name, form]);
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 max-w-md">
@@ -55,7 +57,7 @@ export default function NameUpdateForm({ name }: NameUpdateForm) {
         )}
       />
 
-      <Button type="submit" className="cursor-pointer">
+      <Button type="submit" className="cursor-pointer" disabled={isLoading}>
         Update name
       </Button>
     </form>

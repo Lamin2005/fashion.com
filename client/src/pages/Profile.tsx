@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import EmailUpdateForm from "@/components/profile/EmailUpdateForm";
 import NameUpdateForm from "@/components/profile/NameUpdateForm";
 import PasswordUpdateForm from "@/components/profile/PasswordUpdateFrom";
+import { Link } from "react-router";
 
 function AccountSettings() {
   const { data: userInfo, refetch, isLoading } = useProfileQuery();
@@ -145,9 +146,11 @@ function AccountSettings() {
                     </div>
 
                     <div className="flex justify-end">
-                      <Button className="bg-black cursor-pointer text-white hover:bg-zinc-800 px-8">
-                        Back
-                      </Button>
+                      <Link to="/">
+                        <Button className="bg-black cursor-pointer text-white hover:bg-zinc-800 px-8">
+                          Back
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </div>

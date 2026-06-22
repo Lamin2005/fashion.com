@@ -133,7 +133,7 @@ export const emailUpdate = async (req: AuthenticatedRequest, res: Response) => {
 
   if (oldemail === email) {
     res.status(400);
-    throw new Error("Use Different email to Update.");
+    throw new Error("Use Different Email to Update.");
   }
 
   const existingUser = await User.findOne({ email });
@@ -155,6 +155,12 @@ export const emailUpdate = async (req: AuthenticatedRequest, res: Response) => {
 export const nameUpdate = async (req: AuthenticatedRequest, res: Response) => {
   const id = req.user?._id;
   const { name } = req.body;
+  const oldname = req.user?.name;
+
+  if (oldname === name) {
+    res.status(400);
+    throw new Error("Use Different Name to Update.");
+  }
 
   const emailupdate = await User.findByIdAndUpdate(id, { name });
 

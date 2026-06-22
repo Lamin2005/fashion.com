@@ -175,17 +175,24 @@ const Navbar = () => {
                   <DropdownMenuContent align="end">
                     <DropdownMenuGroup>
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                      <DropdownMenuItem>
-                        {" "}
-                        <Link to="/profile">Profile</Link>
+                      <Link to="/profile">
+                        <DropdownMenuItem className="cursor-pointer">
+                          Profile
+                        </DropdownMenuItem>
+                      </Link>
+                      <DropdownMenuItem className="cursor-pointer">
+                        Order History
                       </DropdownMenuItem>
-                      <DropdownMenuItem>Order History</DropdownMenuItem>
-                      <DropdownMenuItem>Save Address</DropdownMenuItem>
+                      <DropdownMenuItem className="cursor-pointer">
+                        Save Address
+                      </DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                       <DropdownMenuItem
-                        className="cursor-pointer hover:bg-red-400"
+                        className="cursor-pointer
+                           data-highlighted:bg-red-200
+                          "
                         onClick={logoutHandler}
                         disabled={isLoading}
                       >

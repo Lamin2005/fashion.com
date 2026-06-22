@@ -3,10 +3,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import z from "zod";
-import type { emailSchma } from "@/schema/auth";
+import { emailSchma } from "@/schema/auth";
 import { useUpdateEmailMutation } from "@/store/slices/userApi";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type FormValues = z.infer<typeof emailSchma>;
 
@@ -16,12 +17,13 @@ interface EmailUpdateForm {
 
 export default function EmailUpdateForm({ email }: EmailUpdateForm) {
   const form = useForm<FormValues>({
+    resolver: zodResolver(emailSchma),
     defaultValues: {
       email,
     },
   });
 
-  const [updateEmailMutation] = useUpdateEmailMutation();
+  const [updateEmailMutation, { isLoading }] = useUpdateEmailMutation();
 
   const onSubmit = async (data: FormValues) => {
     try {
@@ -55,7 +57,7 @@ export default function EmailUpdateForm({ email }: EmailUpdateForm) {
         )}
       />
 
-      <Button type="submit" className="cursor-pointer">
+      <Button type="submit" className="cursor-pointer" disabled={isLoading}>
         Update Email
       </Button>
     </form>

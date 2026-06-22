@@ -12,7 +12,10 @@ export const loginSchema = z.object({
 });
 
 export const emailSchma = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z
+    .string()
+    .nonempty("Email is required to update")
+    .email("Invalid email address"),
 });
 
 export const nameSchma = z.object({
@@ -20,6 +23,9 @@ export const nameSchma = z.object({
 });
 
 export const passwordSchma = z.object({
-  oldPassword: z.string().nonempty("Old Password is required."),
-  password: z.string().min(6, "Password must be at least 6 characters long"),
+  oldPassword: z.string().nonempty("Old Password is required"),
+  password: z
+    .string()
+    .nonempty("Password is required to update")
+    .min(6, "Password must be at least 6 characters long"),
 });

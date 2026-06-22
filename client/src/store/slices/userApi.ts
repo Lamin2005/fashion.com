@@ -24,7 +24,7 @@ interface updateName {
 
 interface updatePassword {
   oldPassword: string;
-  email: string;
+  password: string;
 }
 const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
