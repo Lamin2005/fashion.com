@@ -8,6 +8,7 @@ import {
   emailUpdate,
   nameUpdate,
   passwordUpdate,
+  sendEmailltoUser,
 } from "../controllers/auth";
 import asyncHandler from "../utils/asyncHandler";
 import {
@@ -60,5 +61,6 @@ router.post(
   authMiddleware,
   asyncHandler(passwordUpdate),
 );
+router.post("/reset-password", authMiddleware, asyncHandler(sendEmailltoUser));
 
 export default router;
