@@ -77,7 +77,7 @@ userSchema.methods.generateResetToken = function () {
 
   this.resetToken = crypto.createHash("sha256").update(token).digest("hex");
 
-  this.tokenExpire = new Date(Date.now() + 60 * 1000);
+  this.tokenExpire = new Date(Date.now() + 10 * 60 * 1000);
 
   return token;
 };

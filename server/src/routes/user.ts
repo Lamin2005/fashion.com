@@ -18,6 +18,7 @@ import {
   emailUpdateValidator,
   nameUpdateValidator,
   passwordUpdateValidator,
+  forgetEmailValidator,
 } from "../validator/users";
 import { validateRequest } from "../middlewares/validatorRequest";
 import { authMiddleware } from "../middlewares/authmiddleware";
@@ -61,6 +62,12 @@ router.post(
   authMiddleware,
   asyncHandler(passwordUpdate),
 );
-router.post("/reset-password", authMiddleware, asyncHandler(sendEmailltoUser));
+router.post(
+  "/forget-password",
+  forgetEmailValidator,
+  validateRequest,
+  authMiddleware,
+  asyncHandler(sendEmailltoUser),
+);
 
 export default router;
