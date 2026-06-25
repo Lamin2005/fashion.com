@@ -215,11 +215,10 @@ export const sendEmailltoUser = async (
   req: AuthenticatedRequest,
   res: Response,
 ) => {
-  const id = req.user?._id;
   const { email } = req.body;
   const userName = req.user?.name;
 
-  const existingUser = await User.findById(id);
+  const existingUser = await User.findOne({ email });
 
   if (!existingUser) {
     res.status(400);
@@ -235,11 +234,11 @@ export const sendEmailltoUser = async (
   try {
     await sendingEmail({
       receiver_email: email!,
-      subject: "Password Reset FROM - Fashion.com",
+      subject: "Password Reset Link from - Fashion.com",
       html: mailbody,
     });
 
-    res.status(200).json({ message: "Reset Password Email Send." });
+    res.status(200).json({ message: "Password reset link sent to your email" });
   } catch (error) {
     console.log("Email Sending Error : ", error);
     existingUser.resetToken = undefined;
@@ -256,6 +255,7 @@ export const resetPassword = async (
   res: Response,
 ) => {
   const { token } = req.params;
+  const { newPassword } = req.body;
 
   const tokenValue = Array.isArray(token) ? token[0] : token;
   if (!tokenValue)
@@ -266,5 +266,23 @@ export const resetPassword = async (
     .update(tokenValue)
     .digest("hex");
 
-  
+  const user = await User.findOne({
+    resetToken: hashedToken,
+    tokenExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    res.status(400);
+    throw new Error(
+      "Reset Token is Invalid, Request Email again to get Token ",
+    );
+  }
+
+  user.password = newPassword;
+  user.resetToken = undefined;
+  user.tokenExpire = undefined;
+
+  await user.save();
+
+  res.status(200).json({ message: "Reset Password is successfully" });
 };

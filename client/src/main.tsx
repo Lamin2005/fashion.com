@@ -15,6 +15,7 @@ import { Provider } from "react-redux";
 import { Toaster } from "sonner";
 import Profile from "./pages/Profile.tsx";
 import ProtectedRoute from "./routes/ProtectedRoute.tsx";
+import ResetPasswordForm from "./pages/ResetPasswordForm.tsx";
 
 const router = createBrowserRouter([
   {
@@ -56,6 +57,11 @@ const router = createBrowserRouter([
             <Profile />
           </ProtectedRoute>
         ),
+      },
+
+      {
+        path: "/reset-password",
+        element: <ResetPasswordForm />,
       },
     ],
   },

@@ -15,6 +15,8 @@ import EmailUpdateForm from "@/components/profile/EmailUpdateForm";
 import NameUpdateForm from "@/components/profile/NameUpdateForm";
 import PasswordUpdateForm from "@/components/profile/PasswordUpdateFrom";
 import { Link } from "react-router";
+import PageSkeleton from "@/components/common/PageSkeleton";
+import ForgotPasswordForm from "@/components/profile/ForgotPasswordForm";
 
 function AccountSettings() {
   const { data: userInfo, refetch, isLoading } = useProfileQuery();
@@ -59,7 +61,7 @@ function AccountSettings() {
   if (isLoading) {
     return (
       <>
-        <p>Loading...</p>
+        <PageSkeleton type="profile" />
       </>
     );
   }
@@ -143,6 +145,13 @@ function AccountSettings() {
                         Change Password
                       </h3>
                       <PasswordUpdateForm />
+                    </div>
+
+                    <div className="rounded-xl border bg-white p-6 shadow-sm space-y-4 hover:shadow-md transition">
+                      <h3 className="text-sm font-medium text-gray-500">
+                        Forgot Password
+                      </h3>
+                      <ForgotPasswordForm />
                     </div>
 
                     <div className="flex justify-end">

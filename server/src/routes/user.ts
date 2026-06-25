@@ -63,10 +63,9 @@ router.post(
   asyncHandler(passwordUpdate),
 );
 router.post(
-  "/forget-password",
+  "/forgot-password",
   forgetEmailValidator,
   validateRequest,
-  authMiddleware,
   asyncHandler(sendEmailltoUser),
 );
 
