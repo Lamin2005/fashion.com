@@ -14,7 +14,7 @@ interface avatarUpload {
   image_url: string;
 }
 
-interface updateEmail {
+interface Email {
   email: string;
 }
 
@@ -26,6 +26,12 @@ interface updatePassword {
   oldPassword: string;
   password: string;
 }
+
+interface resetPassword {
+  token: string;
+  password: string;
+}
+
 const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     register: builder.mutation({
@@ -69,7 +75,7 @@ const userApi = apiSlice.injectEndpoints({
     }),
 
     updateEmail: builder.mutation({
-      query: (data: updateEmail) => ({
+      query: (data: Email) => ({
         url: "/email-update",
         method: "POST",
         body: data,
@@ -93,6 +99,24 @@ const userApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+
+    forgotPassword: builder.mutation({
+      query: (data: Email) => ({
+        url: "/forgot-password",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
+    resetPassword: builder.mutation({
+      query: (data: resetPassword) => ({
+        url: `/reset-password/${data.token}`,
+        method: "POST",
+        body: {
+          password: data.password,
+        },
+      }),
+    }),
   }),
 });
 
@@ -105,4 +129,6 @@ export const {
   useUpdateEmailMutation,
   useUpdateNameMutation,
   useUpdatePasswordMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
 } = userApi;

@@ -45,7 +45,7 @@ export const forgetEmailValidator = [
 ];
 
 export const resetPasswordValidator = [
-  body("newPassword")
+  body("password")
     .notEmpty()
     .withMessage("New Password is required")
     .isLength({ min: 6 })

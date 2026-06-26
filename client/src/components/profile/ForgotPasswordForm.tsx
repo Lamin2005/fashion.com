@@ -1,30 +1,28 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useForgotPasswordMutation } from "@/store/slices/userApi";
 
-export default function ForgotPasswordForm() {
-  const [loading, setLoading] = useState(false);
+interface Prop {
+  email: string;
+}
+
+export default function ForgotPasswordForm({ email }: Prop) {
+  const [forgotPasswordMutation, { isLoading }] = useForgotPasswordMutation();
 
   const handleSendResetLink = async () => {
     try {
-      setLoading(true);
-
-      await new Promise((res) => setTimeout(res, 1500));
-
-      toast.success("Password reset link sent to your email");
+      const response = await forgotPasswordMutation({ email }).unwrap();
+      toast.success(`${response.message}`);
     } catch (error) {
       console.log("Forgot Password Form Error : ", error);
-
-      toast.error("Failed to send reset link");
-    } finally {
-      setLoading(false);
+      toast.error(`${(error as { data: { message: string } }).data.message}`);
     }
   };
 
   return (
     <Button
       onClick={handleSendResetLink}
-      disabled={loading}
+      disabled={isLoading}
       className="
         w-full
         bg-zinc-900
@@ -44,7 +42,7 @@ export default function ForgotPasswordForm() {
         flex items-center justify-center gap-2
       "
     >
-      {loading ? "Sending Link..." : "Send Reset Link"}
+      {isLoading ? "Sending Link..." : "Send Reset Link"}
     </Button>
   );
 }

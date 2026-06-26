@@ -250,16 +250,15 @@ export const sendEmailltoUser = async (
 // @desc user's password reset
 // @access Private
 
-export const resetPassword = async (
-  req: AuthenticatedRequest,
-  res: Response,
-) => {
+export const resetPassword = async (req: Request, res: Response) => {
   const { token } = req.params;
-  const { newPassword } = req.body;
+  const { password } = req.body;
 
   const tokenValue = Array.isArray(token) ? token[0] : token;
-  if (!tokenValue)
-    return res.status(400).json({ message: "Invalid or missing token." });
+  if (!tokenValue) {
+    res.status(400);
+    throw new Error("Invalid or missing token");
+  }
 
   const hashedToken = crypto
     .createHash("sha256")
@@ -273,12 +272,10 @@ export const resetPassword = async (
 
   if (!user) {
     res.status(400);
-    throw new Error(
-      "Reset Token is Invalid, Request Email again to get Token ",
-    );
+    throw new Error("Reset Token is Invalid, Request Email again to get Token");
   }
 
-  user.password = newPassword;
+  user.password = password;
   user.resetToken = undefined;
   user.tokenExpire = undefined;
 

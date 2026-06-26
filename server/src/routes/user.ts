@@ -9,6 +9,7 @@ import {
   nameUpdate,
   passwordUpdate,
   sendEmailltoUser,
+  resetPassword,
 } from "../controllers/auth";
 import asyncHandler from "../utils/asyncHandler";
 import {
@@ -19,6 +20,7 @@ import {
   nameUpdateValidator,
   passwordUpdateValidator,
   forgetEmailValidator,
+  resetPasswordValidator,
 } from "../validator/users";
 import { validateRequest } from "../middlewares/validatorRequest";
 import { authMiddleware } from "../middlewares/authmiddleware";
@@ -67,6 +69,12 @@ router.post(
   forgetEmailValidator,
   validateRequest,
   asyncHandler(sendEmailltoUser),
+);
+router.post(
+  "/reset-password/:token",
+  resetPasswordValidator,
+  validateRequest,
+  asyncHandler(resetPassword),
 );
 
 export default router;

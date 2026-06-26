@@ -151,7 +151,9 @@ function AccountSettings() {
                       <h3 className="text-sm font-medium text-gray-500">
                         Forgot Password
                       </h3>
-                      <ForgotPasswordForm />
+                      <ForgotPasswordForm
+                        email={userInfo?.user ? userInfo?.user?.email : ""}
+                      />
                     </div>
 
                     <div className="flex justify-end">
