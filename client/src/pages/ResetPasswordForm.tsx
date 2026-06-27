@@ -5,11 +5,13 @@ import z from "zod";
 import { resetPasswordSchema } from "@/schema/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  // useLogoutMutation,
+  useLogoutMutation,
   useResetPasswordMutation,
 } from "@/store/slices/userApi";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { clearUserInfo } from "@/store/slices/auth";
 
 type FormValues = z.infer<typeof resetPasswordSchema>;
 
@@ -23,8 +25,9 @@ export default function ResetPasswordForm() {
   });
 
   const [resetPasswordMutation, { isLoading }] = useResetPasswordMutation();
-  // const [logoutMutation] = useLogoutMutation();
   const { token } = useParams();
+  const [logoutMutation] = useLogoutMutation();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const onSubmit = async (data: FormValues) => {
@@ -33,7 +36,9 @@ export default function ResetPasswordForm() {
         password: data.password,
         token: token!,
       }).unwrap();
-      navigate("/");
+      await logoutMutation({});
+      dispatch(clearUserInfo());
+      navigate("/login");
       toast.success(`${response.message}`);
     } catch (error) {
       console.error(error);

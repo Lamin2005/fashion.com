@@ -91,12 +91,12 @@ const Login = () => {
               <label className="text-[11px] font-bold text-zinc-700 uppercase tracking-widest">
                 Password
               </label>
-              <a
-                href="#"
+              <Link
+                to="/forgot-password"
                 className="text-xs text-zinc-400 hover:text-zinc-900 transition-colors underline underline-offset-2"
               >
                 Forgot?
-              </a>
+              </Link>
             </div>
             <div className="relative">
               <input

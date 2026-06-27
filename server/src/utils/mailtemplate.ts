@@ -1,5 +1,5 @@
 interface ResetPasswordMailProps {
-  userName: string | undefined;
+  userName: string;
   resetUrl: string;
 }
 

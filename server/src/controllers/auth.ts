@@ -216,7 +216,6 @@ export const sendEmailltoUser = async (
   res: Response,
 ) => {
   const { email } = req.body;
-  const userName = req.user?.name;
 
   const existingUser = await User.findOne({ email });
 
@@ -224,6 +223,8 @@ export const sendEmailltoUser = async (
     res.status(400);
     throw new Error("User Not Found.");
   }
+
+  const userName = existingUser.name;
 
   const token = await existingUser.generateResetToken();
   await existingUser.save();
