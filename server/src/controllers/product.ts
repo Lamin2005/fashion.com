@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Product from "../model/product";
 import { AuthenticatedRequest } from "../middlewares/authmiddleware";
 
-//@route POST /api/product/create
+// @route POST /api/products/create
 //@desc Create a new product
 //@access Private
 
@@ -49,16 +49,16 @@ export const createProduct = async (
   res.status(201).json({ messsage: "Successfully create Product.", product });
 };
 
-// @route GET /api/product
+// @route GET /api/products
 // @desc Get all products
 // @access Public
 
-export const getAllProducts = async (req: Request, res: Response) => {
-  const products = await Product.find().populate("user", "name email");
-  res.status(200).json({ products });
-};
+// export const getAllProducts = async (req: Request, res: Response) => {
+//   const products = await Product.find().populate("user", "name email");
+//   res.status(200).json({ products });
+// };
 
-// @route GET /api/product/:id
+// @route GET /api/products/:id
 // @desc Get product by id
 // @access Public
 
@@ -72,7 +72,7 @@ export const getProductById = async (req: Request, res: Response) => {
   res.status(200).json({ product });
 };
 
-// @route DELETE /api/product/:id
+// @route DELETE /api/products/:id
 // @desc Delete product by id
 // @access Private
 
@@ -96,7 +96,7 @@ export const deleteProduct = async (
   res.status(200).json({ message: "Product removed successfully" });
 };
 
-// @route PUT /api/product/:id
+// @route PUT /api/products/:id
 // @desc Update product by id
 // @access Private
 
@@ -145,4 +145,82 @@ export const updateProduct = async (
   await product.save();
 
   res.status(200).json({ message: "Product updated successfully", product });
+};
+
+// @route POST /api/products/keywords=t-shirt&minPrice=50&maxPrice=100
+// @desc find product with filter
+// @access Public
+
+export const getProductwithFilter = async (req: Request, res: Response) => {
+  const { keyword, category, maxPrice, minPrice, sizes, colors, sortBy } =
+    req.query;
+
+  const query: any = {};
+
+  if (keyword) {
+    query.name = { $regex: keyword, $options: "i" };
+  }
+
+  if (category) {
+    query.category = category;
+  }
+
+  if (minPrice || maxPrice) {
+    query.price = {};
+
+    if (minPrice) {
+      query.price.$gte = Number(minPrice);
+    }
+
+    if (maxPrice) {
+      query.price.$lte = Number(maxPrice);
+    }
+  }
+
+  if (sizes) {
+    query.sizes = { $in: [sizes] };
+  }
+
+  if (colors) {
+    query.colors = { $in: [colors] };
+  }
+
+  const sortOption: any = {};
+
+  if (sortBy === "asc") {
+    sortOption.price = 1;
+  }
+  if (sortBy === "des") {
+    sortOption.price = -1;
+  }
+
+  if (sortBy === "latest") {
+    sortOption.createdAt = -1;
+  }
+
+  if (sortBy === "rating") {
+    sortOption.rating_count = -1;
+  }
+
+  const products = await Product.find(query).sort(sortOption);
+
+  res.status(200).json({ message: "Product Filter Successfully", products });
+};
+
+// @route POST /api/products/new
+// @desc find new products
+// @access Public
+
+export const getnewProduct = async (req: Request, res: Response) => {
+  const NewProduct = await Product.find({ is_new_arrival: true }).sort({
+    createdAt: -1,
+  });
+
+  res.status(200).json(NewProduct);
+};
+
+export const getfeaturedProduct = async (req: Request, res: Response) => {
+  const FeatureProduct = await Product.find({ is_feature: true });
+
+  res.status(200).json(FeatureProduct);
 };

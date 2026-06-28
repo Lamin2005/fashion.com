@@ -36,7 +36,7 @@ const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     register: builder.mutation({
       query: (data: Register) => ({
-        url: "/register",
+        url: "/users/register",
         method: "POST",
         body: data,
       }),
@@ -44,7 +44,7 @@ const userApi = apiSlice.injectEndpoints({
 
     login: builder.mutation({
       query: (data: Login) => ({
-        url: "/login",
+        url: "/users/login",
         method: "POST",
         body: data,
       }),
@@ -52,14 +52,14 @@ const userApi = apiSlice.injectEndpoints({
 
     logout: builder.mutation({
       query: () => ({
-        url: "/logout",
+        url: "/users/logout",
         method: "POST",
       }),
     }),
 
     profile: builder.query<User, void>({
       query: () => ({
-        url: "/me",
+        url: "/users/me",
         method: "GET",
       }),
       providesTags: ["User"],
@@ -67,7 +67,7 @@ const userApi = apiSlice.injectEndpoints({
 
     upload: builder.mutation({
       query: (data: avatarUpload) => ({
-        url: "/upload",
+        url: "/users/upload",
         method: "POST",
         body: data,
       }),
@@ -76,7 +76,7 @@ const userApi = apiSlice.injectEndpoints({
 
     updateEmail: builder.mutation({
       query: (data: Email) => ({
-        url: "/email-update",
+        url: "/users/email-update",
         method: "POST",
         body: data,
       }),
@@ -85,7 +85,7 @@ const userApi = apiSlice.injectEndpoints({
 
     updateName: builder.mutation({
       query: (data: updateName) => ({
-        url: "/name-update",
+        url: "/users/name-update",
         method: "POST",
         body: data,
       }),
@@ -94,7 +94,7 @@ const userApi = apiSlice.injectEndpoints({
 
     updatePassword: builder.mutation({
       query: (data: updatePassword) => ({
-        url: "/password-update",
+        url: "/users/password-update",
         method: "POST",
         body: data,
       }),
@@ -102,7 +102,7 @@ const userApi = apiSlice.injectEndpoints({
 
     forgotPassword: builder.mutation({
       query: (data: Email) => ({
-        url: "/forgot-password",
+        url: "/users/forgot-password",
         method: "POST",
         body: data,
       }),
@@ -110,7 +110,7 @@ const userApi = apiSlice.injectEndpoints({
 
     resetPassword: builder.mutation({
       query: (data: resetPassword) => ({
-        url: `/reset-password/${data.token}`,
+        url: `/users/reset-password/${data.token}`,
         method: "POST",
         body: {
           password: data.password,
