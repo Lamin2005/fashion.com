@@ -9,6 +9,8 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+// import { useGetProductDetailQuery } from "@/store/slices/productApi";
+// import { useParams } from "react-router";
 
 const productData = {
   id: "prod_001",
@@ -41,6 +43,9 @@ const productData = {
 };
 
 const ProductDetail = () => {
+  // const { id } = useParams();
+  // const { data : product } = useGetProductDetailQuery(id);
+
   const [mainImage, setMainImage] = useState<string>(productData.images[0]);
   const [selectedColor, setSelectedColor] = useState(productData.colors[0]);
   const [selectedSize, setSelectedSize] = useState<string>("M");

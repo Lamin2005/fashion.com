@@ -6,7 +6,10 @@ const productApi = apiSlice.injectEndpoints({
     getnewProduct: builder.query<Product[], void>({
       query: () => "/products/new",
     }),
+    getProductDetail: builder.query<Product, string>({
+      query: (id: string) => `/products/${id}`,
+    }),
   }),
 });
 
-export const { useGetnewProductQuery } = productApi;
+export const { useGetnewProductQuery, useGetProductDetailQuery } = productApi;

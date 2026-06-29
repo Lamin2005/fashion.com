@@ -1,9 +1,10 @@
-interface Image {
+export interface Image {
   url: string;
 }
 
 export interface Product {
   _id: string;
+  description: string;
   name: string;
   category: string;
   price: number;
