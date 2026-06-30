@@ -12,6 +12,7 @@ import {
 // import { useGetProductDetailQuery } from "@/store/slices/productApi";
 // import { useParams } from "react-router";
 
+
 const productData = {
   id: "prod_001",
   name: "Oversized Tailored Wool Blazer",
