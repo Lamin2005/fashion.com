@@ -216,11 +216,11 @@ export const getnewProduct = async (req: Request, res: Response) => {
     createdAt: -1,
   });
 
-  res.status(200).json(NewProduct);
+  res.status(200).json( NewProduct );
 };
 
 export const getfeaturedProduct = async (req: Request, res: Response) => {
   const FeatureProduct = await Product.find({ is_feature: true });
 
-  res.status(200).json(FeatureProduct);
+  res.status(200).json( FeatureProduct );
 };
