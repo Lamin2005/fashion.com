@@ -27,7 +27,8 @@ import { useDispatch } from "react-redux";
 import { clearUserInfo } from "@/store/slices/auth";
 import { useLogoutMutation } from "@/store/slices/userApi";
 import { toast } from "sonner";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { debounce } from "lodash";
 
 interface CartItem {
   id: number;
@@ -43,8 +44,10 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const { userInfo } = useSelector((state: RootState) => state.auth);
+  const [keyword, setKeyword] = useState<string>("");
   const dispatch = useDispatch();
   const [logoutMutation, { isLoading }] = useLogoutMutation();
+  const navigate = useNavigate();
 
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
 
@@ -75,6 +78,13 @@ const Navbar = () => {
     { name: "Collections", path: "/collections" },
     { name: "About", path: "/about" },
   ];
+
+  const searchProducts = debounce((searchTerm: string) => {
+    if (searchTerm.trim() !== "") {
+      navigate(`/products/filters?keyword=${encodeURIComponent(searchTerm)}`);
+    }
+    console.log(searchTerm);
+  }, 500);
 
   const updateQuantity = (id: number, type: "increase" | "decrease") => {
     setCartItems((prevItems) =>
@@ -305,6 +315,8 @@ const Navbar = () => {
             : "-translate-y-full opacity-0 invisible"
         }`}
       >
+        {/* Search Bar Input */}
+
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <div className="flex items-center space-x-4 w-full max-w-3xl">
             <Search className="text-zinc-400" size={22} strokeWidth={1.5} />
@@ -313,6 +325,11 @@ const Navbar = () => {
               placeholder="Search products, collections, clothing..."
               className="w-full bg-transparent text-zinc-900 text-lg placeholder-zinc-400 border-none outline-none focus:ring-0"
               autoFocus={isSearchOpen}
+              value={keyword}
+              onChange={(e) => {
+                setKeyword(e.target.value);
+                searchProducts(e.target.value);
+              }}
             />
           </div>
 

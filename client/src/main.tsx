@@ -17,6 +17,7 @@ import Profile from "./pages/Profile.tsx";
 import ProtectedRoute from "./routes/ProtectedRoute.tsx";
 import ResetPasswordForm from "./pages/ResetPasswordForm.tsx";
 import ExternalForgotPasswordForm from "./components/profile/ExternalForgotPasswordForm.tsx";
+import ProductFilter from "./pages/ProductFilter.tsx";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,12 @@ const router = createBrowserRouter([
         path: "/register",
         element: <Register />,
       },
+
+      {
+        path: "/products/filters",
+        element: <ProductFilter />,
+      },
+
       {
         path: "/products/:id",
         element: <ProductDetail />,
