@@ -8,6 +8,9 @@ const productApi = apiSlice.injectEndpoints({
     }),
     getProductDetail: builder.query<Product, string>({
       query: (id: string) => `/products/${id}`,
+      transformResponse: (response: { product: Product }) => {
+        return response.product;
+      },
     }),
     getProducts: builder.query({
       query: ({
@@ -29,10 +32,14 @@ const productApi = apiSlice.injectEndpoints({
         if (maxPrice) params.append("maxPrice", maxPrice);
         if (sortBy) params.append("sortBy", sortBy);
 
-        return `/products/${params.toString()}`;
+        return `/products/?${params.toString()}`;
       },
     }),
   }),
 });
 
-export const { useGetnewProductQuery, useGetProductDetailQuery, useGetProductsQuery } = productApi;
+export const {
+  useGetnewProductQuery,
+  useGetProductDetailQuery,
+  useGetProductsQuery,
+} = productApi;

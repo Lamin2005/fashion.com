@@ -16,19 +16,19 @@ const ProductDetail = () => {
   const { id } = useParams();
   const { data } = useGetProductDetailQuery(id!);
 
-  const [mainImage, setMainImage] = useState<string>(
-    data?.product?.images?.[0]?.url ?? "",
+  const [mainImage, setMainImage] = useState<string | undefined>(
+    data?.images?.[0]?.url ?? undefined,
   );
-  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
   const [selectedSize, setSelectedSize] = useState<string>("M");
   const [isDetailsOpen, setIsDetailsOpen] = useState<boolean>(true);
   const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
 
   useEffect(() => {
-    if (data?.product.images && data.product.images.length > 0) {
+    if (data?.images && data.images.length > 0) {
       const t = setTimeout(() => {
-        setMainImage(data.product.images[0].url);
-        setSelectedColor(data.product.colors[0]);
+        setMainImage(data.images[0].url);
+        setSelectedColor(data.colors[0]);
       }, 0);
       return () => clearTimeout(t);
     }
@@ -50,7 +50,7 @@ const ProductDetail = () => {
 
                   <img
                     src={mainImage}
-                    alt={data?.product.name}
+                    alt={data?.name}
                     className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
                   />
 
@@ -61,7 +61,7 @@ const ProductDetail = () => {
               </div>
 
               <div className="flex lg:flex-col flex-row gap-3 lg:justify-start justify-center">
-                {data?.product?.images?.map((img, index) => (
+                {data?.images?.map((img, index) => (
                   <button
                     key={index}
                     onClick={() => setMainImage(img.url)}
@@ -97,7 +97,7 @@ const ProductDetail = () => {
                 <div className="flex items-center space-x-1">
                   <Star size={14} className="fill-yellow-400 text-yellow-400" />
                   <span className="text-xs font-bold font-mono">
-                    {data?.product.rating_count}
+                    {data?.rating_count}
                   </span>
                   {/* <span className="text-xs text-zinc-400 font-light">
                     ({productData.reviewsCount})
@@ -105,10 +105,10 @@ const ProductDetail = () => {
                 </div>
               </div>
               <h1 className="text-3xl font-bold tracking-tight text-zinc-900 uppercase leading-none">
-                {data?.product.name}
+                {data?.name}
               </h1>
               <p className="text-2xl font-mono text-zinc-900 pt-1">
-                {data?.product.price.toLocaleString("en-US", {
+                {data?.price.toLocaleString("en-US", {
                   style: "currency",
                   currency: "USD",
                 })}
@@ -118,7 +118,7 @@ const ProductDetail = () => {
             <hr className="border-zinc-100" />
 
             <p className="text-sm text-zinc-500 font-light leading-relaxed">
-              {data?.product.description}
+              {data?.description}
             </p>
 
             <div className="space-y-3">
@@ -132,7 +132,7 @@ const ProductDetail = () => {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                {data?.product.colors.map((color) => (
+                {data?.colors.map((color) => (
                   <button
                     key={color}
                     onClick={() => setSelectedColor(color)}
@@ -164,7 +164,7 @@ const ProductDetail = () => {
                 </a>
               </div>
               <div className="grid grid-cols-5 gap-2">
-                {data?.product.sizes.map((size) => (
+                {data?.sizes.map((size) => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}

@@ -1,4 +1,5 @@
 import { useGetnewProductQuery } from "@/store/slices/productApi";
+import type { Product } from "@/types/product";
 import { Heart, ShoppingBag, Star } from "lucide-react";
 
 const TrendingProducts = () => {
@@ -23,7 +24,7 @@ const TrendingProducts = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
-          {products.map((product) => (
+          {products?.map((product: Product) => (
             <div
               key={product._id}
               className="group relative flex flex-col justify-between"
@@ -59,7 +60,7 @@ const TrendingProducts = () => {
                     {product.category}
                   </p>
                   <h3 className="text-sm font-semibold text-zinc-800 group-hover:text-zinc-900 transition-colors line-clamp-1">
-                    <a href={`/products/${product._id}`}>{product.name}</a>
+                    {product.name}
                   </h3>
 
                   <div className="flex items-center justify-between pt-1">
