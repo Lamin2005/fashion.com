@@ -40,6 +40,6 @@ router.delete(
   isAdmin,
   asyncHandler(deleteProduct),
 );
-router.get("/:id", authMiddleware, isAdmin, asyncHandler(getProductById));
+router.get("/:id", authMiddleware, asyncHandler(getProductById));
 
 export default router;

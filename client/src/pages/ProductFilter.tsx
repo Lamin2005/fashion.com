@@ -19,36 +19,62 @@ function ProductFilter() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const [searchTerm, setSearchTerm] = useState(
-    queryParams.get("keyword") || "",
-  );
   const navigate = useNavigate();
   const Initialkeyword = queryParams.get("keyword") || "";
+  const Initialcategory = queryParams.get("category") || "";
+  const [searchTerm, setSearchTerm] = useState(Initialkeyword || "");
+  const [selectedCategory, setSelectedCategory] = useState(
+    Initialcategory || "All",
+  );
+
   const [filter, setFilter] = useState({
     keyword: Initialkeyword,
+    category: Initialcategory,
   });
 
   const { data: products, isLoading, isError } = useGetProductsQuery(filter);
+  const productList = products?.products || [];
 
-  // ✅ Safe array – adjust the fallback to match your actual API response
-  const productList = Array.isArray(products)
-    ? products
-    : products?.products // if the array is inside `products.products`
-      ? products.products
-      : products?.data // or inside `products.data`
-        ? products.data
-        : [];
-
-  console.log("API response:", products);
-  console.log("Safe array:", productList);
+  console.log(products);
+  console.log(productList);
 
   useEffect(() => {
     const handler = setTimeout(() => {
+      if (searchTerm.trim() === "") {
+        setFilter((prev) => ({ ...prev, keyword: "" }));
+        return;
+      }
       setFilter((prev) => ({ ...prev, keyword: searchTerm }));
+      navigate(`/products/filters/?keyword=${encodeURIComponent(searchTerm)}`, {
+        replace: true,
+      });
     }, 400);
 
     return () => clearTimeout(handler);
-  }, [searchTerm]);
+  }, [searchTerm, navigate]);
+
+  useEffect(() => {
+    if (selectedCategory === "All") {
+      const t = setTimeout(() => {
+        setFilter((prev) => ({ ...prev, category: "" }));
+        navigate("/products/filters/", { replace: true });
+      }, 400);
+      return () => clearTimeout(t);
+    }
+
+    if (selectedCategory !== "All") {
+      const t = setTimeout(() => {
+        setFilter((prev) => ({ ...prev, category: selectedCategory }));
+        navigate(
+          `/products/filters/?category=${encodeURIComponent(selectedCategory)}`,
+          {
+            replace: true,
+          },
+        );
+      }, 400);
+      return () => clearTimeout(t);
+    }
+  }, [selectedCategory, navigate]);
 
   if (isLoading) {
     return (
@@ -70,7 +96,6 @@ function ProductFilter() {
 
   return (
     <div className="w-full min-h-screen bg-white pt-20">
-      {/* Banner & Breadcrumbs */}
       <div className="bg-zinc-50 border-b border-zinc-100 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-2">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900">
@@ -84,7 +109,6 @@ function ProductFilter() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* ---------- Desktop Sidebar (static) ---------- */}
           <aside className="hidden lg:block w-64 shrink-0 space-y-8">
             <div className="space-y-2">
               <h3 className="text-xs font-bold text-zinc-900 uppercase tracking-widest">
@@ -108,6 +132,19 @@ function ProductFilter() {
                   <button
                     key={cat}
                     className="text-sm text-left text-zinc-500 hover:text-zinc-900 transition-colors duration-150 py-0.5 cursor-pointer"
+                    onClick={() => {
+                      setSelectedCategory(cat);
+                      setFilter((prev) => ({
+                        ...prev,
+                        category: cat === "All" ? "" : cat,
+                      }));
+                      navigate(
+                        cat === "All"
+                          ? "/products/filters/"
+                          : `/products/filters/?category=${encodeURIComponent(cat)}`,
+                        { replace: true },
+                      );
+                    }}
                   >
                     {cat}
                   </button>
@@ -144,9 +181,7 @@ function ProductFilter() {
             </button>
           </aside>
 
-          {/* ---------- Right Content ---------- */}
           <div className="flex-1 space-y-6">
-            {/* Toolbar */}
             <div className="flex items-center justify-between border-b border-zinc-100 pb-4">
               <button
                 onClick={() => setIsSidebarOpen(true)}
@@ -183,12 +218,11 @@ function ProductFilter() {
               </div>
             </div>
 
-            {searchTerm !== "" && (
+            {(searchTerm !== "" || selectedCategory !== "All") && (
               <div className="flex flex-wrap items-center gap-2 text-xs">
                 <span className="text-zinc-400">Active Filters:</span>
 
-                {/* Search badge */}
-                {searchTerm && (
+                {searchTerm !== "" && (
                   <span className="inline-flex items-center gap-1 bg-zinc-100 text-zinc-800 px-2.5 py-1 rounded-sm">
                     {searchTerm}
                     <X
@@ -197,39 +231,37 @@ function ProductFilter() {
                       onClick={() => {
                         setSearchTerm("");
                         setFilter((prev) => ({ ...prev, keyword: "" }));
-                        navigate("?", { replace: true });
+                        const newParams = new URLSearchParams(location.search);
+                        newParams.delete("keyword");
+                        navigate(`/products/filters/?${newParams.toString()}`, {
+                          replace: true,
+                        });
                       }}
                     />
                   </span>
                 )}
-                {/* 
-                Category badge (if you have selectedCategory state)
+
                 {selectedCategory !== "All" && (
                   <span className="inline-flex items-center gap-1 bg-zinc-100 text-zinc-800 px-2.5 py-1 rounded-sm">
                     {selectedCategory}
                     <X
                       size={12}
                       className="cursor-pointer"
-                      onClick={() => setSelectedCategory("All")}
+                      onClick={() => {
+                        setSelectedCategory("All");
+                        setFilter((prev) => ({ ...prev, category: "" }));
+                        const newParams = new URLSearchParams(location.search);
+                        newParams.delete("category");
+                        navigate(`/products/filters/?${newParams.toString()}`, {
+                          replace: true,
+                        });
+                      }}
                     />
                   </span>
                 )}
-
-                {/* Price badge (if maxPrice is less than default) */}
-                {/* {maxPrice < 300 && (
-                  <span className="inline-flex items-center gap-1 bg-zinc-100 text-zinc-800 px-2.5 py-1 rounded-sm">
-                    Under ${maxPrice}
-                    <X
-                      size={12}
-                      className="cursor-pointer"
-                      onClick={() => setMaxPrice(300)}
-                    />
-                  </span>
-                )} } */}
               </div>
             )}
 
-            {/* ---------- Product Grid (using safe productList) ---------- */}
             {productList.length === 0 ? (
               <div className="text-center py-20 text-zinc-500">
                 No products found.
@@ -288,7 +320,6 @@ function ProductFilter() {
               </div>
             )}
 
-            {/* Load More – static */}
             {productList.length > 0 && (
               <div className="pt-16 text-center">
                 <button className="inline-flex items-center justify-center border border-zinc-900 text-zinc-900 hover:bg-zinc-900 hover:text-white text-xs font-bold px-8 py-4 transition-colors duration-300 cursor-pointer">
@@ -300,7 +331,6 @@ function ProductFilter() {
         </div>
       </div>
 
-      {/* ---------- Mobile Sidebar Drawer (static) ---------- */}
       <div
         className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-50 transition-opacity duration-300 lg:hidden ${
           isSidebarOpen ? "opacity-100 visible" : "opacity-0 invisible"
@@ -332,6 +362,8 @@ function ProductFilter() {
             <input
               type="text"
               placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full text-sm px-4 py-2 bg-zinc-50 border border-zinc-200 outline-none"
             />
           </div>
@@ -344,6 +376,19 @@ function ProductFilter() {
               {categories.map((cat) => (
                 <button
                   key={cat}
+                  onClick={() => {
+                    setSelectedCategory(cat);
+                    setFilter((prev) => ({
+                      ...prev,
+                      category: cat === "All" ? "" : cat,
+                    }));
+                    navigate(
+                      cat === "All"
+                        ? "/products/filters/"
+                        : `/products/filters/?category=${encodeURIComponent(cat)}`,
+                      { replace: true },
+                    );
+                  }}
                   className="text-xs px-3 py-1.5 border border-zinc-200 bg-white text-zinc-600 hover:border-zinc-900 transition-colors"
                 >
                   {cat}
@@ -353,7 +398,16 @@ function ProductFilter() {
           </div>
         </div>
 
-        <button className="w-full bg-zinc-900 text-white py-3 text-xs font-semibold tracking-wide">
+        <button
+          className="w-full bg-zinc-900 text-white py-3 text-xs font-semibold tracking-wide"
+          onClick={() => {
+            setIsSidebarOpen(false);
+            setSearchTerm("");
+            setSelectedCategory("All");
+            setFilter({ keyword: "", category: "" });
+            navigate("/products/filters/", { replace: true });
+          }}
+        >
           Clear All & Close
         </button>
       </div>

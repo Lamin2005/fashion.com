@@ -162,7 +162,7 @@ export const getProductwithFilter = async (req: Request, res: Response) => {
   }
 
   if (category) {
-    query.category = category;
+    query.category = { $regex: `^${category}$`, $options: "i" };
   }
 
   if (minPrice || maxPrice) {
