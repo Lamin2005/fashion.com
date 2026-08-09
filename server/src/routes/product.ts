@@ -13,6 +13,7 @@ import asyncHandler from "../utils/asyncHandler";
 import { authMiddleware, isAdmin } from "../middlewares/authmiddleware";
 import { createProductvalidator } from "../validator/products";
 import { validateRequest } from "../middlewares/validatorRequest";
+import { getMetaProduct } from "../controllers/product";
 
 const router = Router();
 
@@ -32,6 +33,7 @@ router.post(
 router.get("/new", asyncHandler(getnewProduct));
 
 router.get("/featured", asyncHandler(getfeaturedProduct));
+router.get("/filters/meta", asyncHandler(getMetaProduct));
 
 router.put("/update/:id", authMiddleware, isAdmin, asyncHandler(updateProduct));
 router.delete(
@@ -40,6 +42,6 @@ router.delete(
   isAdmin,
   asyncHandler(deleteProduct),
 );
-router.get("/:id", authMiddleware, asyncHandler(getProductById));
+router.get("/:id", asyncHandler(getProductById));
 
 export default router;

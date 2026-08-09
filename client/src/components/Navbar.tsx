@@ -29,6 +29,7 @@ import { useLogoutMutation } from "@/store/slices/userApi";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router";
 import { debounce } from "lodash";
+import { useMemo } from "react";
 
 interface CartItem {
   id: number;
@@ -79,12 +80,19 @@ const Navbar = () => {
     { name: "About", path: "/about" },
   ];
 
-  const searchProducts = debounce((searchTerm: string) => {
-    if (searchTerm.trim() !== "") {
-      navigate(`/products/filters?keyword=${encodeURIComponent(searchTerm)}`);
-    }
-    console.log(searchTerm);
-  }, 500);
+  const searchProducts = useMemo(
+    () =>
+      debounce((searchTerm: string) => {
+        if (searchTerm.trim() !== "") {
+          navigate(
+            `/products/filters?keyword=${encodeURIComponent(searchTerm)}`,
+          );
+        } else {
+          navigate("/products/filters");
+        }
+      }, 500),
+    [navigate],
+  );
 
   const updateQuantity = (id: number, type: "increase" | "decrease") => {
     setCartItems((prevItems) =>

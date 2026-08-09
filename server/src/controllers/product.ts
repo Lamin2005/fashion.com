@@ -228,3 +228,29 @@ export const getfeaturedProduct = async (req: Request, res: Response) => {
 
   res.status(200).json(FeatureProduct);
 };
+
+// @route GET /api/products/filters/meta
+// @desc find products with meta data
+// @access Public
+
+export const getMetaProduct = async (req: Request, res: Response) => {
+  const colors = await Product.distinct("colors");
+  const sizes = await Product.distinct("sizes");
+
+  const price = await Product.aggregate([
+    {
+      $group: {
+        _id: null,
+        minPrice: { $min: "$price" },
+        maxPrice: { $max: "$price" },
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    colors,
+    sizes,
+    maxPrice: price[0]?.maxPrice || 0,
+    minPrice: price[0].minPrice || 0,
+  });
+};
