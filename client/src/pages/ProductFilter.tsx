@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { SlidersHorizontal, Star, Heart, ShoppingBag, X } from "lucide-react";
-import { useGetProductsQuery } from "@/store/slices/productApi";
+import {
+  useGetProductsMetaQuery,
+  useGetProductsQuery,
+} from "@/store/slices/productApi";
 import type { Product } from "@/types/product";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import type { ProductFiltersMeta } from "@/types/product";
 
 const categories = [
   "All",
@@ -33,8 +37,11 @@ function ProductFilter() {
   });
 
   const { data: products, isLoading, isError } = useGetProductsQuery(filter);
+  const { data: productsMeta = {} as ProductFiltersMeta } =
+    useGetProductsMetaQuery("none");
   const productList = products?.products || [];
 
+  console.log("Product Meta : ", productsMeta.colors);
   console.log(products);
   console.log(productList);
 
@@ -153,12 +160,68 @@ function ProductFilter() {
             </div>
 
             <div className="space-y-3">
+              <h3 className="text-xs font-bold text-zinc-900 uppercase tracking-widest">
+                Colors
+              </h3>
+              <div className="flex flex-col space-y-2">
+                {productsMeta.colors?.map((color) => (
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="w-3 h-3 accent-zinc-900 cursor-pointer"
+                      id={color}
+                      name={color}
+                      value={color}
+                    />
+                    <label
+                      htmlFor={color}
+                      className="ml-2 text-sm text-zinc-500"
+                    >
+                      {color}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-zinc-900 uppercase tracking-widest">
+                Sizes
+              </h3>
+              <div className="flex flex-col space-y-2">
+                {productsMeta.sizes?.map((size) => (
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="w-3 h-3 accent-zinc-900 cursor-pointer"
+                      id={size}
+                      name={size}
+                      value={size}
+                    />
+                    <label
+                      htmlFor={size}
+                      className="ml-2 text-sm text-zinc-500"
+                    >
+                      {size}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold text-zinc-900 uppercase tracking-widest">
                   Max Price
                 </h3>
                 <span className="text-sm font-semibold text-zinc-900">
-                  $300
+                  <span className="text-sm font-semibold text-zinc-900">
+                    {isLoading
+                      ? "Loading..."
+                      : productsMeta.maxPrice
+                        ? `$${productsMeta.maxPrice}`
+                        : "$0"}
+                  </span>
                 </span>
               </div>
               <input
@@ -168,11 +231,22 @@ function ProductFilter() {
                 step="5"
                 defaultValue="300"
                 className="w-full accent-zinc-900 cursor-pointer h-1 bg-zinc-200 rounded-lg appearance-none"
-                disabled
               />
               <div className="flex justify-between text-[11px] text-zinc-400">
-                <span>$40</span>
-                <span>$300</span>
+                <span>
+                  {isLoading
+                    ? "Loading..."
+                    : productsMeta.minPrice
+                      ? `$${productsMeta.minPrice}`
+                      : "$0"}
+                </span>
+                <span>
+                  {isLoading
+                    ? "Loading..."
+                    : productsMeta.maxPrice
+                      ? `$${productsMeta.maxPrice}`
+                      : "$0"}
+                </span>
               </div>
             </div>
 
@@ -395,6 +469,97 @@ function ProductFilter() {
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold text-zinc-900 uppercase tracking-widest">
+            Colors
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {productsMeta.colors?.map((color) => (
+              <div>
+                <input
+                  type="checkbox"
+                  className="w-3 h-3 accent-zinc-900 cursor-pointer"
+                  id={color}
+                  name={color}
+                  value={color}
+                />
+                <label
+                  htmlFor={color}
+                  className="text-xs px-3 py-1.5  bg-white text-zinc-600"
+                >
+                  {color}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold text-zinc-900 uppercase tracking-widest">
+            Sizes
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {productsMeta.sizes?.map((size) => (
+              <div>
+                <input
+                  type="checkbox"
+                  className="w-3 h-3 accent-zinc-900 cursor-pointer"
+                  id={size}
+                  name={size}
+                  value={size}
+                />
+                <label
+                  htmlFor={size}
+                  className="text-xs px-3 py-1.5  bg-white text-zinc-600"
+                >
+                  {size}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-zinc-900 uppercase tracking-widest">
+              Max Price
+            </h3>
+            <span className="text-sm font-semibold text-zinc-900">
+              <span className="text-sm font-semibold text-zinc-900">
+                {isLoading
+                  ? "Loading..."
+                  : productsMeta.maxPrice
+                    ? `$${productsMeta.maxPrice}`
+                    : "$0"}
+              </span>
+            </span>
+          </div>
+          <input
+            type="range"
+            min="40"
+            max="300"
+            step="5"
+            defaultValue="300"
+            className="w-full accent-zinc-900 cursor-pointer h-1 bg-zinc-200 rounded-lg appearance-none"
+          />
+          <div className="flex justify-between text-[11px] text-zinc-400">
+            <span>
+              {isLoading
+                ? "Loading..."
+                : productsMeta.minPrice
+                  ? `$${productsMeta.minPrice}`
+                  : "$0"}
+            </span>
+            <span>
+              {isLoading
+                ? "Loading..."
+                : productsMeta.maxPrice
+                  ? `$${productsMeta.maxPrice}`
+                  : "$0"}
+            </span>
           </div>
         </div>
 

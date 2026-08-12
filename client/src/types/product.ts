@@ -15,3 +15,11 @@ export interface Product {
   is_new_arrival?: boolean;
   is_feature?: boolean;
 }
+
+export interface ProductFiltersMeta {
+  sizes: string[];
+  colors: string[];
+  categories: string[];
+  minPrice: number;
+  maxPrice: number;
+}
