@@ -19,7 +19,9 @@ const ProductDetail = () => {
   const [mainImage, setMainImage] = useState<string | undefined>(
     data?.images?.[0]?.url ?? undefined,
   );
-  const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
+  const [selectedColor, setSelectedColor] = useState<string | undefined>(
+    undefined,
+  );
   const [selectedSize, setSelectedSize] = useState<string>("M");
   const [isDetailsOpen, setIsDetailsOpen] = useState<boolean>(true);
   const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
@@ -141,6 +143,7 @@ const ProductDetail = () => {
                         ? "border-zinc-900 scale-105"
                         : "border-zinc-200 hover:border-zinc-400 hover:scale-105"
                     }`}
+                    title={color}
                   >
                     <div
                       className="w-full h-full"

@@ -10,15 +10,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { ProductFiltersMeta } from "@/types/product";
 
-const categories = [
-  "All",
-  "Outerwear",
-  "T-Shirts",
-  "Pants",
-  "Shirts",
-  "Accessories",
-];
-
 function ProductFilter() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
@@ -26,6 +17,8 @@ function ProductFilter() {
   const navigate = useNavigate();
   const Initialkeyword = queryParams.get("keyword") || "";
   const Initialcategory = queryParams.get("category") || "";
+  const Initialcolors = queryParams.getAll("colors");
+  const Initialsizes = queryParams.getAll("sizes");
   const [searchTerm, setSearchTerm] = useState(Initialkeyword || "");
   const [selectedCategory, setSelectedCategory] = useState(
     Initialcategory || "All",
@@ -34,6 +27,8 @@ function ProductFilter() {
   const [filter, setFilter] = useState({
     keyword: Initialkeyword,
     category: Initialcategory,
+    colors: Initialcolors,
+    sizes: Initialsizes,
   });
 
   const { data: products, isLoading, isError } = useGetProductsQuery(filter);
@@ -41,7 +36,7 @@ function ProductFilter() {
     useGetProductsMetaQuery("none");
   const productList = products?.products || [];
 
-  console.log("Product Meta : ", productsMeta.colors);
+  console.log("Product Meta : ", productsMeta.categories);
   console.log(products);
   console.log(productList);
 
@@ -82,6 +77,43 @@ function ProductFilter() {
       return () => clearTimeout(t);
     }
   }, [selectedCategory, navigate]);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (filter.keyword) {
+      params.set("keyword", filter.keyword);
+    }
+
+    if (filter.category) {
+      params.set("category", filter.category);
+    }
+
+    filter.colors.forEach((color) => {
+      params.append("colors", color);
+    });
+
+    filter.sizes.forEach((size) => {
+      params.append("sizes", size);
+    });
+
+    navigate(`/products/filters/?${params.toString()}`, {
+      replace: true,
+    });
+  }, [filter, navigate]);
+
+  const togglefilter = (key: "colors" | "sizes", value: string) => {
+    setFilter((prev) => {
+      const isSelected = prev[key].includes(value);
+
+      return {
+        ...prev,
+        [key]: isSelected
+          ? prev[key].filter((item) => item !== value)
+          : [...prev[key], value],
+      };
+    });
+  };
 
   if (isLoading) {
     return (
@@ -135,7 +167,7 @@ function ProductFilter() {
                 Categories
               </h3>
               <div className="flex flex-col space-y-2">
-                {categories.map((cat) => (
+                {productsMeta.categories?.map((cat) => (
                   <button
                     key={cat}
                     className="text-sm text-left text-zinc-500 hover:text-zinc-900 transition-colors duration-150 py-0.5 cursor-pointer"
@@ -165,13 +197,17 @@ function ProductFilter() {
               </h3>
               <div className="flex flex-col space-y-2">
                 {productsMeta.colors?.map((color) => (
-                  <div>
+                  <div key={color}>
                     <input
                       type="checkbox"
                       className="w-3 h-3 accent-zinc-900 cursor-pointer"
                       id={color}
                       name={color}
                       value={color}
+                      onChange={() => {
+                        togglefilter("colors", color);
+                      }}
+                      checked={filter.colors.includes(color)}
                     />
                     <label
                       htmlFor={color}
@@ -190,13 +226,17 @@ function ProductFilter() {
               </h3>
               <div className="flex flex-col space-y-2">
                 {productsMeta.sizes?.map((size) => (
-                  <div>
+                  <div key={size}>
                     <input
                       type="checkbox"
                       className="w-3 h-3 accent-zinc-900 cursor-pointer"
                       id={size}
                       name={size}
                       value={size}
+                      onChange={() => {
+                        togglefilter("sizes", size);
+                      }}
+                      checked={filter.sizes.includes(size)}
                     />
                     <label
                       htmlFor={size}
@@ -292,7 +332,10 @@ function ProductFilter() {
               </div>
             </div>
 
-            {(searchTerm !== "" || selectedCategory !== "All") && (
+            {(searchTerm !== "" ||
+              selectedCategory !== "All" ||
+              filter?.colors ||
+              filter?.sizes) && (
               <div className="flex flex-wrap items-center gap-2 text-xs">
                 <span className="text-zinc-400">Active Filters:</span>
 
@@ -333,6 +376,40 @@ function ProductFilter() {
                     />
                   </span>
                 )}
+
+                {filter.colors.map((color) => (
+                  <span
+                    key={color}
+                    className="inline-flex items-center gap-1 bg-zinc-100 text-zinc-800 px-2.5 py-1 rounded-sm"
+                  >
+                    {color}
+
+                    <X
+                      size={12}
+                      className="cursor-pointer"
+                      onClick={() => {
+                        togglefilter("colors", color);
+                      }}
+                    />
+                  </span>
+                ))}
+
+                {filter.sizes.map((size) => (
+                  <span
+                    key={size}
+                    className="inline-flex items-center gap-1 bg-zinc-100 text-zinc-800 px-2.5 py-1 rounded-sm"
+                  >
+                    {size}
+
+                    <X
+                      size={12}
+                      className="cursor-pointer"
+                      onClick={() => {
+                        togglefilter("sizes", size);
+                      }}
+                    />
+                  </span>
+                ))}
               </div>
             )}
 
@@ -447,7 +524,7 @@ function ProductFilter() {
               Categories
             </h3>
             <div className="flex flex-wrap gap-2">
-              {categories.map((cat) => (
+              {productsMeta.categories?.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => {
@@ -478,13 +555,15 @@ function ProductFilter() {
           </h3>
           <div className="flex flex-wrap gap-2">
             {productsMeta.colors?.map((color) => (
-              <div>
+              <div key={color}>
                 <input
                   type="checkbox"
                   className="w-3 h-3 accent-zinc-900 cursor-pointer"
                   id={color}
                   name={color}
                   value={color}
+                  onChange={() => togglefilter("colors", color)}
+                  checked={filter.colors.includes(color)}
                 />
                 <label
                   htmlFor={color}
@@ -503,13 +582,15 @@ function ProductFilter() {
           </h3>
           <div className="flex flex-wrap gap-2">
             {productsMeta.sizes?.map((size) => (
-              <div>
+              <div key={size}>
                 <input
                   type="checkbox"
                   className="w-3 h-3 accent-zinc-900 cursor-pointer"
                   id={size}
                   name={size}
                   value={size}
+                  onChange={() => togglefilter("sizes", size)}
+                  checked={filter.sizes.includes(size)}
                 />
                 <label
                   htmlFor={size}
@@ -569,7 +650,7 @@ function ProductFilter() {
             setIsSidebarOpen(false);
             setSearchTerm("");
             setSelectedCategory("All");
-            setFilter({ keyword: "", category: "" });
+            setFilter({ keyword: "", category: "", colors: [], sizes: [] });
             navigate("/products/filters/", { replace: true });
           }}
         >

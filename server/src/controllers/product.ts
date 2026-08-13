@@ -178,11 +178,13 @@ export const getProductwithFilter = async (req: Request, res: Response) => {
   }
 
   if (sizes) {
-    query.sizes = { $in: [sizes] };
+    const sizesArray = Array.isArray(sizes) ? sizes : [sizes];
+    query.sizes = { $in: sizesArray };
   }
 
   if (colors) {
-    query.colors = { $in: [colors] };
+    const colorsArray = Array.isArray(colors) ? colors : [colors];
+    query.colors = { $in: colorsArray };
   }
 
   const sortOption: any = {};
@@ -236,6 +238,7 @@ export const getfeaturedProduct = async (req: Request, res: Response) => {
 export const getMetaProduct = async (req: Request, res: Response) => {
   const colors = await Product.distinct("colors");
   const sizes = await Product.distinct("sizes");
+  const categories = await Product.distinct("category");
 
   const price = await Product.aggregate([
     {
@@ -252,5 +255,6 @@ export const getMetaProduct = async (req: Request, res: Response) => {
     sizes,
     maxPrice: price[0]?.maxPrice || 0,
     minPrice: price[0].minPrice || 0,
+    categories,
   });
 };
