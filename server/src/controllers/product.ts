@@ -238,7 +238,14 @@ export const getfeaturedProduct = async (req: Request, res: Response) => {
 export const getMetaProduct = async (req: Request, res: Response) => {
   const colors = await Product.distinct("colors");
   const sizes = await Product.distinct("sizes");
-  const categories = await Product.distinct("category");
+  const categories = [
+    "All",
+    ...new Set(
+      (await Product.distinct("category")).filter(
+        (category) => category && category !== "All",
+      ),
+    ),
+  ];
 
   const price = await Product.aggregate([
     {

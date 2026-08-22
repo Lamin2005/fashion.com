@@ -5,7 +5,7 @@ import {
   useGetProductsQuery,
 } from "@/store/slices/productApi";
 import type { Product } from "@/types/product";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { ProductFiltersMeta } from "@/types/product";
@@ -15,10 +15,14 @@ function ProductFilter() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const navigate = useNavigate();
-  const Initialkeyword = queryParams.get("keyword") || "";
-  const Initialcategory = queryParams.get("category") || "";
+  const { data: productsMeta = {} as ProductFiltersMeta } =
+    useGetProductsMetaQuery("none");
+  const Initialkeyword = queryParams.get("keyword");
+  const Initialcategory = queryParams.get("category");
   const Initialcolors = queryParams.getAll("colors");
   const Initialsizes = queryParams.getAll("sizes");
+  const InitialminPrice = queryParams.get("minPrice") || "";
+  const InitialmaxPrice = queryParams.get("maxPrice") || "";
   const [searchTerm, setSearchTerm] = useState(Initialkeyword || "");
   const [selectedCategory, setSelectedCategory] = useState(
     Initialcategory || "All",
@@ -29,16 +33,23 @@ function ProductFilter() {
     category: Initialcategory,
     colors: Initialcolors,
     sizes: Initialsizes,
+    minPrice: InitialminPrice,
+    maxPrice: InitialmaxPrice,
   });
 
   const { data: products, isLoading, isError } = useGetProductsQuery(filter);
-  const { data: productsMeta = {} as ProductFiltersMeta } =
-    useGetProductsMetaQuery("none");
+
   const productList = products?.products || [];
+  const categoryOptions = [
+    "All",
+    ...(productsMeta.categories || []).filter((cat) => cat && cat !== "All"),
+  ];
 
   console.log("Product Meta : ", productsMeta.categories);
   console.log(products);
   console.log(productList);
+  console.log("Min Price is ", filter.minPrice);
+  console.log("Max Price is ", filter.maxPrice);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -97,9 +108,20 @@ function ProductFilter() {
       params.append("sizes", size);
     });
 
-    navigate(`/products/filters/?${params.toString()}`, {
-      replace: true,
-    });
+    if (filter.minPrice) {
+      params.set("minPrice", String(filter.minPrice));
+    }
+
+    if (filter.maxPrice) {
+      params.set("maxPrice", String(filter.maxPrice));
+    }
+
+    const queryString = params.toString();
+
+    navigate(
+      queryString ? `/products/filters/?${queryString}` : "/products/filters/",
+      { replace: true },
+    );
   }, [filter, navigate]);
 
   const togglefilter = (key: "colors" | "sizes", value: string) => {
@@ -167,7 +189,7 @@ function ProductFilter() {
                 Categories
               </h3>
               <div className="flex flex-col space-y-2">
-                {productsMeta.categories?.map((cat) => (
+                {categoryOptions.map((cat) => (
                   <button
                     key={cat}
                     className="text-sm text-left text-zinc-500 hover:text-zinc-900 transition-colors duration-150 py-0.5 cursor-pointer"
@@ -249,48 +271,58 @@ function ProductFilter() {
               </div>
             </div>
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold text-zinc-900 uppercase tracking-widest">
-                  Max Price
-                </h3>
-                <span className="text-sm font-semibold text-zinc-900">
-                  <span className="text-sm font-semibold text-zinc-900">
-                    {isLoading
-                      ? "Loading..."
-                      : productsMeta.maxPrice
-                        ? `$${productsMeta.maxPrice}`
-                        : "$0"}
-                  </span>
-                </span>
-              </div>
-              <input
-                type="range"
-                min="40"
-                max="300"
-                step="5"
-                defaultValue="300"
-                className="w-full accent-zinc-900 cursor-pointer h-1 bg-zinc-200 rounded-lg appearance-none"
-              />
-              <div className="flex justify-between text-[11px] text-zinc-400">
-                <span>
-                  {isLoading
-                    ? "Loading..."
-                    : productsMeta.minPrice
-                      ? `$${productsMeta.minPrice}`
-                      : "$0"}
-                </span>
-                <span>
-                  {isLoading
-                    ? "Loading..."
-                    : productsMeta.maxPrice
-                      ? `$${productsMeta.maxPrice}`
-                      : "$0"}
-                </span>
+            <div>
+              <h3 className="mb-3 text-sm font-semibold">Price Range</h3>
+
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  placeholder={`Min ${productsMeta?.minPrice || 0}`}
+                  value={filter.minPrice}
+                  min={productsMeta?.minPrice}
+                  max={productsMeta?.maxPrice}
+                  onChange={(e) =>
+                    setFilter((prev) => ({
+                      ...prev,
+                      minPrice: e.target.value,
+                    }))
+                  }
+                  className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none"
+                />
+
+                <input
+                  type="number"
+                  placeholder={`Max ${productsMeta?.maxPrice || 0}`}
+                  value={filter.maxPrice}
+                  min={productsMeta?.minPrice}
+                  max={productsMeta?.maxPrice}
+                  onChange={(e) =>
+                    setFilter((prev) => ({
+                      ...prev,
+                      maxPrice: e.target.value,
+                    }))
+                  }
+                  className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none"
+                />
               </div>
             </div>
 
-            <button className="w-full bg-zinc-100 hover:bg-zinc-900 hover:text-white text-zinc-800 text-xs font-semibold py-3 transition-colors duration-300">
+            <button
+              className="w-full bg-zinc-100 hover:bg-zinc-900 hover:text-white text-zinc-800 text-xs font-semibold py-3 transition-colors duration-300 cursor-pointer"
+              onClick={() => {
+                setSearchTerm("");
+                setSelectedCategory("All");
+                setFilter({
+                  keyword: "",
+                  category: "",
+                  colors: [],
+                  sizes: [],
+                  minPrice: "",
+                  maxPrice: "",
+                });
+                navigate("/products/filters/", { replace: true });
+              }}
+            >
               Reset All Filters
             </button>
           </aside>
@@ -420,7 +452,7 @@ function ProductFilter() {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-10 sm:gap-x-6">
                 {productList.map((product: Product) => (
-                  <a href={`/products/${product._id}`} key={product._id}>
+                  <Link to={`/products/${product._id}`} key={product._id}>
                     <div className="group relative flex flex-col justify-between">
                       <div className="relative w-full aspect-3/4 bg-zinc-50 overflow-hidden border border-zinc-100 shadow-sm mb-4">
                         {product.is_new_arrival && (
@@ -466,7 +498,7 @@ function ProductFilter() {
                         </div>
                       </div>
                     </div>
-                  </a>
+                  </Link>
                 ))}
               </div>
             )}
@@ -524,7 +556,7 @@ function ProductFilter() {
               Categories
             </h3>
             <div className="flex flex-wrap gap-2">
-              {productsMeta.categories?.map((cat) => (
+              {categoryOptions.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => {
@@ -650,7 +682,14 @@ function ProductFilter() {
             setIsSidebarOpen(false);
             setSearchTerm("");
             setSelectedCategory("All");
-            setFilter({ keyword: "", category: "", colors: [], sizes: [] });
+            setFilter({
+              keyword: "",
+              category: "",
+              colors: [],
+              sizes: [],
+              minPrice: "",
+              maxPrice: "",
+            });
             navigate("/products/filters/", { replace: true });
           }}
         >

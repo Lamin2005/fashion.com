@@ -199,7 +199,7 @@ const Shoppage = () => {
             </div>
 
             {/* Price Slider Filter */}
-            <div className="space-y-3">
+            {/* <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-bold text-zinc-900 uppercase tracking-widest">
                   Max Price
@@ -221,7 +221,7 @@ const Shoppage = () => {
                 <span>$40</span>
                 <span>$300</span>
               </div>
-            </div>
+            </div> */}
 
             {/* Clear Filters Button */}
             <button

@@ -25,11 +25,11 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/index.ts";
 import { useDispatch } from "react-redux";
 import { clearUserInfo } from "@/store/slices/auth";
-import { useLogoutMutation } from "@/store/slices/userApi";
+import { useLogoutMutation, useProfileQuery } from "@/store/slices/userApi";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router";
 import { debounce } from "lodash";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 
 interface CartItem {
   id: number;
@@ -49,6 +49,8 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const [logoutMutation, { isLoading }] = useLogoutMutation();
   const navigate = useNavigate();
+  const { isError } = useProfileQuery();
+  const hasShowerror = useRef(false);
 
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
 
@@ -136,11 +138,23 @@ const Navbar = () => {
     try {
       const response = await logoutMutation({}).unwrap();
       dispatch(clearUserInfo());
-      toast.success(`${response.message}`);
+      if (!isError) {
+        toast.success(`${response.message}`);
+      }
     } catch (error) {
       console.log("Logout Error : ", error);
     }
   };
+
+  useEffect(() => {
+    if (isError && !hasShowerror.current) {
+      hasShowerror.current = true;
+      logoutHandler();
+      toast.error("Your session has expired! Please login again.");
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isError]);
 
   return (
     <>
@@ -154,24 +168,24 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <div className="shrink-0">
-              <a
-                href="/"
+              <Link
+                to="/"
                 className="text-2xl font-bold tracking-widest text-zinc-900 uppercase"
               >
                 FASHION<span className="text-amber-600">.</span>
-              </a>
+              </Link>
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
-                  href={`${link.path.toLowerCase()}`}
+                  to={`${link.path.toLowerCase()}`}
                   className="relative text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors duration-200 group py-2"
                 >
                   {link.name}
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-zinc-950 transition-all duration-300 group-hover:w-full"></span>
-                </a>
+                </Link>
               ))}
             </div>
 
@@ -268,14 +282,14 @@ const Navbar = () => {
         >
           <div className="px-4 pt-2 pb-6 space-y-4 shadow-lg">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={`${link.path.toLowerCase()}`}
+                to={`${link.path.toLowerCase()}`}
                 onClick={() => setIsOpen(false)}
                 className="block text-base font-medium text-zinc-600 hover:text-zinc-900 py-2 border-b border-zinc-50"
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
             <div className="flex items-center space-x-6 pt-4">
               <button
