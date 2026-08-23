@@ -1,4 +1,4 @@
-import SideBar from "@/components/SideBar";
+import SideBar from "@/pages/admin/SideBar";
 import { Outlet } from "react-router-dom";
 
 function AdminLayout() {
