@@ -29,7 +29,7 @@ import { useLogoutMutation, useProfileQuery } from "@/store/slices/userApi";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router";
 import { debounce } from "lodash";
-import { useMemo, useRef } from "react";
+import { useMemo } from "react";
 
 interface CartItem {
   id: number;
@@ -50,7 +50,7 @@ const Navbar = () => {
   const [logoutMutation, { isLoading }] = useLogoutMutation();
   const navigate = useNavigate();
   const { isError } = useProfileQuery();
-  const hasShowerror = useRef(false);
+  // const hasShowerror = useRef(false);
 
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
 
@@ -146,15 +146,15 @@ const Navbar = () => {
     }
   };
 
-  useEffect(() => {
-    if (isError && !hasShowerror.current) {
-      hasShowerror.current = true;
-      logoutHandler();
-      toast.error("Your session has expired! Please login again.");
-    }
+  // useEffect(() => {
+  //   if (isError && !hasShowerror.current) {
+  //     hasShowerror.current = true;
+  //     logoutHandler();
+  //     toast.error("Your session has expired! Please login again.");
+  //   }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isError]);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [isError]);
 
   return (
     <>

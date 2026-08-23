@@ -4,7 +4,6 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./layout/Layout.tsx";
 import Homepage from "./pages/Homepage.tsx";
-// import Shoppage from "./pages/Shoppage.tsx";
 import Collectionspage from "./pages/Collectionspage.tsx";
 import Aboutpage from "./pages/Aboutpage.tsx";
 import Login from "./pages/Login.tsx";
@@ -18,6 +17,8 @@ import ProtectedRoute from "./routes/ProtectedRoute.tsx";
 import ResetPasswordForm from "./pages/ResetPasswordForm.tsx";
 import ExternalForgotPasswordForm from "./components/profile/ExternalForgotPasswordForm.tsx";
 import ProductFilter from "./pages/ProductFilter.tsx";
+import AdminLayout from "./layout/AdminLayout.tsx";
+import Dashboard from "./pages/admin/Dashboard.tsx";
 
 const router = createBrowserRouter([
   {
@@ -28,10 +29,6 @@ const router = createBrowserRouter([
         index: true,
         element: <Homepage />,
       },
-      // {
-      //   path: "/products",
-      //   element: <Shoppage />,
-      // },
       {
         path: "/collections",
         element: <Collectionspage />,
@@ -53,7 +50,7 @@ const router = createBrowserRouter([
         path: "/products",
         element: <ProductFilter />,
       },
-      
+
       {
         path: "/products/filters",
         element: <ProductFilter />,
@@ -80,6 +77,21 @@ const router = createBrowserRouter([
       {
         path: "/reset-password/:token",
         element: <ResetPasswordForm />,
+      },
+    ],
+  },
+
+  {
+    path: "/admin",
+    element: (
+      <ProtectedRoute adminOnly={true}>
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
       },
     ],
   },

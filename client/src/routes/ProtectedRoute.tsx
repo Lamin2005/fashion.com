@@ -1,17 +1,23 @@
 import type { RootState } from "@/store";
-import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedRoute({
+  children,
+  adminOnly = false,
+}: {
+  children: React.ReactNode;
+  adminOnly?: boolean;
+}) {
   const { userInfo } = useSelector((state: RootState) => state.auth);
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!userInfo) {
-      navigate("/login");
-    }
-  }, [userInfo, navigate]);
+  if (!userInfo) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (adminOnly && userInfo.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
 
   return <>{children}</>;
 }
