@@ -271,7 +271,7 @@ function ProductFilter() {
               </div>
             </div>
 
-            <div>
+            <div className="space-y-3">
               <h3 className="mb-3 text-sm font-semibold">Price Range</h3>
 
               <div className="flex gap-2">
@@ -636,43 +636,38 @@ function ProductFilter() {
         </div>
 
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-zinc-900 uppercase tracking-widest">
-              Max Price
-            </h3>
-            <span className="text-sm font-semibold text-zinc-900">
-              <span className="text-sm font-semibold text-zinc-900">
-                {isLoading
-                  ? "Loading..."
-                  : productsMeta.maxPrice
-                    ? `$${productsMeta.maxPrice}`
-                    : "$0"}
-              </span>
-            </span>
-          </div>
-          <input
-            type="range"
-            min="40"
-            max="300"
-            step="5"
-            defaultValue="300"
-            className="w-full accent-zinc-900 cursor-pointer h-1 bg-zinc-200 rounded-lg appearance-none"
-          />
-          <div className="flex justify-between text-[11px] text-zinc-400">
-            <span>
-              {isLoading
-                ? "Loading..."
-                : productsMeta.minPrice
-                  ? `$${productsMeta.minPrice}`
-                  : "$0"}
-            </span>
-            <span>
-              {isLoading
-                ? "Loading..."
-                : productsMeta.maxPrice
-                  ? `$${productsMeta.maxPrice}`
-                  : "$0"}
-            </span>
+          <h3 className="mb-3 text-sm font-semibold">Price Range</h3>
+
+          <div className="flex gap-2">
+            <input
+              type="number"
+              placeholder={`Min ${productsMeta?.minPrice || 0}`}
+              value={filter.minPrice}
+              min={productsMeta?.minPrice}
+              max={productsMeta?.maxPrice}
+              onChange={(e) =>
+                setFilter((prev) => ({
+                  ...prev,
+                  minPrice: e.target.value,
+                }))
+              }
+              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none"
+            />
+
+            <input
+              type="number"
+              placeholder={`Max ${productsMeta?.maxPrice || 0}`}
+              value={filter.maxPrice}
+              min={productsMeta?.minPrice}
+              max={productsMeta?.maxPrice}
+              onChange={(e) =>
+                setFilter((prev) => ({
+                  ...prev,
+                  maxPrice: e.target.value,
+                }))
+              }
+              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none"
+            />
           </div>
         </div>
 

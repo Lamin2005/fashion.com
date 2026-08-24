@@ -53,3 +53,5 @@ export const productSchema = z.object({
 
   is_feature: z.boolean().optional(),
 });
+
+export type ProductFormInput = z.infer<typeof productSchema>;
