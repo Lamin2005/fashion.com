@@ -70,9 +70,7 @@ export default function SideBar() {
         {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
       </button>
 
-      {/* Top Header & Links */}
       <div>
-        {/* Brand Logo Header */}
         <div
           className={`h-20 flex items-center border-b border-zinc-900 px-6 ${isCollapsed ? "justify-center" : "justify-start gap-3"}`}
         >
@@ -149,7 +147,6 @@ export default function SideBar() {
         </div>
       </div>
 
-      {/* Bottom Admin User & Logout */}
       <div className="p-4 border-t border-zinc-900 space-y-2">
         <div
           className={`flex items-center gap-3 p-2 rounded-xl bg-zinc-900/50 border border-zinc-900 ${isCollapsed ? "justify-center" : ""}`}
