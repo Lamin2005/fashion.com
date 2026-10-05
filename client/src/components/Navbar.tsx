@@ -150,7 +150,6 @@ const Navbar = () => {
   //   if (isError && !hasShowerror.current) {
   //     hasShowerror.current = true;
   //     logoutHandler();
-  //     toast.error("Your session has expired! Please login again.");
   //   }
 
   //   // eslint-disable-next-line react-hooks/exhaustive-deps

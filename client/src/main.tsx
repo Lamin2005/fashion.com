@@ -19,6 +19,7 @@ import ExternalForgotPasswordForm from "./components/profile/ExternalForgotPassw
 import ProductFilter from "./pages/ProductFilter.tsx";
 import AdminLayout from "./layout/AdminLayout.tsx";
 import Dashboard from "./pages/admin/Dashboard.tsx";
+import ProductCreate from "./pages/admin/ProductCreate.tsx";
 
 const router = createBrowserRouter([
   {
@@ -93,6 +94,11 @@ const router = createBrowserRouter([
         index: true,
         element: <Dashboard />,
       },
+      {
+        path: "/admin/create-products",
+        element:<ProductCreate/>
+      }
+
     ],
   },
 ]);

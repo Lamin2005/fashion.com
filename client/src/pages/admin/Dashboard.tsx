@@ -145,7 +145,7 @@ function Dashboard() {
             View Analytics
           </NavLink>
           <NavLink
-            to="/admin/products"
+            to="/admin/create-products"
             className="flex items-center gap-2 rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-semibold text-zinc-950 transition-colors hover:bg-amber-300"
           >
             <Plus size={16} />

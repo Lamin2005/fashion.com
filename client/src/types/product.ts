@@ -1,3 +1,5 @@
+import { type ProductFormInput } from "@/schema/products";
+
 export interface Image {
   url: string;
 }
@@ -22,4 +24,10 @@ export interface ProductFiltersMeta {
   categories: string[];
   minPrice: number;
   maxPrice: number;
+}
+
+export interface ProductFormProp {
+  initialData?: unknown;
+  onSubmit: (data: ProductFormInput) => void;
+  isLoading: boolean;
 }
