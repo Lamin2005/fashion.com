@@ -38,7 +38,23 @@ export default function ProductForm({
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel>Name</FieldLabel>
 
-            <Input type="name" placeholder="john does" {...field} />
+            <Input type="name" placeholder="eg. T-Shirt" {...field} />
+
+            {fieldState.error && (
+              <FieldError>{fieldState.error.message}</FieldError>
+            )}
+          </Field>
+        )}
+      />
+
+      <Controller
+        name="price"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel>Price</FieldLabel>
+
+            <Input type="number" placeholder="eg.$2000" {...field} />
 
             {fieldState.error && (
               <FieldError>{fieldState.error.message}</FieldError>
@@ -48,7 +64,7 @@ export default function ProductForm({
       />
 
       <Button type="submit" className="cursor-pointer" disabled={isLoading}>
-        Update name
+        Create Product
       </Button>
     </form>
   );
