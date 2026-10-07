@@ -18,7 +18,7 @@ function ImageUpload({ image, onChange }: ImageUploadProps) {
     }));
 
     console.log(newImages);
-    console.log( ...newImages);
+    console.log(...newImages);
 
     onChange([...image, ...newImages]);
   };
@@ -42,7 +42,7 @@ function ImageUpload({ image, onChange }: ImageUploadProps) {
 
       <div className="flex gap-2 flex-wrap">
         {image.map((img, index) => (
-          <div key={index} className="relative">
+          <div key={index} className="relative group">
             <img
               src={img.preview}
               alt={`Preview ${index}`}
@@ -50,10 +50,10 @@ function ImageUpload({ image, onChange }: ImageUploadProps) {
             />
             <button
               onClick={() => {
-                const updatedImages = image.filter((_, i) => i !== index);
-                onChange(updatedImages);
+                const removedImages = image.filter((_, i) => i !== index);
+                onChange(removedImages);
               }}
-              className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center rotate-45 cursor-pointer"
+              className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center rotate-45 cursor-pointer md:opacity-0 md:group-hover:opacity-100 transition-opacity"
             >
               <Cross size={12} />
             </button>

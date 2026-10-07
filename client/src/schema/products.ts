@@ -44,8 +44,11 @@ export const productSchema = z.object({
     .min(1, "At least one size is required"),
 
   colors: z.array(z.string()).min(1, "At least one color is required"),
-  instock_count: z.number(),
-
+  instock_count: z
+    .number({
+      message: "In Stock Count must be a number",
+    })
+    .positive("In Stock Count must be greater than 0"),
   rating_count: z.string(),
 
   images: z.array(imageSchema).min(1, "At least one image is required"),
