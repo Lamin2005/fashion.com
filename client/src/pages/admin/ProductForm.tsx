@@ -6,6 +6,7 @@ import { productSchema, type ProductFormInput } from "@/schema/products";
 // import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type ProductFormProp } from "@/types/product";
+import ImageUpload from "./ImageUpload";
 
 export default function ProductForm({
   initialData,
@@ -54,7 +55,27 @@ export default function ProductForm({
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel>Price</FieldLabel>
 
-            <Input type="number" placeholder="eg.$2000" {...field} />
+            <Input
+              type="number"
+              placeholder="eg.$2000"
+              {...field}
+              onChange={(e) => field.onChange(parseFloat(e.target.value))}
+            />
+
+            {fieldState.error && (
+              <FieldError>{fieldState.error.message}</FieldError>
+            )}
+          </Field>
+        )}
+      />
+
+      <Controller
+        name="images"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel>Image</FieldLabel>
+            <ImageUpload image={field.value} onChange={field.onChange} />
 
             {fieldState.error && (
               <FieldError>{fieldState.error.message}</FieldError>

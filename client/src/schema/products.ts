@@ -21,7 +21,7 @@ export const imageSchema = z.object({
     }),
 
   preview: z.string().min(1, "Image preview is required"),
-  public_id: z.string().min(1, "Public ID is required"),
+  public_id: z.string(),
 });
 
 export const productSchema = z.object({
@@ -44,7 +44,7 @@ export const productSchema = z.object({
     .min(1, "At least one size is required"),
 
   colors: z.array(z.string()).min(1, "At least one color is required"),
-  instock_count : z.number(),
+  instock_count: z.number(),
 
   rating_count: z.string(),
 
