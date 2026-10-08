@@ -37,7 +37,7 @@ function Category({ value, onChange }: CategoryProps) {
         <SelectContent>
           <SelectGroup>
             {categories.map((category) => (
-              <SelectItem key={category.id} value={category.label}>
+              <SelectItem key={category.id} value={category.label} className="cursor-pointer">
                 {category.label}
               </SelectItem>
             ))}

@@ -8,6 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type ProductFormProp } from "@/types/product";
 import ImageUpload from "./ImageUpload";
 import Category from "./Category";
+import Colorpicker from "./Colorpicker";
+import Sizes from "./Sizes";
 
 export default function ProductForm({
   initialData,
@@ -114,6 +116,38 @@ export default function ProductForm({
             <FieldLabel>Category</FieldLabel>
 
             <Category value={field.value} onChange={field.onChange} />
+
+            {fieldState.error && (
+              <FieldError>{fieldState.error.message}</FieldError>
+            )}
+          </Field>
+        )}
+      />
+
+      <Controller
+        name="colors"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel>Colors</FieldLabel>
+
+            <Colorpicker colors={field.value} onChange={field.onChange} />
+
+            {fieldState.error && (
+              <FieldError>{fieldState.error.message}</FieldError>
+            )}
+          </Field>
+        )}
+      />
+
+      <Controller
+        name="sizes"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel>Sizes</FieldLabel>
+
+            <Sizes sizes={field.value} onChange={field.onChange} />
 
             {fieldState.error && (
               <FieldError>{fieldState.error.message}</FieldError>
