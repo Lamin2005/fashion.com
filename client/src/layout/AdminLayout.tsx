@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Menu, Bell } from "lucide-react";
-import SideBar from "@/pages/admin/SideBar";
+import SideBar from "@/components/admin/SideBar";
 
 function AdminLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);

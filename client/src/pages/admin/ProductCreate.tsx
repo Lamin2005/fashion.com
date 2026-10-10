@@ -1,4 +1,4 @@
-import ProductForm from "./ProductForm";
+import ProductForm from "../../components/admin/ProductForm";
 
 function ProductCreate() {
   const onSubmit = (data: unknown) => {
