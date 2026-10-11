@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Product from "../model/product";
 import { AuthenticatedRequest } from "../middlewares/authmiddleware";
+import { uploadsigleImage } from "../utils/cloudinary";
 
 // @route POST /api/products/create
 //@desc Create a new product
@@ -30,6 +31,22 @@ export const createProduct = async (
     res.status(401);
     throw new Error("Unauthorized user...");
   }
+
+  await Promise.all(
+    images.map(async (image: { file?: string; public_id?: string }) => {
+      if (image.file) {
+        const uploadResponse = await uploadsigleImage(
+          image.file,
+          "fashion.com/products",
+        );
+
+        return {
+          url: uploadResponse.image_url, //response result form cloudinary so image_url is the secure_url from cloudinary response
+          public_id: uploadResponse.public_id,
+        };
+      }
+    }),
+  );
 
   const product = await Product.create({
     name,

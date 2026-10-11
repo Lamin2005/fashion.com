@@ -10,7 +10,7 @@ import Category from "./Category";
 import Colorpicker from "./Colorpicker";
 import Sizes from "./Sizes";
 import Tiptap from "../editor/Tiptap";
-import { ArrowLeft } from "lucide-react";
+// import { ArrowLeft } from "lucide-react";
 
 export default function ProductForm({
   initialData,
@@ -42,7 +42,6 @@ export default function ProductForm({
       onSubmit={form.handleSubmit(onSubmit)}
       className="min-h-screen w-full bg-zinc-950 px-4 py-6 text-white sm:px-6 sm:py-8 lg:px-8"
     >
-      {/* Header */}
       <div className="mb-8 border-b border-zinc-800 pb-6">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
           Create Product
@@ -54,11 +53,8 @@ export default function ProductForm({
         </p>
       </div>
 
-      {/* Two Column Layout */}
       <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
-        {/* LEFT COLUMN */}
         <div className="min-w-0 space-y-6">
-          {/* Basic Information */}
           <section className="space-y-6 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 sm:p-6">
             <div>
               <h2 className="text-lg font-semibold">Basic Information</h2>
@@ -69,7 +65,6 @@ export default function ProductForm({
             </div>
 
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-              {/* Product Name */}
               <Controller
                 name="name"
                 control={form.control}
@@ -92,7 +87,6 @@ export default function ProductForm({
                 )}
               />
 
-              {/* Price */}
               <Controller
                 name="price"
                 control={form.control}
@@ -118,7 +112,6 @@ export default function ProductForm({
                 )}
               />
 
-              {/* Stock Quantity */}
               <Controller
                 name="instock_count"
                 control={form.control}
@@ -142,7 +135,6 @@ export default function ProductForm({
                 )}
               />
 
-              {/* Category */}
               <Controller
                 name="category"
                 control={form.control}
@@ -161,7 +153,6 @@ export default function ProductForm({
             </div>
           </section>
 
-          {/* Product Images */}
           <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 sm:p-6">
             <div>
               <h2 className="text-lg font-semibold">Product Images</h2>
@@ -184,7 +175,6 @@ export default function ProductForm({
             />
           </section>
 
-          {/* Product Variants */}
           <section className="space-y-6 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 sm:p-6">
             <div>
               <h2 className="text-lg font-semibold">Product Variants</h2>
@@ -195,7 +185,6 @@ export default function ProductForm({
             </div>
 
             <div className="space-y-6">
-              {/* Colors */}
               <Controller
                 name="colors"
                 control={form.control}
@@ -217,7 +206,6 @@ export default function ProductForm({
                 )}
               />
 
-              {/* Sizes */}
               <Controller
                 name="sizes"
                 control={form.control}
@@ -238,7 +226,6 @@ export default function ProductForm({
             </div>
           </section>
 
-          {/* Display Settings */}
           <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 sm:p-6">
             <div>
               <h2 className="text-lg font-semibold">Display Settings</h2>
@@ -249,7 +236,6 @@ export default function ProductForm({
             </div>
 
             <div className="space-y-4">
-              {/* New Arrival Toggle */}
               <Controller
                 name="is_new_arrival"
                 control={form.control}
@@ -277,7 +263,7 @@ export default function ProductForm({
                       <span
                         className={`absolute top-0.5 h-5 w-5 rounded-full transition-all ${
                           field.value
-                            ? "left-[22px] bg-black"
+                            ? "left-5.5 bg-black"
                             : "left-0.5 bg-white"
                         }`}
                       />
@@ -286,7 +272,6 @@ export default function ProductForm({
                 )}
               />
 
-              {/* Featured Toggle */}
               <Controller
                 name="is_feature"
                 control={form.control}
@@ -314,7 +299,7 @@ export default function ProductForm({
                       <span
                         className={`absolute top-0.5 h-5 w-5 rounded-full transition-all ${
                           field.value
-                            ? "left-[22px] bg-black"
+                            ? "left-5.5 bg-black"
                             : "left-0.5 bg-white"
                         }`}
                       />
@@ -326,7 +311,6 @@ export default function ProductForm({
           </section>
         </div>
 
-        {/* RIGHT COLUMN — TIPTAP EDITOR */}
         <div className="min-w-0 lg:sticky lg:top-6">
           <section className="space-y-5 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 sm:p-6">
             <div>
@@ -352,12 +336,14 @@ export default function ProductForm({
         </div>
       </div>
 
-      {/* Submit Button */}
-      <div className="mt-6 flex justify-between border-t border-zinc-800 pt-6">
-        <Button type="submit" className="flex items-center gap-2 h-11 w-full cursor-pointer bg-zinc-800 px-8 font-medium text-white hover:bg-zinc-700 sm:w-auto">
+      <div className="mt-6 gap-1 flex  justify-end border-t border-zinc-800 pt-6">
+        {/* <Button
+          type="submit"
+          className="flex items-center gap-2 h-11 w-full cursor-pointer bg-zinc-800 px-8 font-medium text-white hover:bg-zinc-700 sm:w-auto"
+        >
           <ArrowLeft />
           Back
-        </Button>
+        </Button> */}
         <Button
           type="submit"
           className="h-11 w-full cursor-pointer bg-white px-8 font-medium text-black hover:bg-zinc-200 sm:w-auto"
