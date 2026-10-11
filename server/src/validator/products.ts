@@ -9,10 +9,7 @@ export const createProductvalidator = [
   body("sizes").isArray({ min: 1 }).withMessage("Sizes must be an array"),
   body("colors").isArray({ min: 1 }).withMessage("Colors must be an array"),
   body("images").isArray({ min: 1 }).withMessage("Images must be an array"),
-  body("images.*.url").notEmpty().withMessage("Image URL is required"),
-  body("images.*.public_id")
-    .notEmpty()
-    .withMessage("Image public ID is required"),
+  body("images.*.file").notEmpty().withMessage("Image file is required"),
   body("is_new_arrival")
     .isBoolean()
     .withMessage("Is new arrival must be a boolean"),

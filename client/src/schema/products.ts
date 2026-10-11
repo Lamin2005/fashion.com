@@ -21,7 +21,7 @@ export const imageSchema = z.object({
     }),
 
   preview: z.string().min(1, "Image preview is required"),
-  public_id: z.string(),
+  public_id: z.string().optional(),
 });
 
 export const productSchema = z.object({
@@ -40,7 +40,7 @@ export const productSchema = z.object({
     .positive("Price must be greater than 0"),
 
   sizes: z
-    .array(z.enum(["XS", "S", "M", "L", "XL", "XXL"]))
+    .array(z.string())
     .min(1, "At least one size is required"),
 
   colors: z.array(z.string()).min(1, "At least one color is required"),

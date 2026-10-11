@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { convertFileToBase64 } from "@/lib/utils";
 import { type ProductFormInput } from "@/schema/products";
 import { Cross } from "lucide-react";
 
@@ -8,24 +9,30 @@ interface ImageUploadProps {
 }
 
 function ImageUpload({ image, onChange }: ImageUploadProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    const newImages = files.map((file) => ({
-      file,
-      preview: URL.createObjectURL(file),
-      public_id: "",
-    }));
+    try {
+      const newImagesPromises = files.map(async (file) => {
+        const base64String = await convertFileToBase64(file);
+        return {
+          file,
+          preview: base64String,
+        };
+      });
 
-    console.log(newImages);
-    console.log(...newImages);
-
-    onChange([...image, ...newImages]);
+      const newImages = await Promise.all(newImagesPromises);
+      onChange([...image, ...newImages]);
+    } catch (error) {
+      console.error("Error converting images to Base64:", error);
+    }
   };
 
   return (
     <div className="flex flex-col gap-2">
       <Button
+        type="button"
         onClick={() => document.getElementById("image-upload")?.click()}
         className="cursor-pointer"
       >
@@ -49,6 +56,7 @@ function ImageUpload({ image, onChange }: ImageUploadProps) {
               className="w-20 h-20 object-cover rounded"
             />
             <button
+              type="button"
               onClick={() => {
                 const removedImages = image.filter((_, i) => i !== index);
                 onChange(removedImages);

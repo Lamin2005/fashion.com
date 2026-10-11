@@ -32,19 +32,17 @@ export const createProduct = async (
     throw new Error("Unauthorized user...");
   }
 
-  await Promise.all(
-    images.map(async (image: { file?: string; public_id?: string }) => {
-      if (image.file) {
-        const uploadResponse = await uploadsigleImage(
-          image.file,
-          "fashion.com/products",
-        );
+  const uploadedImages = await Promise.all(
+    images.map(async (image: { file: string }) => {
+      const uploadResponse = await uploadsigleImage(
+        image.file,
+        "fashion.com/products",
+      );
 
-        return {
-          url: uploadResponse.image_url, //response result form cloudinary so image_url is the secure_url from cloudinary response
-          public_id: uploadResponse.public_id,
-        };
-      }
+      return {
+        url: uploadResponse.image_url,
+        public_id: uploadResponse.public_id,
+      };
     }),
   );
 
@@ -56,14 +54,14 @@ export const createProduct = async (
     category,
     sizes,
     colors,
-    images,
+    images: uploadedImages,
     is_new_arrival,
     is_feature,
     rating_count,
     user,
   });
 
-  res.status(201).json({ messsage: "Successfully create Product.", product });
+  res.status(201).json({ message: "Successfully create Product.", product });
 };
 
 // @route GET /api/products
