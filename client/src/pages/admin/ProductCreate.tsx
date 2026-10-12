@@ -1,29 +1,12 @@
 import ProductForm from "../../components/admin/ProductForm";
 import { useCreateProductMutation } from "../../store/slices/productApi";
-import { productSchema, type ProductFormInput } from "../../schema/products";
+import { type ProductFormInput } from "../../schema/products";
 import { toast } from "sonner";
-import { zodResolver } from "@hookform/resolvers/zod/dist/zod.js";
-import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 function ProductCreate() {
   const [createProduct, { isLoading }] = useCreateProductMutation();
-
-  const form = useForm<ProductFormInput>({
-    resolver: zodResolver(productSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      category: "",
-      price: 0,
-      sizes: [],
-      colors: [],
-      instock_count: 0,
-      rating_count: "0",
-      images: [],
-      is_new_arrival: false,
-      is_feature: false,
-    },
-  });
+  const navigate = useNavigate();
 
   const onSubmit = async (data: ProductFormInput) => {
     const formData = new FormData();
@@ -54,19 +37,7 @@ function ProductCreate() {
       const response = await createProduct(formData).unwrap();
       console.log("Product created successfully:", response);
       toast.success(`${response.message}`);
-      form.reset({
-        name: "",
-        description: "",
-        category: "",
-        price: 0,
-        sizes: [],
-        colors: [],
-        instock_count: 0,
-        rating_count: "0",
-        images: [],
-        is_new_arrival: false,
-        is_feature: false,
-      });
+      navigate("/admin/products");
     } catch (error) {
       console.error("Error creating product:", error);
       toast.error("Failed to create product.");

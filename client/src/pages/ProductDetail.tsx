@@ -119,9 +119,9 @@ const ProductDetail = () => {
 
             <hr className="border-zinc-100" />
 
-            <p className="text-sm text-zinc-500 font-light leading-relaxed">
-              {data?.description}
-            </p>
+            <div
+              dangerouslySetInnerHTML={{ __html: data?.description ?? "" }}
+            />
 
             <div className="space-y-3">
               <div className="flex justify-between">

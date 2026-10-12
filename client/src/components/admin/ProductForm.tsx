@@ -64,7 +64,7 @@ export default function ProductForm({
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4">
               <Controller
                 name="name"
                 control={form.control}
@@ -86,70 +86,98 @@ export default function ProductForm({
                   </Field>
                 )}
               />
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Controller
+                  name="price"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel className="mb-2 text-sm font-medium text-zinc-200">
+                        Price
+                      </FieldLabel>
 
-              <Controller
-                name="price"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel className="mb-2 text-sm font-medium text-zinc-200">
-                      Price
-                    </FieldLabel>
+                      <Input
+                        type="number"
+                        placeholder="eg. 2000"
+                        className={inputClassName}
+                        aria-invalid={fieldState.invalid}
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value))
+                        }
+                      />
 
-                    <Input
-                      type="number"
-                      placeholder="eg. 2000"
-                      className={inputClassName}
-                      aria-invalid={fieldState.invalid}
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(parseFloat(e.target.value))
-                      }
-                    />
+                      <FieldError errors={[fieldState.error]} />
+                    </Field>
+                  )}
+                />
 
-                    <FieldError errors={[fieldState.error]} />
-                  </Field>
-                )}
-              />
+                <Controller
+                  name="instock_count"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel className="mb-2 text-sm font-medium text-zinc-200">
+                        Stock Quantity
+                      </FieldLabel>
 
-              <Controller
-                name="instock_count"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel className="mb-2 text-sm font-medium text-zinc-200">
-                      Stock Quantity
-                    </FieldLabel>
+                      <Input
+                        type="number"
+                        placeholder="eg. 100"
+                        className={inputClassName}
+                        aria-invalid={fieldState.invalid}
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
+                      />
 
-                    <Input
-                      type="number"
-                      placeholder="eg. 100"
-                      className={inputClassName}
-                      aria-invalid={fieldState.invalid}
-                      {...field}
-                      onChange={(e) => field.onChange(parseInt(e.target.value))}
-                    />
+                      <FieldError errors={[fieldState.error]} />
+                    </Field>
+                  )}
+                />
 
-                    <FieldError errors={[fieldState.error]} />
-                  </Field>
-                )}
-              />
+                <Controller
+                  name="category"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel className="mb-2 text-sm font-medium text-zinc-200">
+                        Category
+                      </FieldLabel>
 
-              <Controller
-                name="category"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel className="mb-2 text-sm font-medium text-zinc-200">
-                      Category
-                    </FieldLabel>
+                      <Category value={field.value} onChange={field.onChange} />
 
-                    <Category value={field.value} onChange={field.onChange} />
+                      <FieldError errors={[fieldState.error]} />
+                    </Field>
+                  )}
+                />
 
-                    <FieldError errors={[fieldState.error]} />
-                  </Field>
-                )}
-              />
+                <Controller
+                  name="rating_count"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel className="mb-2 text-sm font-medium text-zinc-200">
+                        Rating Count
+                      </FieldLabel>
+
+                      <Input
+                        type="text"
+                        placeholder="eg. 125"
+                        className={inputClassName}
+                        aria-invalid={fieldState.invalid}
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(e.target.value)
+                        }
+                      />
+
+                      <FieldError errors={[fieldState.error]} />
+                    </Field>
+                  )}
+                />
+              </div>
             </div>
           </section>
 
