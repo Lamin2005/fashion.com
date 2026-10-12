@@ -11,9 +11,10 @@ import {
 } from "../controllers/product";
 import asyncHandler from "../utils/asyncHandler";
 import { authMiddleware, isAdmin } from "../middlewares/authmiddleware";
-import { createProductvalidator } from "../validator/products";
+// import { createProductvalidator } from "../validator/products";
 import { validateRequest } from "../middlewares/validatorRequest";
 import { getMetaProduct } from "../controllers/product";
+import { upload } from "../utils/upload";
 
 const router = Router();
 
@@ -25,7 +26,7 @@ router.post(
   "/create",
   authMiddleware,
   isAdmin,
-  createProductvalidator,
+  upload.array("images"),
   validateRequest,
   asyncHandler(createProduct),
 );

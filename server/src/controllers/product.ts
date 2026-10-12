@@ -11,19 +11,7 @@ export const createProduct = async (
   req: AuthenticatedRequest,
   res: Response,
 ) => {
-  const {
-    name,
-    description,
-    price,
-    instock_count,
-    category,
-    sizes,
-    colors,
-    images,
-    is_new_arrival,
-    is_feature,
-    rating_count,
-  } = req.body;
+  const { name, description, category } = req.body;
 
   const user = req.user?._id;
 
@@ -32,19 +20,53 @@ export const createProduct = async (
     throw new Error("Unauthorized user...");
   }
 
+  const existingProduct = await Product.findOne({ name });
+  if (existingProduct) {
+    res.status(400);
+    throw new Error("Product already exists with this name");
+  }
+
+  const sizes = Array.isArray(req.body.sizes)
+    ? req.body.sizes
+    : [req.body.sizes];
+  const colors = Array.isArray(req.body.colors)
+    ? req.body.colors
+    : [req.body.colors];
+
+  const price = Number(req.body.price);
+  const instock_count = Number(req.body.instock_count);
+  const rating_count = Number(req.body.rating_count);
+  const is_new_arrival = req.body.is_new_arrival === "true";
+  const is_feature = req.body.is_feature === "true";
+
+  const images = req.files as Express.Multer.File[];
+
   const uploadedImages = await Promise.all(
-    images.map(async (image: { file: string }) => {
+    images.map(async (image) => {
       const uploadResponse = await uploadsigleImage(
-        image.file,
+        `data:${image.mimetype};base64,${image.buffer.toString("base64")}`,
         "fashion.com/products",
       );
-
       return {
         url: uploadResponse.image_url,
         public_id: uploadResponse.public_id,
       };
     }),
   );
+
+  // const uploadedImages = await Promise.all(
+  //   images.map(async (image: { file: string }) => {
+  //     const uploadResponse = await uploadsigleImage(
+  //       image.file,
+  //       "fashion.com/products",
+  //     );
+
+  //     return {
+  //       url: uploadResponse.image_url,
+  //       public_id: uploadResponse.public_id,
+  //     };
+  //   }),
+  // );
 
   const product = await Product.create({
     name,
