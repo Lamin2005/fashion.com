@@ -20,6 +20,7 @@ import ProductFilter from "./pages/ProductFilter.tsx";
 import AdminLayout from "./layout/AdminLayout.tsx";
 import Dashboard from "./pages/admin/Dashboard.tsx";
 import ProductCreate from "./pages/admin/ProductCreate.tsx";
+import ProductEdit from "./pages/admin/ProductEdit.tsx";
 
 const router = createBrowserRouter([
   {
@@ -96,9 +97,12 @@ const router = createBrowserRouter([
       },
       {
         path: "/admin/create-products",
-        element:<ProductCreate/>
-      }
-
+        element: <ProductCreate />,
+      },
+      {
+        path: "/admin/edit-products/:id",
+        element: <ProductEdit />,
+      },
     ],
   },
 ]);

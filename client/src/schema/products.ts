@@ -20,7 +20,7 @@ export const imageSchema = z.object({
       message: "Image size must be less than 5MB",
     }),
 
-  preview: z.string().min(1, "Image preview is required"),
+  url: z.string(),
   public_id: z.string().optional(),
 });
 
@@ -39,9 +39,7 @@ export const productSchema = z.object({
     })
     .positive("Price must be greater than 0"),
 
-  sizes: z
-    .array(z.string())
-    .min(1, "At least one size is required"),
+  sizes: z.array(z.string()).min(1, "At least one size is required"),
 
   colors: z.array(z.string()).min(1, "At least one color is required"),
   instock_count: z

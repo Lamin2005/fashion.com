@@ -18,7 +18,7 @@ function ImageUpload({ image, onChange }: ImageUploadProps) {
         const base64String = await convertFileToBase64(file);
         return {
           file,
-          preview: base64String,
+          url: base64String,
         };
       });
 
@@ -28,6 +28,8 @@ function ImageUpload({ image, onChange }: ImageUploadProps) {
       console.error("Error converting images to Base64:", error);
     }
   };
+
+  console.log(image);
 
   return (
     <div className="flex flex-col gap-2">
@@ -48,25 +50,27 @@ function ImageUpload({ image, onChange }: ImageUploadProps) {
       />
 
       <div className="flex gap-2 flex-wrap">
-        {image.map((img, index) => (
-          <div key={index} className="relative group">
-            <img
-              src={img.preview}
-              alt={`Preview ${index}`}
-              className="w-20 h-20 object-cover rounded"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                const removedImages = image.filter((_, i) => i !== index);
-                onChange(removedImages);
-              }}
-              className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center rotate-45 cursor-pointer md:opacity-0 md:group-hover:opacity-100 transition-opacity"
-            >
-              <Cross size={12} />
-            </button>
-          </div>
-        ))}
+        {image.map((img, index: number) => {
+          return (
+            <div key={index} className="relative group">
+              <img
+                src={img.url}
+                alt={`Preview ${index}`}
+                className="w-20 h-20 object-cover rounded border border-zinc-800"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const removedImages = image.filter((_, i) => i !== index);
+                  onChange(removedImages);
+                }}
+                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center cursor-pointer md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-md rotate-45"
+              >
+                <Cross size={12} />
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

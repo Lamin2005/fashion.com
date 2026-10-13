@@ -6,6 +6,11 @@ export interface CreateProductResponse {
   product: Product;
 }
 
+export interface UpdateProductResponse {
+  message: string;
+  product: Product;
+}
+
 const productApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getnewProduct: builder.query<Product[], void>({
@@ -55,6 +60,14 @@ const productApi = apiSlice.injectEndpoints({
         invalidatesTags: ["Products"],
       }),
     }),
+    updateProduct: builder.mutation<UpdateProductResponse, { id: string; data: FormData }>({
+      query: ({ id, data }) => ({
+        url: `/products/update/${id}`,
+        method: "PUT",
+        body: data,
+        invalidatesTags: ["Products"],
+      }),
+    }),
   }),
 });
 
@@ -64,4 +77,5 @@ export const {
   useGetProductDetailQuery,
   useGetProductsQuery,
   useCreateProductMutation,
+  useUpdateProductMutation,
 } = productApi;

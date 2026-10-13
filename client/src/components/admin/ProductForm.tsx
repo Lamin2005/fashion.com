@@ -10,6 +10,7 @@ import Category from "./Category";
 import Colorpicker from "./Colorpicker";
 import Sizes from "./Sizes";
 import Tiptap from "../editor/Tiptap";
+import { useEffect } from "react";
 // import { ArrowLeft } from "lucide-react";
 
 export default function ProductForm({
@@ -37,6 +38,27 @@ export default function ProductForm({
   const inputClassName =
     "h-11 w-full border-zinc-700 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:ring-zinc-500";
 
+  console.log(initialData);
+
+  useEffect(() => {
+    if (initialData) {
+      form.reset({
+        name: (initialData as ProductFormInput)?.name || "",
+        description: (initialData as ProductFormInput)?.description || "",
+        category: (initialData as ProductFormInput)?.category || "",
+        price: (initialData as ProductFormInput)?.price || 0,
+        sizes: (initialData as ProductFormInput)?.sizes || [],
+        colors: (initialData as ProductFormInput)?.colors || [],
+        instock_count: (initialData as ProductFormInput)?.instock_count || 0,
+        rating_count: (initialData as ProductFormInput)?.rating_count || "0",
+        images: (initialData as ProductFormInput)?.images || [],
+        is_new_arrival:
+          (initialData as ProductFormInput)?.is_new_arrival ?? false,
+        is_feature: (initialData as ProductFormInput)?.is_feature ?? false,
+      });
+    }
+  }, [initialData, form]);
+
   return (
     <form
       onSubmit={form.handleSubmit(onSubmit)}
@@ -44,7 +66,7 @@ export default function ProductForm({
     >
       <div className="mb-8 border-b border-zinc-800 pb-6">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Create Product
+          {initialData ? "Edit" : "Create"} Product
         </h1>
 
         <p className="mt-2 text-sm text-zinc-400">
@@ -168,9 +190,7 @@ export default function ProductForm({
                         className={inputClassName}
                         aria-invalid={fieldState.invalid}
                         {...field}
-                        onChange={(e) =>
-                          field.onChange(e.target.value)
-                        }
+                        onChange={(e) => field.onChange(e.target.value)}
                       />
 
                       <FieldError errors={[fieldState.error]} />
@@ -377,7 +397,13 @@ export default function ProductForm({
           className="h-11 w-full cursor-pointer bg-white px-8 font-medium text-black hover:bg-zinc-200 sm:w-auto"
           disabled={isLoading}
         >
-          {isLoading ? "Saving..." : "Create Product"}
+          {isLoading
+            ? initialData
+              ? "Updating..."
+              : "Creating..."
+            : initialData
+              ? "Update Product"
+              : "Create Product"}
         </Button>
       </div>
     </form>

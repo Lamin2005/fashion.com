@@ -8,7 +8,7 @@ interface ColorPickerProp {
 }
 
 function Colorpicker({ colors, onChange }: ColorPickerProp) {
-  const [color, setColor] = useState("#0000");
+  const [color, setColor] = useState("#000000");
 
   const addColor = () => {
     if (colors.includes(color)) return;
