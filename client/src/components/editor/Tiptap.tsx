@@ -1,5 +1,6 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { useEffect } from "react"; // 1. useEffect ကို import လုပ်ပါ
 import { Button } from "../ui/button";
 import {
   Bold,
@@ -31,6 +32,12 @@ const Tiptap = ({ content, onChange }: TiptapProps) => {
     },
   });
 
+  useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content || "");
+    }
+  }, [content, editor]);
+
   if (!editor) return null;
 
   const toolbarButton =
@@ -38,7 +45,6 @@ const Tiptap = ({ content, onChange }: TiptapProps) => {
 
   return (
     <div className="overflow-hidden rounded-xl border border-zinc-800 bg-black text-white shadow-sm">
-      {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-1 border-b border-zinc-800 bg-zinc-950 p-2">
         <Button
           type="button"

@@ -17,6 +17,7 @@ export default function ProductForm({
   initialData,
   onSubmit,
   isLoading,
+  isUpdating,
 }: ProductFormProp) {
   const form = useForm<ProductFormInput>({
     resolver: zodResolver(productSchema),
@@ -395,11 +396,11 @@ export default function ProductForm({
         <Button
           type="submit"
           className="h-11 w-full cursor-pointer bg-white px-8 font-medium text-black hover:bg-zinc-200 sm:w-auto"
-          disabled={isLoading}
+          disabled={isLoading || isUpdating}
         >
-          {isLoading
+          {isLoading || isUpdating
             ? initialData
-              ? "Updating..."
+              ? "Saving..."
               : "Creating..."
             : initialData
               ? "Update Product"

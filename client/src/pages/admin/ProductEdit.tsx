@@ -8,9 +8,13 @@ import { toast } from "sonner";
 import { useNavigate, useParams } from "react-router-dom";
 
 function ProductEdit() {
-  const [updateProduct, { isLoading }] = useUpdateProductMutation();
+  const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
   const { id } = useParams<{ id: string }>();
-  const { data: product, isError } = useGetProductDetailQuery(id as string);
+  const {
+    data: product,
+    isError,
+    isLoading,
+  } = useGetProductDetailQuery(id as string);
   const navigate = useNavigate();
 
   const onSubmit = async (data: ProductFormInput) => {
@@ -33,11 +37,24 @@ function ProductEdit() {
       formData.append("sizes", size);
     });
 
-    data.images.forEach((img) => {
-      if (img.file) {
-        formData.append("images", img.file as File);
-      }
+    const existingImages = data?.images
+      ? data.images
+          .filter((image) => image && image.public_id)
+          .map((image) => image.public_id)
+      : [];
+
+    const newImages = data?.images
+      ? data.images.filter((image) => image && image.file)
+      : [];
+
+    formData.append("existingImages", JSON.stringify(existingImages));
+
+    newImages.forEach((image) => {
+      formData.append("images", image.file as File);
     });
+
+    console.log("New Images:", newImages);
+
     try {
       if (!id) {
         toast.error("Product ID is missing.");
@@ -64,6 +81,7 @@ function ProductEdit() {
         onSubmit={onSubmit}
         isLoading={isLoading}
         initialData={product}
+        isUpdating={isUpdating}
       />
     </div>
   );

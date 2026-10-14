@@ -30,4 +30,5 @@ export interface ProductFormProp {
   initialData?: unknown;
   onSubmit: (data: ProductFormInput) => void;
   isLoading: boolean;
+  isUpdating?:boolean;
 }
