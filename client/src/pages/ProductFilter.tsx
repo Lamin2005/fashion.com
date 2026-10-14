@@ -218,7 +218,7 @@ function ProductFilter() {
                 Colors
               </h3>
               <div className="flex flex-col space-y-2">
-                {productsMeta.colors?.map((color) => (
+                {productsMeta.colors?.slice(0, 10).map((color) => (
                   <div key={color}>
                     <input
                       type="checkbox"

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import Product from "../model/product";
 import { AuthenticatedRequest } from "../middlewares/authmiddleware";
-import { uploadsigleImage } from "../utils/cloudinary";
+import { deleteImage, uploadsigleImage } from "../utils/cloudinary";
 
 // @route POST /api/products/create
 //@desc Create a new product
@@ -153,19 +153,68 @@ export const updateProduct = async (
     throw new Error("Unauthorized user...");
   }
 
-  const {
-    name,
-    description,
-    price,
-    instock_count,
-    category,
-    sizes,
-    colors,
-    images,
-    is_new_arrival,
-    is_feature,
-    rating_count,
-  } = req.body;
+  const { name, description, category, existingImages } = req.body;
+
+  const sizes = Array.isArray(req.body.sizes)
+    ? req.body.sizes
+    : [req.body.sizes];
+  const colors = Array.isArray(req.body.colors)
+    ? req.body.colors
+    : [req.body.colors];
+
+  const price = Number(req.body.price);
+  const instock_count = Number(req.body.instock_count);
+  const rating_count = Number(req.body.rating_count);
+  const is_new_arrival = req.body.is_new_arrival === "true";
+  const is_feature = req.body.is_feature === "true";
+
+  const parsedExisting = existingImages ? JSON.parse(existingImages) : [];
+
+  const keepexistingImages = product.images.filter((existImg) => {
+    return parsedExisting.some((item: any) => {
+      const target =
+        typeof item === "string" ? item : item.public_id || item.url;
+      return target === existImg.public_id || target === existImg.url;
+    });
+  });
+
+  const newImages = req.files as Express.Multer.File[];
+
+  const imageToDelete = product.images.filter((existImg) => {
+    return !keepexistingImages.some(
+      (keepImage: any) => keepImage.public_id === existImg.public_id,
+    );
+  });
+
+  if (imageToDelete && imageToDelete.length > 0) {
+    await Promise.all(
+      imageToDelete.map(async (image) => {
+        try {
+          await deleteImage(image.public_id);
+        } catch (err) {
+          console.log(`Fail to delete image : ${image.public_id}`, err);
+        }
+      }),
+    );
+  }
+
+  let uploadNewImages: any[] = [];
+  if (newImages && newImages.length > 0) {
+    uploadNewImages = await Promise.all(
+      newImages.map(async (image) => {
+        const uploadResponse = await uploadsigleImage(
+          `data:${image.mimetype};base64,${image.buffer.toString("base64")}`,
+          "fashion.com/products",
+        );
+        return {
+          url: uploadResponse.image_url,
+          public_id: uploadResponse.public_id,
+        };
+      }),
+    );
+  }
+
+  const finalImages = [...keepexistingImages, ...uploadNewImages];
 
   product.name = name || product.name;
   product.description = description || product.description;
@@ -174,7 +223,7 @@ export const updateProduct = async (
   product.category = category || product.category;
   product.sizes = sizes || product.sizes;
   product.colors = colors || product.colors;
-  product.images = images || product.images;
+  product.images = finalImages;
   product.is_new_arrival = is_new_arrival || product.is_new_arrival;
   product.is_feature = is_feature || product.is_feature;
   product.rating_count = rating_count || product.rating_count;
@@ -183,6 +232,8 @@ export const updateProduct = async (
 
   res.status(200).json({ message: "Product updated successfully", product });
 };
+
+//n2,7v,hm
 
 // @route POST /api/products/keywords=t-shirt&minPrice=50&maxPrice=100
 // @desc find product with filter

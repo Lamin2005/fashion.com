@@ -53,8 +53,6 @@ function ProductEdit() {
       formData.append("images", image.file as File);
     });
 
-    console.log("New Images:", newImages);
-
     try {
       if (!id) {
         toast.error("Product ID is missing.");

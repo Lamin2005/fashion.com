@@ -36,7 +36,14 @@ router.get("/new", asyncHandler(getnewProduct));
 router.get("/featured", asyncHandler(getfeaturedProduct));
 router.get("/filters/meta", asyncHandler(getMetaProduct));
 
-router.put("/update/:id", authMiddleware, isAdmin, asyncHandler(updateProduct));
+router.put(
+  "/update/:id",
+  authMiddleware,
+  isAdmin,
+  upload.array("images"),
+  asyncHandler(updateProduct),
+);
+
 router.delete(
   "/delete/:id",
   authMiddleware,
