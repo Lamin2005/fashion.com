@@ -21,6 +21,7 @@ import AdminLayout from "./layout/AdminLayout.tsx";
 import Dashboard from "./pages/admin/Dashboard.tsx";
 import ProductCreate from "./pages/admin/ProductCreate.tsx";
 import ProductEdit from "./pages/admin/ProductEdit.tsx";
+import ProductsPage from "./pages/admin/Products.tsx";
 
 const router = createBrowserRouter([
   {
@@ -98,6 +99,10 @@ const router = createBrowserRouter([
       {
         path: "/admin/create-products",
         element: <ProductCreate />,
+      },
+      {
+        path: "/admin/products",
+        element: <ProductsPage />,
       },
       {
         path: "/admin/edit-products/:id",

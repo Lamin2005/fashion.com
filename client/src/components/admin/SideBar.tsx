@@ -19,7 +19,6 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
 
-  // Close the mobile drawer whenever the route changes
   useEffect(() => {
     onClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -70,7 +69,6 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
     },
   ];
 
-  // Shared class helpers so mobile stays expanded while lg can collapse
   const hideWhenCollapsed = isCollapsed ? "lg:hidden" : "";
 
   return (
@@ -86,7 +84,6 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
         ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
       `}
     >
-      {/* ---------- Collapse toggle (desktop only) ---------- */}
       <button
         type="button"
         onClick={() => setIsCollapsed((v) => !v)}
@@ -96,7 +93,6 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
         {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
       </button>
 
-      {/* ---------- Header ---------- */}
       <div
         className={`
           flex h-20 shrink-0 items-center gap-3 border-b border-zinc-900 px-5
@@ -116,7 +112,6 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
           </p>
         </div>
 
-        {/* Mobile close button */}
         <button
           type="button"
           onClick={onClose}
@@ -127,7 +122,6 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
         </button>
       </div>
 
-      {/* ---------- Navigation ---------- */}
       <nav
         className="
           flex-1 space-y-8 overflow-y-auto px-3 py-5
@@ -216,7 +210,6 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
         ))}
       </nav>
 
-      {/* ---------- Footer ---------- */}
       <div className="shrink-0 space-y-2 border-t border-zinc-900 p-4">
         <div
           className={`
@@ -228,13 +221,13 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
             AD
           </div>
 
-          <div className={`min-w-0 flex-1 overflow-hidden ${hideWhenCollapsed}`}>
+          <div
+            className={`min-w-0 flex-1 overflow-hidden ${hideWhenCollapsed}`}
+          >
             <p className="truncate text-sm font-medium text-white">
               Administrator
             </p>
-            <p className="truncate text-xs text-zinc-500">
-              admin@fashion.com
-            </p>
+            <p className="truncate text-xs text-zinc-500">admin@fashion.com</p>
           </div>
         </div>
 
