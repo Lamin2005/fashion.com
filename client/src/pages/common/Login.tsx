@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff, ArrowRight, AlertCircleIcon } from "lucide-react";
-import { loginSchema } from "../schema/auth";
+import { loginSchema } from "../../schema/auth";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver as hookFormResolver } from "@hookform/resolvers/zod";
