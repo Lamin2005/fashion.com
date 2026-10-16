@@ -10,10 +10,10 @@ import { ProductTable } from "@/components/product/ProductTable";
 import { columns } from "../../components/product/useProductColumn";
 
 function ProductPage() {
-  const { data: product, isLoading } = useGetProductsQuery(undefined);
+  const { data: product, isLoading } = useGetProductsQuery({});
+  const products = product?.products || [];
 
-  console.log(product);
-  
+  console.log(products);
 
   return (
     <div className="min-w-0 space-y-6 pb-6">
@@ -42,31 +42,21 @@ function ProductPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <ProductStatusCard
           title="In Stock"
-          count={
-            product?.filter((p: { status: string }) => p.status === "In Stock")
-              .length || 0
-          }
+          count={products?.length || 0}
           icon={<Boxes className="h-6 w-6" />}
           status="In Stock"
           isLoading={isLoading}
         />
         <ProductStatusCard
           title="Low Stock"
-          count={
-            product?.filter((p: { status: string }) => p.status === "Low Stock")
-              .length || 0
-          }
+          count={products?.length || 0}
           icon={<AlertTriangle className="h-6 w-6" />}
           status="Low Stock"
           isLoading={isLoading}
         />
         <ProductStatusCard
           title="Out of Stock"
-          count={
-            product?.filter(
-              (p: { status: string }) => p.status === "Out of Stock",
-            ).length || 0
-          }
+          count={products?.length || 0}
           icon={<XCircle className="h-6 w-6" />}
           status="Out of Stock"
           isLoading={isLoading}
@@ -81,7 +71,7 @@ function ProductPage() {
         <CardContent>
           <ProductTable
             columns={columns}
-            data={product ?? []}
+            data={products ?? []}
             isLoading={isLoading}
           />
         </CardContent>

@@ -16,6 +16,7 @@ export interface Product {
   images: Image[];
   is_new_arrival?: boolean;
   is_feature?: boolean;
+  instock_count: number;
 }
 
 export interface ProductFiltersMeta {
@@ -30,5 +31,5 @@ export interface ProductFormProp {
   initialData?: unknown;
   onSubmit: (data: ProductFormInput) => void;
   isLoading: boolean;
-  isUpdating?:boolean;
+  isUpdating?: boolean;
 }
