@@ -7,11 +7,13 @@ import ProductStatusCard from "@/components/admin/ProductStatusCard";
 import { useGetProductsQuery } from "@/store/slices/productApi";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { ProductTable } from "@/components/product/ProductTable";
-import { columns } from "../../components/product/useProductColumn";
+import { useProductColumn } from "../../components/product/useProductColumn";
+import { type Product } from "@/types/product";
 
 function ProductPage() {
   const { data: product, isLoading } = useGetProductsQuery({});
   const products = product?.products || [];
+  const columns = useProductColumn();
 
   console.log(products);
 
@@ -42,21 +44,29 @@ function ProductPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <ProductStatusCard
           title="In Stock"
-          count={products?.length || 0}
+          count={
+            products?.filter((p: Product) => p.instock_count > 10).length || 0
+          }
           icon={<Boxes className="h-6 w-6" />}
           status="In Stock"
           isLoading={isLoading}
         />
         <ProductStatusCard
           title="Low Stock"
-          count={products?.length || 0}
+          count={
+            products?.filter(
+              (p: Product) => p.instock_count < 10 && p.instock_count !== 0,
+            ).length || 0
+          }
           icon={<AlertTriangle className="h-6 w-6" />}
           status="Low Stock"
           isLoading={isLoading}
         />
         <ProductStatusCard
           title="Out of Stock"
-          count={products?.length || 0}
+          count={
+            products?.filter((p: Product) => p.instock_count === 0).length || 0
+          }
           icon={<XCircle className="h-6 w-6" />}
           status="Out of Stock"
           isLoading={isLoading}
