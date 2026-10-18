@@ -21,11 +21,31 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router";
+import { useDeleteProductMutation } from "@/store/slices/productApi";
+import { toast } from "sonner";
 
 const columnHelper = createColumnHelper<DataTableFeatures, Product>();
 
 export const useProductColumn = () => {
   const navigate = useNavigate();
+  const [deleteProduct, { isLoading }] = useDeleteProductMutation();
+
+  const handleDeleteProduct = async (id: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this product?",
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const response = await deleteProduct({ id }).unwrap();
+
+      toast.success(response.message || "Product deleted successfully");
+    } catch (error) {
+      console.error("Delete product error:", error);
+      toast.error("Failed to delete product. Please try again.");
+    }
+  };
 
   return columnHelper.columns([
     columnHelper.accessor("images", {
@@ -146,9 +166,19 @@ export const useProductColumn = () => {
                 <Edit /> Edit Product
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="cursor-pointer gap-2 rounded-md px-2 py-2 text-sm focus:bg-white/10 focus:text-white">
-                <Trash />
-                Delete Product
+              <DropdownMenuItem
+                disabled={isLoading}
+                className="group cursor-pointer gap-2 rounded-md px-2 py-2
+    text-gray-400
+    hover:bg-red-500 hover:text-white
+    focus:bg-red-500 focus:text-white"
+                onClick={() => handleDeleteProduct(product._id)}
+              >
+                <Trash className="h-4 w-4 text-gray-400 transition-colors group-hover:text-white group-focus:text-white" />
+
+                <span className="transition-colors group-hover:text-white group-focus:text-white">
+                  Delete Product
+                </span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -1,15 +1,11 @@
 import { apiSlice } from "./api";
 import type { Product, ProductFiltersMeta } from "@/types/product";
 
-export interface CreateProductResponse {
+export interface ProductResponse {
   message: string;
-  product: Product;
+  product?: Product;
 }
 
-export interface UpdateProductResponse {
-  message: string;
-  product: Product;
-}
 
 const productApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -48,26 +44,37 @@ const productApi = apiSlice.injectEndpoints({
 
         return `/products/?${params.toString()}`;
       },
+      providesTags : ["Products"],
     }),
     getProductsMeta: builder.query<ProductFiltersMeta, string>({
       query: () => "/products/filters/meta",
     }),
-    createProduct: builder.mutation<CreateProductResponse, FormData>({
+    createProduct: builder.mutation<ProductResponse, FormData>({
       query: (productData) => ({
         url: "/products/create",
         method: "POST",
         body: productData,
-        invalidatesTags: ["Products"],
+       
       }),
+      invalidatesTags: ["Products"],
     }),
-    updateProduct: builder.mutation<UpdateProductResponse, { id: string; data: FormData }>({
+    updateProduct: builder.mutation<ProductResponse, { id: string; data: FormData }>({
       query: ({ id, data }) => ({
         url: `/products/update/${id}`,
         method: "PUT",
         body: data,
-        invalidatesTags: ["Products"],
+       
       }),
+      invalidatesTags: ["Products"],
     }),
+    deleteProduct: builder.mutation<ProductResponse, { id: string }>({
+      query: ({id}) => ({
+        url: `/products/delete/${id}`,
+        method: "DELETE"             
+      }),
+      invalidatesTags: ["Products"],
+    }),
+   
   }),
 });
 
@@ -78,4 +85,5 @@ export const {
   useGetProductsQuery,
   useCreateProductMutation,
   useUpdateProductMutation,
+  useDeleteProductMutation
 } = productApi;

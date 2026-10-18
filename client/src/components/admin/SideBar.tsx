@@ -14,17 +14,34 @@ import {
   Bell,
   X,
 } from "lucide-react";
+import useLowStockCount from "@/components/hooks/useLowStockCount";
+import type { LucideIcon } from "lucide-react";
+
+type MenuItem = {
+  path: string;
+  label: string;
+  icon: LucideIcon;
+  end?: boolean;
+  badge?: string;
+  badgeColor?: string;
+};
+
+type MenuGroup = {
+  groupLabel: string;
+  items: MenuItem[];
+};
 
 export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
+  const { lowStockCount, isLoading, isError } = useLowStockCount();
 
   useEffect(() => {
     onClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
-  const menuGroups = [
+  const menuGroups: MenuGroup[] = [
     {
       groupLabel: "Main",
       items: [
@@ -38,7 +55,11 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
           path: "/admin/products",
           label: "Products",
           icon: ShoppingBag,
-          badge: "128",
+          badge: isLoading ? "..." : isError ? "!" : String(lowStockCount),
+          badgeColor:
+            lowStockCount > 0
+              ? "border border-red-500/30 bg-red-500/10 text-red-400"
+              : "border border-zinc-700 bg-zinc-800 text-zinc-400",
         },
         {
           path: "/admin/orders",
@@ -57,14 +78,22 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
     {
       groupLabel: "Management",
       items: [
-        { path: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+        {
+          path: "/admin/analytics",
+          label: "Analytics",
+          icon: BarChart3,
+        },
         {
           path: "/admin/notifications",
           label: "Notifications",
           icon: Bell,
           badge: "3",
         },
-        { path: "/admin/settings", label: "Settings", icon: Settings },
+        {
+          path: "/admin/settings",
+          label: "Settings",
+          icon: Settings,
+        },
       ],
     },
   ];
