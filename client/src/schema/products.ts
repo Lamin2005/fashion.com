@@ -47,7 +47,7 @@ export const productSchema = z.object({
       message: "In Stock Count must be a number",
     })
     .positive("In Stock Count must be greater than 0"),
-  rating_count: z.string(),
+  rating_count: z.number(),
 
   images: z.array(imageSchema).min(1, "At least one image is required"),
 

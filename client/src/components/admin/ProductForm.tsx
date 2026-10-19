@@ -29,7 +29,7 @@ export default function ProductForm({
       sizes: [],
       colors: [],
       instock_count: 0,
-      rating_count: "0",
+      rating_count: 0,
       images: [],
       is_new_arrival: false,
       is_feature: false,
@@ -51,7 +51,7 @@ export default function ProductForm({
         sizes: (initialData as ProductFormInput)?.sizes || [],
         colors: (initialData as ProductFormInput)?.colors || [],
         instock_count: (initialData as ProductFormInput)?.instock_count || 0,
-        rating_count: (initialData as ProductFormInput)?.rating_count || "0",
+        rating_count: (initialData as ProductFormInput)?.rating_count || 0,
         images: (initialData as ProductFormInput)?.images || [],
         is_new_arrival:
           (initialData as ProductFormInput)?.is_new_arrival ?? false,
@@ -186,12 +186,12 @@ export default function ProductForm({
                       </FieldLabel>
 
                       <Input
-                        type="text"
+                        type="number"
                         placeholder="eg. 125"
                         className={inputClassName}
                         aria-invalid={fieldState.invalid}
                         {...field}
-                        onChange={(e) => field.onChange(e.target.value)}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
                       />
 
                       <FieldError errors={[fieldState.error]} />

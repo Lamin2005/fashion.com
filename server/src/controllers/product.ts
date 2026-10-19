@@ -224,8 +224,8 @@ export const updateProduct = async (
   product.sizes = sizes || product.sizes;
   product.colors = colors || product.colors;
   product.images = finalImages;
-  product.is_new_arrival = is_new_arrival || product.is_new_arrival;
-  product.is_feature = is_feature || product.is_feature;
+  product.is_new_arrival = req.body.is_new_arrival === "true";
+  product.is_feature = req.body.is_feature === "true";
   product.rating_count = rating_count || product.rating_count;
 
   await product.save();

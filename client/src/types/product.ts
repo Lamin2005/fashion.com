@@ -12,7 +12,7 @@ export interface Product {
   price: number;
   sizes: string[];
   colors: string[];
-  rating_count: string;
+  rating_count: number;
   images: Image[];
   is_new_arrival?: boolean;
   is_feature?: boolean;

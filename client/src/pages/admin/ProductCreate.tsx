@@ -16,7 +16,7 @@ function ProductCreate() {
     formData.append("category", data.category);
     formData.append("price", data.price.toString());
     formData.append("instock_count", data.instock_count.toString());
-    formData.append("rating_count", data.rating_count);
+    formData.append("rating_count", data.rating_count.toString());
     formData.append("is_new_arrival", String(data.is_new_arrival));
     formData.append("is_feature", String(data.is_feature));
 
