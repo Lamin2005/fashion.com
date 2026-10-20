@@ -22,6 +22,7 @@ function AccountSettings() {
   const { data: userInfo, refetch, isLoading } = useProfileQuery();
   const [avatar, setAvatar] = useState<string | null>(null);
   const [uploadmutation, { isLoading: isMutation }] = useUploadMutation();
+
   const ref = useRef<HTMLInputElement>(null);
 
   const imageHandler = (e: React.ChangeEvent<HTMLInputElement>) => {

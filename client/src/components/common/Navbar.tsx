@@ -25,7 +25,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/index.ts";
 import { useDispatch } from "react-redux";
 import { clearUserInfo } from "@/store/slices/auth";
-import { useLogoutMutation, useProfileQuery } from "@/store/slices/userApi";
+import { useLogoutMutation } from "@/store/slices/userApi";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router";
 import { debounce } from "lodash";
@@ -49,8 +49,6 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const [logoutMutation, { isLoading }] = useLogoutMutation();
   const navigate = useNavigate();
-  const { isError } = useProfileQuery();
-  // const hasShowerror = useRef(false);
 
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
 
@@ -138,22 +136,11 @@ const Navbar = () => {
     try {
       const response = await logoutMutation({}).unwrap();
       dispatch(clearUserInfo());
-      if (!isError) {
-        toast.success(`${response.message}`);
-      }
+      toast.success(`${response.message}`);
     } catch (error) {
       console.log("Logout Error : ", error);
     }
   };
-
-  // useEffect(() => {
-  //   if (isError && !hasShowerror.current) {
-  //     hasShowerror.current = true;
-  //     logoutHandler();
-  //   }
-
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [isError]);
 
   return (
     <>
@@ -206,6 +193,13 @@ const Navbar = () => {
                   <DropdownMenuContent align="end">
                     <DropdownMenuGroup>
                       <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                      {userInfo.role === "admin" && (
+                        <Link to="/admin">
+                          <DropdownMenuItem className="cursor-pointer">
+                            Dashboard
+                          </DropdownMenuItem>
+                        </Link>
+                      )}
                       <Link to="/profile">
                         <DropdownMenuItem className="cursor-pointer">
                           Profile
