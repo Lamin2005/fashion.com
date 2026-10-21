@@ -1,57 +1,15 @@
-// src/pages/admin/Dashboard.jsx
 import {
   ArrowUpRight,
-  ArrowDownRight,
-  DollarSign,
-  ShoppingBag,
-  ShoppingCart,
-  Users,
   MoreHorizontal,
-  TrendingUp,
+  ShoppingBag,
   Package,
   Eye,
   Plus,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
-
-const stats = [
-  {
-    label: "Total Revenue",
-    value: "$48,295",
-    change: "+12.4%",
-    trend: "up",
-    icon: DollarSign,
-    accent: "text-emerald-400",
-    bg: "bg-emerald-500/10",
-  },
-  {
-    label: "Total Orders",
-    value: "1,284",
-    change: "+8.1%",
-    trend: "up",
-    icon: ShoppingCart,
-    accent: "text-amber-400",
-    bg: "bg-amber-500/10",
-  },
-  {
-    label: "Products",
-    value: "128",
-    change: "+3.2%",
-    trend: "up",
-    icon: ShoppingBag,
-    accent: "text-sky-400",
-    bg: "bg-sky-500/10",
-  },
-  {
-    label: "Customers",
-    value: "3,642",
-    change: "-1.8%",
-    trend: "down",
-    icon: Users,
-    accent: "text-fuchsia-400",
-    bg: "bg-fuchsia-500/10",
-  },
-];
+import { useGetProductsQuery } from "@/store/slices/productApi";
+import ProductStatusCard from "@/components/admin/ProductStatusCard";
+import DailyProductChart from "@/components/admin/DailyProductChart";
 
 const recentOrders = [
   {
@@ -123,7 +81,8 @@ const salesData = [
 
 function Dashboard() {
   const maxValue = Math.max(...salesData.map((d) => d.value));
-
+  const { data: product, isLoading } = useGetProductsQuery({});
+  const products = product?.products || [];
   return (
     <div className="space-y-6 overflow-y-auto scrollbar-none">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -154,71 +113,19 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* ---------- Stat cards ---------- */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          const isUp = stat.trend === "up";
-
-          return (
-            <div
-              key={stat.label}
-              className="group relative overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-5 transition-all duration-200 hover:border-zinc-700 hover:bg-zinc-900/70"
-            >
-              <div className="flex items-start justify-between">
-                <div
-                  className={`flex h-11 w-11 items-center justify-center rounded-xl ${stat.bg}`}
-                >
-                  <Icon size={20} className={stat.accent} />
-                </div>
-
-                <span
-                  className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                    isUp
-                      ? "bg-emerald-500/10 text-emerald-400"
-                      : "bg-red-500/10 text-red-400"
-                  }`}
-                >
-                  {isUp ? (
-                    <ArrowUpRight size={12} />
-                  ) : (
-                    <ArrowDownRight size={12} />
-                  )}
-                  {stat.change}
-                </span>
-              </div>
-
-              <p className="mt-4 text-sm font-medium text-zinc-500">
-                {stat.label}
-              </p>
-              <p className="mt-1 font-serif text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                {stat.value}
-              </p>
-            </div>
-          );
-        })}
+        <ProductStatusCard
+          title="Total Products"
+          count={products?.length || 0}
+          icon={<ShoppingBag className="h-6 w-6" />}
+          status="Products"
+          isLoading={isLoading}
+        />
       </div>
 
-      {/* ---------- Chart + Top products ---------- */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        {/* Sales chart */}
         <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-5 sm:p-6 xl:col-span-2">
-          <div className="flex items-start justify-between">
-            <div>
-              <h2 className="font-serif text-lg font-semibold text-white">
-                Weekly Sales
-              </h2>
-              <p className="mt-0.5 text-xs text-zinc-500">
-                Revenue overview for the last 7 days
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs font-medium text-zinc-400">
-              <TrendingUp size={14} className="text-emerald-400" />
-              <span className="text-emerald-400">+18.2%</span>
-              <span className="text-zinc-600">vs last week</span>
-            </div>
-          </div>
+          <DailyProductChart />
 
           {/* Bars */}
           <div className="mt-6 flex h-48 items-end justify-between gap-2 sm:gap-4">

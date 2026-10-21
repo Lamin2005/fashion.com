@@ -6,7 +6,15 @@ interface ProductStatusCardProps {
   title: string;
   count: number;
   icon: React.ReactNode;
-  status: "In Stock" | "Low Stock" | "Out of Stock";
+  status:
+    | "In Stock"
+    | "Low Stock"
+    | "Out of Stock"
+    | "Total Revenue"
+    | "Total Orders"
+    | "Products"
+    | "Customers"
+    | "Total Stocks";
   isLoading?: boolean;
 }
 
@@ -25,6 +33,31 @@ const statusStyles = {
     icon: "bg-red-500/10 text-red-400",
     badge: "border-red-500/20 bg-red-500/10 text-red-400",
     dot: "bg-red-400",
+  },
+  "Total Revenue": {
+    icon: "bg-emerald-500/10 text-emerald-400",
+    badge: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+    dot: "bg-emerald-400",
+  },
+  "Total Orders": {
+    icon: "bg-amber-500/10 text-amber-400",
+    badge: "border-amber-500/20 bg-amber-500/10 text-amber-400",
+    dot: "bg-amber-400",
+  },
+  "Products": {
+    icon: "bg-sky-500/10 text-sky-400",
+    badge: "border-sky-500/20 bg-sky-500/10 text-sky-400",
+    dot: "bg-sky-400",
+  },
+  "Customers": {
+    icon: "bg-fuchsia-500/10 text-fuchsia-400",
+    badge: "border-fuchsia-500/20 bg-fuchsia-500/10 text-fuchsia-400",
+    dot: "bg-fuchsia-400",
+  },
+  "Total Stocks": {
+    icon: "bg-blue-500/10 text-blue-400",
+    badge: "border-blue-500/20 bg-blue-500/10 text-blue-400",
+    dot: "bg-blue-400",
   },
 };
 

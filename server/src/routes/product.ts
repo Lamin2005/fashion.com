@@ -15,12 +15,14 @@ import { authMiddleware, isAdmin } from "../middlewares/authmiddleware";
 import { validateRequest } from "../middlewares/validatorRequest";
 import { getMetaProduct } from "../controllers/product";
 import { upload } from "../utils/upload";
+import { getDailyProductAnalytics } from "../utils/productAnalyticsController";
 
 const router = Router();
 
 // router.get("/", authMiddleware, isAdmin, asyncHandler(getAllProducts));
 
 router.get("/", asyncHandler(getProductwithFilter));
+router.get("/daily", getDailyProductAnalytics);
 
 router.post(
   "/create",

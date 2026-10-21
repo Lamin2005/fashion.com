@@ -43,16 +43,18 @@ function ProductPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <ProductStatusCard
-          title="In Stock"
+          title="In Stock Produts"
           count={
-            products?.filter((p: Product) => p.instock_count > 10).length || 0
+            products?.filter(
+              (p: Product) => p.instock_count > 10 || p.instock_count === 10,
+            ).length || 0
           }
           icon={<Boxes className="h-6 w-6" />}
           status="In Stock"
           isLoading={isLoading}
         />
         <ProductStatusCard
-          title="Low Stock"
+          title="Low Stock Produts"
           count={
             products?.filter(
               (p: Product) => p.instock_count < 10 && p.instock_count !== 0,
@@ -63,12 +65,22 @@ function ProductPage() {
           isLoading={isLoading}
         />
         <ProductStatusCard
-          title="Out of Stock"
+          title="Out of Stock Produts"
           count={
             products?.filter((p: Product) => p.instock_count === 0).length || 0
           }
           icon={<XCircle className="h-6 w-6" />}
           status="Out of Stock"
+          isLoading={isLoading}
+        />
+        <ProductStatusCard
+          title="Total Stocks"
+          count={products.reduce(
+            (total: number, product: Product) => total + product.instock_count,
+            0,
+          )}
+          icon={<Boxes className="h-6 w-6" />}
+          status="Total Stocks"
           isLoading={isLoading}
         />
       </div>
