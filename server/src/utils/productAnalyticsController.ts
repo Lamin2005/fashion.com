@@ -1,11 +1,7 @@
-
 import { Request, Response } from "express";
 import Product from "../model/product";
 
-export const getDailyProductAnalytics = async (
-  req: Request,
-  res: Response,
-) => {
+export const getDailyProductAnalytics = async (req: Request, res: Response) => {
   try {
     const result = await Product.aggregate([
       {

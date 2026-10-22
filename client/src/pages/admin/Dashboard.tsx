@@ -1,15 +1,9 @@
-import {
-  ArrowUpRight,
-  MoreHorizontal,
-  ShoppingBag,
-  Package,
-  Eye,
-  Plus,
-} from "lucide-react";
+import { ArrowUpRight, ShoppingBag,  Eye, Plus } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useGetProductsQuery } from "@/store/slices/productApi";
 import ProductStatusCard from "@/components/admin/ProductStatusCard";
 import DailyProductChart from "@/components/admin/DailyProductChart";
+import type { Product } from "@/types/product";
 
 const recentOrders = [
   {
@@ -56,31 +50,8 @@ const statusStyles: Record<string, string> = {
   Cancelled: "bg-red-500/10 text-red-400 border-red-500/20",
 };
 
-const topProducts = [
-  { name: "Oversized Wool Coat", sold: 342, revenue: "$18,420", progress: 82 },
-  {
-    name: "Leather Chelsea Boots",
-    sold: 289,
-    revenue: "$14,290",
-    progress: 68,
-  },
-  { name: "Silk Scarf — Autumn", sold: 214, revenue: "$6,420", progress: 51 },
-  { name: "Linen Blazer", sold: 178, revenue: "$9,890", progress: 42 },
-];
-
-// Simple bar chart data (last 7 days)
-const salesData = [
-  { day: "Mon", value: 45 },
-  { day: "Tue", value: 62 },
-  { day: "Wed", value: 38 },
-  { day: "Thu", value: 74 },
-  { day: "Fri", value: 88 },
-  { day: "Sat", value: 56 },
-  { day: "Sun", value: 71 },
-];
 
 function Dashboard() {
-  const maxValue = Math.max(...salesData.map((d) => d.value));
   const { data: product, isLoading } = useGetProductsQuery({});
   const products = product?.products || [];
   return (
@@ -126,83 +97,72 @@ function Dashboard() {
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-5 sm:p-6 xl:col-span-2">
           <DailyProductChart />
-
-          {/* Bars */}
-          <div className="mt-6 flex h-48 items-end justify-between gap-2 sm:gap-4">
-            {salesData.map((d) => {
-              const height = (d.value / maxValue) * 100;
-              return (
-                <div
-                  key={d.day}
-                  className="group flex flex-1 flex-col items-center gap-2"
-                >
-                  <div className="relative flex w-full flex-1 items-end">
-                    <div
-                      style={{ height: `${height}%` }}
-                      className="w-full rounded-t-lg bg-linear-to-t from-amber-500/40 to-amber-400 transition-all duration-300 group-hover:from-amber-400/60 group-hover:to-amber-300"
-                    />
-                    {/* Tooltip */}
-                    <div className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 rounded-lg border border-zinc-700 bg-zinc-950 px-2 py-1 text-[11px] font-semibold text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-                      ${(d.value * 100).toLocaleString()}
-                    </div>
-                  </div>
-                  <span className="text-xs font-medium text-zinc-500">
-                    {d.day}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
         </div>
 
-        {/* Top products */}
         <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-5 sm:p-6">
           <div className="flex items-start justify-between">
             <div>
               <h2 className="font-serif text-lg font-semibold text-white">
-                Top Products
+                Recent Products
               </h2>
               <p className="mt-0.5 text-xs text-zinc-500">
-                Best sellers this month
+                recent products list
               </p>
             </div>
-            <button
-              type="button"
-              aria-label="More options"
-              className="rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-white"
+            <NavLink
+              to="/admin/products"
+              className="flex items-center gap-1 text-sm font-medium text-amber-400 transition-colors hover:text-amber-300"
             >
-              <MoreHorizontal size={18} />
-            </button>
+              View all
+              <ArrowUpRight size={14} />
+            </NavLink>
           </div>
 
           <div className="mt-5 space-y-4">
-            {topProducts.map((p) => (
-              <div key={p.name}>
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900">
-                      <Package size={16} className="text-zinc-400" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-white">
-                        {p.name}
-                      </p>
-                      <p className="text-xs text-zinc-500">{p.sold} sold</p>
-                    </div>
-                  </div>
-                  <span className="shrink-0 font-mono text-sm font-semibold text-amber-400">
-                    {p.revenue}
-                  </span>
-                </div>
+            {products.slice(0,7).map((p: Product) => {
+              const maxStock = 100;
+              const stock = Math.max(0, p.instock_count ?? 0);
+              const percentage = Math.min(
+                100,
+                Math.round((stock / maxStock) * 100),
+              );
 
-                <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
+              const stockColor =
+                stock === 0
+                  ? "bg-red-500"
+                  : stock <= 10
+                    ? "bg-amber-400"
+                    : "bg-emerald-400";
+
+              return (
+                <div key={p.name}>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-white">{p.name}</p>
+                    <span className="text-xs text-zinc-400">
+                      {stock} in stock
+                    </span>
+                  </div>
+
                   <div
-                    style={{ width: `${p.progress}%` }}
-                    className="h-full rounded-full bg-linear-to-r from-amber-500 to-amber-300"
-                  />
+                    className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-zinc-800"
+                    role="progressbar"
+                    aria-valuenow={percentage}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`Stock level for ${p.name}`}
+                  >
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${stockColor}`}
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {percentage}% of stock capacity
+                  </p>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

@@ -22,6 +22,7 @@ import Dashboard from "./pages/admin/Dashboard.tsx";
 import ProductCreate from "./pages/admin/ProductCreate.tsx";
 import ProductEdit from "./pages/admin/ProductEdit.tsx";
 import ProductsPage from "./pages/admin/Products.tsx";
+import OrderPage from "./pages/admin/Orders.tsx";
 
 const router = createBrowserRouter([
   {
@@ -107,6 +108,10 @@ const router = createBrowserRouter([
       {
         path: "/admin/edit-products/:id",
         element: <ProductEdit />,
+      },
+      {
+        path: "/admin/orders",
+        element: <OrderPage />,
       },
     ],
   },
