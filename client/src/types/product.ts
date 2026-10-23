@@ -33,3 +33,4 @@ export interface ProductFormProp {
   isLoading: boolean;
   isUpdating?: boolean;
 }
+
