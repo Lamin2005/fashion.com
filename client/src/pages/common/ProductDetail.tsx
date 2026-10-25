@@ -16,6 +16,7 @@ import { useGetProductDetailQuery } from "@/store/slices/api/productApi";
 import { useParams } from "react-router";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/store/slices/states/cart";
+import { toast } from "sonner";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -55,25 +56,26 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    if (!data || stock < 1 || quantity > stock) return;
+    if (!data || stock < 1 || quantity > stock) {
+      toast.error("Not enough stock available");
+      return;
+    }
 
-    console.log("Add to cart:", {
-      productId: data._id,
-      name: data.name,
-      price: data.price,
-      color: activeColor,
-      size: activeSize,
-      quantity,
-    });
+    if (!activeSize || !activeColor) {
+      toast.error("Please select a size and color");
+      return;
+    }
 
     dispatch(
       addToCart({
         product: data,
         quantity,
         size: activeSize,
-        color: activeColor!,
+        color: activeColor,
       }),
     );
+
+    toast.success(`${data.name} added to cart`);
   };
 
   const formatPrice = (price: number) =>

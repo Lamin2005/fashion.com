@@ -1,12 +1,35 @@
 import { useGetnewProductQuery } from "@/store/slices/api/productApi";
 import type { Product } from "@/types/product";
 import { Heart, ShoppingBag, Star } from "lucide-react";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router";
+import { toast } from "sonner";
+import { addToCart } from "@/store/slices/states/cart";
 
 const TrendingProducts = () => {
   const { data: products = [], isLoading } = useGetnewProductQuery(undefined);
+  const dispatch = useDispatch();
 
-  console.log(products);
+  const handleAddToCart = (product: Product) => {
+    if (!product._id) {
+      toast.error("Product not found.");
+      return;
+    }
+
+    const size = product.sizes?.[0] ?? "";
+    const color = product.colors?.[0] ?? "";
+
+    dispatch(
+      addToCart({
+        product,
+        quantity: 1,
+        size,
+        color,
+      }),
+    );
+
+    toast.success(`${product.name} added to cart!`);
+  };
 
   return (
     <section className="w-full bg-zinc-50/50 py-16 lg:py-24 border-t border-zinc-100">
@@ -65,7 +88,10 @@ const TrendingProducts = () => {
                       />
                     </Link>
                     <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-linear-to-t from-zinc-900/40 to-transparent">
-                      <button className="w-full bg-zinc-900 text-white text-xs font-medium py-3 px-4 flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors shadow-lg cursor-pointer">
+                      <button
+                        className="w-full bg-zinc-900 text-white text-xs font-medium py-3 px-4 flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors shadow-lg cursor-pointer"
+                        onClick={() => handleAddToCart(product)}
+                      >
                         <ShoppingBag size={14} />
                         Quick Add to Bag
                       </button>

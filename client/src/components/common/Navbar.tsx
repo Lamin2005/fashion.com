@@ -30,7 +30,11 @@ import { toast } from "sonner";
 import { Link, useNavigate } from "react-router";
 import { debounce } from "lodash";
 import { useMemo } from "react";
-import { updateCartQuantity, removeFromCart } from "@/store/slices/states/cart";
+import {
+  updateCartQuantity,
+  removeFromCart,
+  clearCart,
+} from "@/store/slices/states/cart";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -372,6 +376,15 @@ const Navbar = () => {
             <span className="bg-zinc-100 text-zinc-800 text-xs font-semibold px-2 py-0.5 rounded-full">
               {totalItemsCount}
             </span>
+
+            {products.length > 3 && (
+              <button
+                onClick={() => dispatch(clearCart())}
+                className=" bg-transparent text-zinc-600 hover:text-red-900 text-xs font-medium py-2 transition-colors cursor-pointer text-center"
+              >
+                Clear All
+              </button>
+            )}
           </div>
           <button
             onClick={() => setIsCartOpen(false)}
@@ -423,6 +436,7 @@ const Navbar = () => {
                     </span>
                   </div>
                   <p className="text-xs text-zinc-400">Size: {item.size}</p>
+                  <p className="text-xs text-zinc-400">Color: {item.color}</p>
 
                   <div className="flex items-center justify-between pt-3">
                     <div className="flex items-center border border-zinc-200">

@@ -9,6 +9,9 @@ import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { ProductFiltersMeta } from "@/types/product";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
+import { addToCart } from "@/store/slices/states/cart";
 
 function ProductFilter() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -27,6 +30,7 @@ function ProductFilter() {
   const [selectedCategory, setSelectedCategory] = useState(
     Initialcategory || "All",
   );
+  const dispatch = useDispatch();
 
   const [filter, setFilter] = useState({
     keyword: Initialkeyword,
@@ -137,6 +141,27 @@ function ProductFilter() {
     });
   };
 
+  const handleAddToCart = (product: Product) => {
+    if (!product._id) {
+      toast.error("Product not found.");
+      return;
+    }
+
+    const size = product.sizes?.[0] ?? "";
+    const color = product.colors?.[0] ?? "";
+
+    dispatch(
+      addToCart({
+        product,
+        quantity: 1,
+        size,
+        color,
+      }),
+    );
+
+    toast.success(`${product.name} added to cart!`);
+  };
+  
   if (isLoading) {
     return (
       <div className="w-full min-h-screen bg-white pt-20">
@@ -452,17 +477,17 @@ function ProductFilter() {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-10 sm:gap-x-6">
                 {productList.map((product: Product) => (
-                  <Link to={`/products/${product._id}`} key={product._id}>
-                    <div className="group relative flex flex-col justify-between">
-                      <div className="relative w-full aspect-3/4 bg-zinc-50 overflow-hidden border border-zinc-100 shadow-sm mb-4">
-                        {product.is_new_arrival && (
-                          <span className="absolute top-2.5 left-2.5 bg-zinc-900 text-white text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 z-10">
-                            NEW
-                          </span>
-                        )}
-                        <button className="absolute top-2.5 right-2.5 p-2 bg-white/80 backdrop-blur-sm text-zinc-600 hover:text-red-500 rounded-full transition-colors z-10 shadow-sm">
-                          <Heart size={14} strokeWidth={2} />
-                        </button>
+                  <div className="group relative flex flex-col justify-between">
+                    <div className="relative w-full aspect-3/4 bg-zinc-50 overflow-hidden border border-zinc-100 shadow-sm mb-4">
+                      {product.is_new_arrival && (
+                        <span className="absolute top-2.5 left-2.5 bg-zinc-900 text-white text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 z-10">
+                          NEW
+                        </span>
+                      )}
+                      <button className="absolute top-2.5 right-2.5 p-2 bg-white/80 backdrop-blur-sm text-zinc-600 hover:text-red-500 rounded-full transition-colors z-10 shadow-sm">
+                        <Heart size={14} strokeWidth={2} />
+                      </button>
+                      <Link to={`/products/${product._id}`} key={product._id}>
                         <img
                           src={
                             product.images?.[0]?.url ||
@@ -471,34 +496,39 @@ function ProductFilter() {
                           alt={product.name}
                           className="w-full h-full object-cover object-center transform transition-transform duration-500 group-hover:scale-105"
                         />
-                        <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                          <button className="w-full bg-zinc-900 text-white text-xs font-medium py-3 px-4 flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors shadow-md">
-                            <ShoppingBag size={14} /> Add to Bag
-                          </button>
-                        </div>
+                      </Link>
+                      <div className="absolute inset-x-0 bottom-0 p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                        <button
+                          className="w-full bg-zinc-900 text-white text-xs font-medium py-3 px-4 flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors shadow-md"
+                          onClick={() => {
+                            handleAddToCart(product);
+                          }}
+                        >
+                          <ShoppingBag size={14} /> Add to Bag
+                        </button>
                       </div>
+                    </div>
 
-                      <div className="space-y-1 px-1">
-                        <p className="text-[11px] text-zinc-400 font-medium tracking-wide uppercase">
-                          {product.category}
-                        </p>
-                        <h3 className="text-xs sm:text-sm font-semibold text-zinc-800 line-clamp-1">
-                          {product.name}
-                        </h3>
-                        <div className="flex items-center justify-between pt-1">
-                          <span className="text-sm font-bold text-zinc-900">
-                            ${product.price?.toFixed(2) || "0.00"}
+                    <div className="space-y-1 px-1">
+                      <p className="text-[11px] text-zinc-400 font-medium tracking-wide uppercase">
+                        {product.category}
+                      </p>
+                      <h3 className="text-xs sm:text-sm font-semibold text-zinc-800 line-clamp-1">
+                        {product.name}
+                      </h3>
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-sm font-bold text-zinc-900">
+                          ${product.price?.toFixed(2) || "0.00"}
+                        </span>
+                        <div className="flex items-center gap-1 text-amber-500">
+                          <Star size={12} fill="currentColor" />
+                          <span className="text-xs font-medium text-zinc-500">
+                            {product.rating_count || "0"}
                           </span>
-                          <div className="flex items-center gap-1 text-amber-500">
-                            <Star size={12} fill="currentColor" />
-                            <span className="text-xs font-medium text-zinc-500">
-                              {product.rating_count || "0"}
-                            </span>
-                          </div>
                         </div>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             )}
