@@ -8,7 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useProfileQuery, useUploadMutation } from "@/store/slices/userApi";
+import { useProfileQuery, useUploadMutation } from "@/store/slices/api/userApi";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import EmailUpdateForm from "@/components/profile/EmailUpdateForm";

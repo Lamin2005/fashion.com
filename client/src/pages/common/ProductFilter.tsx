@@ -3,7 +3,7 @@ import { SlidersHorizontal, Star, Heart, ShoppingBag, X } from "lucide-react";
 import {
   useGetProductsMetaQuery,
   useGetProductsQuery,
-} from "@/store/slices/productApi";
+} from "@/store/slices/api/productApi";
 import type { Product } from "@/types/product";
 import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";

@@ -41,6 +41,18 @@ const cartSlice = createSlice({
     addToCart: (state, action: PayloadAction<AddToCartPayload>) => {
       const { product, quantity, size, color } = action.payload;
 
+      const totalProductQuantity = state.items
+        .filter((item) => item.product._id === product._id)
+        .reduce((total, item) => total + item.quantity, 0);
+
+      const remainingStock = product.instock_count - totalProductQuantity;
+
+      if (remainingStock <= 0) {
+        return;
+      }
+
+      const quantityToAdd = Math.min(quantity, remainingStock);
+
       const existingItem = state.items.find(
         (item) =>
           item.product._id === product._id &&
@@ -49,12 +61,12 @@ const cartSlice = createSlice({
       );
 
       if (existingItem) {
-        existingItem.quantity += quantity;
+        existingItem.quantity += quantityToAdd;
       } else {
         state.items.push({
           key: `${product._id}-${size}-${color}`,
           product,
-          quantity,
+          quantity: quantityToAdd,
           size,
           color,
         });

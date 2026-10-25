@@ -24,21 +24,13 @@ import {
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/index.ts";
 import { useDispatch } from "react-redux";
-import { clearUserInfo } from "@/store/slices/auth";
-import { useLogoutMutation } from "@/store/slices/userApi";
+import { clearUserInfo } from "@/store/slices/states/auth";
+import { useLogoutMutation } from "@/store/slices/api/userApi";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router";
 import { debounce } from "lodash";
 import { useMemo } from "react";
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  size: string;
-  image: string;
-  quantity: number;
-}
+import { updateCartQuantity, removeFromCart } from "@/store/slices/states/cart";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -49,29 +41,8 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const [logoutMutation, { isLoading }] = useLogoutMutation();
   const navigate = useNavigate();
-
+  const products = useSelector((state: RootState) => state.cart.items);
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
-
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 1,
-      name: "Classic Beige Trench Coat",
-      price: 189.0,
-      size: "M",
-      image:
-        "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=150&q=80",
-      quantity: 1,
-    },
-    {
-      id: 2,
-      name: "Oversized Organic Cotton Tee",
-      price: 45.0,
-      size: "L",
-      image:
-        "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=150&q=80",
-      quantity: 2,
-    },
-  ]);
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -94,28 +65,50 @@ const Navbar = () => {
     [navigate],
   );
 
-  const updateQuantity = (id: number, type: "increase" | "decrease") => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) => {
-        if (item.id === id) {
-          const newQty =
-            type === "increase" ? item.quantity + 1 : item.quantity - 1;
-          return { ...item, quantity: newQty < 1 ? 1 : newQty };
-        }
-        return item;
-      }),
-    );
+  const updateQuantity = (key: string, type: "increase" | "decrease") => {
+    const item = products.find((item) => item.key === key);
+
+    if (!item) return;
+
+    const totalProductQuantity = products
+      .filter((cartItem) => cartItem.product._id === item.product._id)
+      .reduce((total, cartItem) => total + cartItem.quantity, 0);
+
+    if (type === "increase") {
+      if (totalProductQuantity >= item.product.instock_count) {
+        toast.error("Not enough stock available");
+        return;
+      }
+
+      dispatch(
+        updateCartQuantity({
+          key,
+          quantity: item.quantity + 1,
+        }),
+      );
+    } else {
+      const newQuantity = Math.max(1, item.quantity - 1);
+
+      dispatch(
+        updateCartQuantity({
+          key,
+          quantity: newQuantity,
+        }),
+      );
+    }
   };
 
-  const removeItem = (id: number) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  const removeItem = (key: string) => {
+    if (key) {
+      dispatch(removeFromCart(key));
+    }
   };
 
-  const subtotal = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
+  const subtotal = products.reduce(
+    (acc, item) => acc + item.product.price * item.quantity,
     0,
   );
-  const totalItemsCount = cartItems.reduce(
+  const totalItemsCount = products.reduce(
     (acc, item) => acc + item.quantity,
     0,
   );
@@ -366,7 +359,6 @@ const Navbar = () => {
         onClick={() => setIsCartOpen(false)}
       />
 
-      {/* Cart section */}
       <div
         className={`fixed top-0 right-0 h-full w-full sm:w-112.5 bg-white z-50 shadow-2xl flex flex-col justify-between transition-transform duration-300 ease-in-out transform ${
           isCartOpen ? "translate-x-0" : "translate-x-full"
@@ -390,7 +382,7 @@ const Navbar = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {cartItems.length === 0 ? (
+          {products.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center space-y-4 py-12">
               <ShoppingBag
                 size={48}
@@ -408,15 +400,15 @@ const Navbar = () => {
               </button>
             </div>
           ) : (
-            cartItems.map((item) => (
+            products.map((item) => (
               <div
-                key={item.id}
+                key={item.key}
                 className="flex gap-4 pb-6 border-b border-zinc-100 items-start"
               >
                 <div className="w-20 h-24 bg-zinc-50 border border-zinc-100 shrink-0 overflow-hidden">
                   <img
-                    src={item.image}
-                    alt={item.name}
+                    src={item.product.images[0].url}
+                    alt={item.product.name}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -424,10 +416,10 @@ const Navbar = () => {
                 <div className="flex-1 space-y-1">
                   <div className="flex justify-between gap-2">
                     <h4 className="text-sm font-medium text-zinc-900 line-clamp-1">
-                      {item.name}
+                      {item.product.name}
                     </h4>
                     <span className="text-sm font-bold text-zinc-900">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ${(item.product.price * item.quantity).toFixed(2)}
                     </span>
                   </div>
                   <p className="text-xs text-zinc-400">Size: {item.size}</p>
@@ -435,7 +427,7 @@ const Navbar = () => {
                   <div className="flex items-center justify-between pt-3">
                     <div className="flex items-center border border-zinc-200">
                       <button
-                        onClick={() => updateQuantity(item.id, "decrease")}
+                        onClick={() => updateQuantity(item.key, "decrease")}
                         className="p-1.5 text-zinc-500 hover:text-zinc-900 transition-colors"
                       >
                         <Minus size={12} />
@@ -444,7 +436,9 @@ const Navbar = () => {
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => updateQuantity(item.id, "increase")}
+                        onClick={() => {
+                          updateQuantity(item.key, "increase");
+                        }}
                         className="p-1.5 text-zinc-500 hover:text-zinc-900 transition-colors"
                       >
                         <Plus size={12} />
@@ -452,7 +446,7 @@ const Navbar = () => {
                     </div>
 
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeItem(item.key)}
                       className="text-zinc-400 hover:text-red-500 transition-colors p-1"
                     >
                       <Trash2 size={14} />
@@ -464,7 +458,7 @@ const Navbar = () => {
           )}
         </div>
 
-        {cartItems.length > 0 && (
+        {products.length > 0 && (
           <div className="p-6 border-t border-zinc-100 bg-zinc-50/50 space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-zinc-500">

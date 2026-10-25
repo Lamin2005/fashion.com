@@ -7,11 +7,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useLogoutMutation,
   useResetPasswordMutation,
-} from "@/store/slices/userApi";
+} from "@/store/slices/api/userApi";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
-import { clearUserInfo } from "@/store/slices/auth";
+import { clearUserInfo } from "@/store/slices/states/auth";
 
 type FormValues = z.infer<typeof resetPasswordSchema>;
 

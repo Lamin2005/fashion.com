@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useForgotPasswordMutation } from "@/store/slices/userApi";
+import { useForgotPasswordMutation } from "@/store/slices/api/userApi";
 
 interface Prop {
   email: string;

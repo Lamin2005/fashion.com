@@ -4,7 +4,7 @@ import { Boxes, AlertTriangle, XCircle, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import ProductStatusCard from "@/components/admin/ProductStatusCard";
-import { useGetProductsQuery } from "@/store/slices/productApi";
+import { useGetProductsQuery } from "@/store/slices/api/productApi";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { ProductTable } from "@/components/product/ProductTable";
 import { useProductColumn } from "../../components/product/useProductColumn";

@@ -1,6 +1,6 @@
 import { ArrowUpRight, ShoppingBag, Eye, Plus } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import { useGetProductsQuery } from "@/store/slices/productApi";
+import { useGetProductsQuery } from "@/store/slices/api/productApi";
 import ProductStatusCard from "@/components/admin/ProductStatusCard";
 import DailyProductChart from "@/components/admin/DailyProductChart";
 import type { Product } from "@/types/product";

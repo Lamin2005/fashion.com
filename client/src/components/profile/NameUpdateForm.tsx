@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import z from "zod";
 import { nameSchma } from "@/schema/auth";
-import { useUpdateNameMutation } from "@/store/slices/userApi";
+import { useUpdateNameMutation } from "@/store/slices/api/userApi";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";

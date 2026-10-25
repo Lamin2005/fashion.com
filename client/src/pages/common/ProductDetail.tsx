@@ -12,8 +12,10 @@ import {
   Plus,
   Check,
 } from "lucide-react";
-import { useGetProductDetailQuery } from "@/store/slices/productApi";
+import { useGetProductDetailQuery } from "@/store/slices/api/productApi";
 import { useParams } from "react-router";
+import { useDispatch } from "react-redux";
+import { addToCart } from "@/store/slices/states/cart";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -28,6 +30,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [isDetailsOpen, setIsDetailsOpen] = useState(true);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const dispatch = useDispatch();
 
   const mainImage =
     data?.images?.find((img) => img.url === selectedImage)?.url ??
@@ -54,7 +57,6 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     if (!data || stock < 1 || quantity > stock) return;
 
-    // Connect your Redux cart action or cart API here.
     console.log("Add to cart:", {
       productId: data._id,
       name: data.name,
@@ -63,6 +65,15 @@ const ProductDetail = () => {
       size: activeSize,
       quantity,
     });
+
+    dispatch(
+      addToCart({
+        product: data,
+        quantity,
+        size: activeSize,
+        color: activeColor!,
+      }),
+    );
   };
 
   const formatPrice = (price: number) =>

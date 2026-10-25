@@ -2,7 +2,7 @@ import ProductForm from "../../components/admin/ProductForm";
 import {
   useGetProductDetailQuery,
   useUpdateProductMutation,
-} from "../../store/slices/productApi";
+} from "../../store/slices/api/productApi";
 import { type ProductFormInput } from "../../schema/products";
 import { toast } from "sonner";
 import { useNavigate, useParams } from "react-router-dom";

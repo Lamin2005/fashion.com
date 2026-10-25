@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router";
-import { useDeleteProductMutation } from "@/store/slices/productApi";
+import { useDeleteProductMutation } from "@/store/slices/api/productApi";
 import { toast } from "sonner";
 
 const columnHelper = createColumnHelper<DataTableFeatures, Product>();

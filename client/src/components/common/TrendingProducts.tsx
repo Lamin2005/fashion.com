@@ -1,6 +1,7 @@
-import { useGetnewProductQuery } from "@/store/slices/productApi";
+import { useGetnewProductQuery } from "@/store/slices/api/productApi";
 import type { Product } from "@/types/product";
 import { Heart, ShoppingBag, Star } from "lucide-react";
+import { Link } from "react-router";
 
 const TrendingProducts = () => {
   const { data: products = [], isLoading } = useGetnewProductQuery(undefined);
@@ -56,13 +57,13 @@ const TrendingProducts = () => {
                     <button className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm text-zinc-600 hover:text-red-500 rounded-full transition-colors z-10 shadow-sm cursor-pointer">
                       <Heart size={16} strokeWidth={2} />
                     </button>
-                    <a href={`/products/${product._id}`}>
+                    <Link to={`/products/${product._id}`}>
                       <img
                         src={`${product.images[0].url}`}
                         alt={product.name}
                         className="w-full h-full object-cover object-center transform transition-transform duration-500 group-hover:scale-105"
                       />
-                    </a>
+                    </Link>
                     <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-linear-to-t from-zinc-900/40 to-transparent">
                       <button className="w-full bg-zinc-900 text-white text-xs font-medium py-3 px-4 flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors shadow-lg cursor-pointer">
                         <ShoppingBag size={14} />

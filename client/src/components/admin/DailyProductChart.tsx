@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { useGetDailyProductAnalyticsQuery } from "@/store/slices/productAnalyticsApi";
+import { useGetDailyProductAnalyticsQuery } from "@/store/slices/api/productAnalyticsApi";
 
 const chartConfig = {
   created: {

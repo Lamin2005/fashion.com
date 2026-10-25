@@ -5,7 +5,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver as hookFormResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
-import { useRegisterMutation } from "@/store/slices/userApi";
+import { useRegisterMutation } from "@/store/slices/api/userApi";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store";

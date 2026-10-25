@@ -1,7 +1,7 @@
 import type { RootState } from "@/store";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
-import { useProfileQuery } from "@/store/slices/userApi";
+import { useProfileQuery } from "@/store/slices/api/userApi";
 
 function ProtectedRoute({
   children,

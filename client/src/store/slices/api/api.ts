@@ -6,7 +6,7 @@ import type {
   FetchBaseQueryError,
 } from "@reduxjs/toolkit/query";
 
-import { clearUserInfo } from "./auth";
+import { clearUserInfo } from "../states/auth";
 
 const baseUrl =
   import.meta.env.VITE_MOOD === "development"

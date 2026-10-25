@@ -1,5 +1,5 @@
 import type { Product } from "@/types/product";
-import { useGetProductsQuery } from "../../store/slices/productApi";
+import { useGetProductsQuery } from "../../store/slices/api/productApi";
 
 const LOW_STOCK_LIMIT = 10;
 const POLLING_INTERVAL = 10000; // 10 seconds

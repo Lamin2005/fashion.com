@@ -1,5 +1,5 @@
 import ProductForm from "../../components/admin/ProductForm";
-import { useCreateProductMutation } from "../../store/slices/productApi";
+import { useCreateProductMutation } from "../../store/slices/api/productApi";
 import { type ProductFormInput } from "../../schema/products";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
