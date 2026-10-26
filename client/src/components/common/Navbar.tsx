@@ -327,8 +327,7 @@ const Navbar = () => {
             : "-translate-y-full opacity-0 invisible"
         }`}
       >
-        {/* Search Bar Input */}
-
+       
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <div className="flex items-center space-x-4 w-full max-w-3xl">
             <Search className="text-zinc-400" size={22} strokeWidth={1.5} />

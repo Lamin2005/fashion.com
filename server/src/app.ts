@@ -6,6 +6,7 @@ import { connectDB } from "./db/db";
 import userRouter from "./routes/user";
 import errorHandler from "./middlewares/errorHandler";
 import productRouter from "./routes/product";
+import cart from "./routes/cart";
 
 dotenv.config({
   path: "./.env",
@@ -26,6 +27,7 @@ const PORT = process.env.PORT || 8000;
 
 app.use("/api/users", userRouter);
 app.use("/api/products", productRouter);
+app.use("/api/carts", cart);
 
 app.use(errorHandler);
 
