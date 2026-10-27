@@ -47,6 +47,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const products = useSelector((state: RootState) => state.cart.items);
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -136,6 +137,53 @@ const Navbar = () => {
       toast.success(`${response.message}`);
     } catch (error) {
       console.log("Logout Error : ", error);
+    }
+  };
+
+  const handleCheckout = async () => {
+    if (products.length === 0) {
+      toast.error("Your cart is empty");
+      return;
+    }
+
+    try {
+      setIsCheckoutLoading(true);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/stripe/create-checkout-session`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            items: products.map((item) => ({
+              productId: item.product._id,
+              quantity: item.quantity,
+              size: item.size,
+              color: item.color,
+            })),
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Checkout failed");
+      }
+
+      if (!data.url) {
+        throw new Error("Stripe Checkout URL was not returned");
+      }
+
+      window.location.href = data.url;
+    } catch (error: unknown) {
+      toast.error(
+        error instanceof Error ? error.message : "Unable to start checkout",
+      );
+      setIsCheckoutLoading(false);
     }
   };
 
@@ -327,7 +375,6 @@ const Navbar = () => {
             : "-translate-y-full opacity-0 invisible"
         }`}
       >
-       
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <div className="flex items-center space-x-4 w-full max-w-3xl">
             <Search className="text-zinc-400" size={22} strokeWidth={1.5} />
@@ -485,8 +532,17 @@ const Navbar = () => {
               Shipping, taxes, and discounts will be calculated at checkout.
             </p>
             <div className="space-y-2 pt-2">
-              <button className="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-sm py-4 transition-colors shadow-md cursor-pointer">
-                Proceed to Checkout
+              <button
+                onClick={handleCheckout}
+                disabled={isCheckoutLoading || products.length === 0}
+                className="w-full bg-zinc-900 hover:bg-zinc-800
+    text-white font-medium text-sm py-4
+    transition-colors shadow-md
+    disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isCheckoutLoading
+                  ? "Redirecting to Stripe..."
+                  : "Proceed to Checkout"}
               </button>
               <button
                 onClick={() => setIsCartOpen(false)}
