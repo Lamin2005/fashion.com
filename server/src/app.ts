@@ -28,7 +28,7 @@ const PORT = process.env.PORT || 8000;
 
 app.use("/api/users", userRouter);
 app.use("/api/products", productRouter);
-app.use("/api/carts", cart);
+app.use("/api/cart", cart);
 app.use("/api/stripe", stripeRouter);
 
 app.use(errorHandler);

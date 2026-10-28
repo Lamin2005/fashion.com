@@ -1,16 +1,15 @@
 import { useGetnewProductQuery } from "@/store/slices/api/productApi";
 import type { Product } from "@/types/product";
 import { Heart, ShoppingBag, Star } from "lucide-react";
-import { useDispatch } from "react-redux";
 import { Link } from "react-router";
 import { toast } from "sonner";
-import { addToCart } from "@/store/slices/states/cart";
+import { useAddCartItemMutation } from "@/store/slices/api/cartApi";
 
 const TrendingProducts = () => {
   const { data: products = [], isLoading } = useGetnewProductQuery(undefined);
-  const dispatch = useDispatch();
+  const [addCartItem] = useAddCartItemMutation();
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = async (product: Product) => {
     if (!product._id) {
       toast.error("Product not found.");
       return;
@@ -19,16 +18,14 @@ const TrendingProducts = () => {
     const size = product.sizes?.[0] ?? "";
     const color = product.colors?.[0] ?? "";
 
-    dispatch(
-      addToCart({
-        product,
-        quantity: 1,
-        size,
-        color,
-      }),
-    );
+    const response = await addCartItem({
+      product_id: product._id,
+      quantity: 1,
+      size,
+      color,
+    }).unwrap();
 
-    toast.success(`${product.name} added to cart!`);
+    toast.success(`${product.name} is ${response.message} `);
   };
 
   return (

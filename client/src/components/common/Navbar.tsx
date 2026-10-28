@@ -11,6 +11,7 @@ import {
   Minus,
   Trash2,
   LogOutIcon,
+  Loader,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -31,10 +32,11 @@ import { Link, useNavigate } from "react-router";
 import { debounce } from "lodash";
 import { useMemo } from "react";
 import {
-  updateCartQuantity,
-  removeFromCart,
-  clearCart,
-} from "@/store/slices/states/cart";
+  useClearMyCartMutation,
+  useGetMyCartQuery,
+  useRemoveCartItemMutation,
+  useUpdateCartItemMutation,
+} from "@/store/slices/api/cartApi";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -45,9 +47,19 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const [logoutMutation, { isLoading }] = useLogoutMutation();
   const navigate = useNavigate();
-  const products = useSelector((state: RootState) => state.cart.items);
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
+  const { data: cartResponse, isLoading: isCartLoading } = useGetMyCartQuery(
+    undefined,
+    {
+      skip: !userInfo,
+    },
+  );
+
+  const products = cartResponse?.cart.items ?? [];
+  const [updateCartItem] = useUpdateCartItemMutation();
+  const [removeCartItem] = useRemoveCartItemMutation();
+  const [clearMyCart] = useClearMyCartMutation();
 
   const navLinks = [
     { name: "Home", path: "/" },
@@ -70,7 +82,7 @@ const Navbar = () => {
     [navigate],
   );
 
-  const updateQuantity = (key: string, type: "increase" | "decrease") => {
+  const updateQuantity = async (key: string, type: "increase" | "decrease") => {
     const item = products.find((item) => item.key === key);
 
     if (!item) return;
@@ -85,27 +97,32 @@ const Navbar = () => {
         return;
       }
 
-      dispatch(
-        updateCartQuantity({
-          key,
-          quantity: item.quantity + 1,
-        }),
-      );
+      await updateCartItem({
+        key,
+        quantity: item.quantity + 1,
+      }).unwrap();
     } else {
       const newQuantity = Math.max(1, item.quantity - 1);
 
-      dispatch(
-        updateCartQuantity({
-          key,
-          quantity: newQuantity,
-        }),
-      );
+      await updateCartItem({
+        key,
+        quantity: newQuantity,
+      }).unwrap();
     }
   };
 
-  const removeItem = (key: string) => {
+  const removeItem = async (key: string) => {
     if (key) {
-      dispatch(removeFromCart(key));
+      await removeCartItem(key).unwrap();
+    }
+  };
+
+  const clearCart = async () => {
+    try {
+      const response = await clearMyCart().unwrap();
+      toast(response.message);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -420,12 +437,12 @@ const Navbar = () => {
               Your Shopping Bag
             </h2>
             <span className="bg-zinc-100 text-zinc-800 text-xs font-semibold px-2 py-0.5 rounded-full">
-              {totalItemsCount}
+              {isCartLoading ? <Loader size={20} /> : totalItemsCount}
             </span>
 
             {products.length > 3 && (
               <button
-                onClick={() => dispatch(clearCart())}
+                onClick={clearCart}
                 className=" bg-transparent text-zinc-600 hover:text-red-900 text-xs font-medium py-2 transition-colors cursor-pointer text-center"
               >
                 Clear All
@@ -518,7 +535,7 @@ const Navbar = () => {
           )}
         </div>
 
-        {products.length > 0 && (
+        {products?.length > 0 && (
           <div className="p-6 border-t border-zinc-100 bg-zinc-50/50 space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-zinc-500">
@@ -535,7 +552,7 @@ const Navbar = () => {
               <button
                 onClick={handleCheckout}
                 disabled={isCheckoutLoading || products.length === 0}
-                className="w-full bg-zinc-900 hover:bg-zinc-800
+                className="w-full cursor-pointer bg-zinc-900 hover:bg-zinc-800
     text-white font-medium text-sm py-4
     transition-colors shadow-md
     disabled:opacity-50 disabled:cursor-not-allowed"

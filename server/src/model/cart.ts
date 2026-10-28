@@ -23,7 +23,7 @@ const cartItemSchema = new Schema<ICartItem>(
     },
     product_id: {
       type: Schema.Types.ObjectId,
-      ref: "Product",
+      ref: "product",
       required: true,
     },
     quantity: {
@@ -47,7 +47,7 @@ const cartSchema = new Schema<ICart>(
   {
     user_id: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
       required: true,
       unique: true,
       index: true,
@@ -60,6 +60,6 @@ const cartSchema = new Schema<ICart>(
   { timestamps: true },
 );
 
-const Cart = mongoose.model<ICart>("Cart", cartSchema);
+const Cart = mongoose.model<ICart>("cart", cartSchema);
 
 export default Cart;
