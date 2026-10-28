@@ -9,9 +9,8 @@ import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { ProductFiltersMeta } from "@/types/product";
-import { useDispatch } from "react-redux";
 import { toast } from "sonner";
-import { addToCart } from "@/store/slices/states/cart";
+import { useAddCartItemMutation } from "@/store/slices/api/cartApi";
 
 function ProductFilter() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -30,7 +29,7 @@ function ProductFilter() {
   const [selectedCategory, setSelectedCategory] = useState(
     Initialcategory || "All",
   );
-  const dispatch = useDispatch();
+  const [addCartItem] = useAddCartItemMutation();
 
   const [filter, setFilter] = useState({
     keyword: Initialkeyword,
@@ -141,7 +140,7 @@ function ProductFilter() {
     });
   };
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = async (product: Product) => {
     if (!product._id) {
       toast.error("Product not found.");
       return;
@@ -150,18 +149,16 @@ function ProductFilter() {
     const size = product.sizes?.[0] ?? "";
     const color = product.colors?.[0] ?? "";
 
-    dispatch(
-      addToCart({
-        product,
-        quantity: 1,
-        size,
-        color,
-      }),
-    );
+    await addCartItem({
+      product_id: product._id,
+      quantity: 1,
+      size,
+      color,
+    }).unwrap();
 
-    toast.success(`${product.name} added to cart!`);
+    toast.success(`${product.name} added to cart`);
   };
-  
+
   if (isLoading) {
     return (
       <div className="w-full min-h-screen bg-white pt-20">

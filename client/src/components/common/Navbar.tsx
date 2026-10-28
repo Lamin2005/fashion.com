@@ -61,6 +61,9 @@ const Navbar = () => {
   const [removeCartItem] = useRemoveCartItemMutation();
   const [clearMyCart] = useClearMyCartMutation();
 
+  console.log(cartResponse);
+  console.log(products);
+
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Shop", path: "/products" },

@@ -14,9 +14,8 @@ import {
 } from "lucide-react";
 import { useGetProductDetailQuery } from "@/store/slices/api/productApi";
 import { useParams } from "react-router";
-import { useDispatch } from "react-redux";
-import { addToCart } from "@/store/slices/states/cart";
 import { toast } from "sonner";
+import { useAddCartItemMutation } from "@/store/slices/api/cartApi";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -31,7 +30,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [isDetailsOpen, setIsDetailsOpen] = useState(true);
   const [isWishlisted, setIsWishlisted] = useState(false);
-  const dispatch = useDispatch();
+  const [addCartItem] = useAddCartItemMutation();
 
   const mainImage =
     data?.images?.find((img) => img.url === selectedImage)?.url ??
@@ -55,7 +54,7 @@ const ProductDetail = () => {
     setQuantity((current) => Math.min(stock, current + 1));
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!data || stock < 1 || quantity > stock) {
       toast.error("Not enough stock available");
       return;
@@ -66,14 +65,12 @@ const ProductDetail = () => {
       return;
     }
 
-    dispatch(
-      addToCart({
-        product: data,
-        quantity,
-        size: activeSize,
-        color: activeColor,
-      }),
-    );
+    await addCartItem({
+      product_id: data._id,
+      quantity: 1,
+      size: activeSize,
+      color: activeColor,
+    }).unwrap();
 
     toast.success(`${data.name} added to cart`);
   };
