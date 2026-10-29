@@ -2,6 +2,8 @@ import type { Request, Response } from "express";
 import Product from "../model/product";
 import stripe from "../config/stripe";
 import Stripe from "stripe";
+import { AuthenticatedRequest } from "../middlewares/authmiddleware";
+
 interface CheckoutItem {
   productId: string;
   quantity: number;
@@ -12,10 +14,17 @@ interface CheckoutItem {
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export const createCheckoutSession = async (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
 ): Promise<void> => {
   try {
+    const userId = req.user?._id;
+
+    if (!userId) {
+      res.status(401).json({ message: "Please login first." });
+      return;
+    }
+
     const items = req.body.items as CheckoutItem[];
     const clientUrl = process.env.CLIENT_URL;
 
@@ -81,7 +90,13 @@ export const createCheckoutSession = async (
           product_data: {
             name: product.name,
             description: `Size: ${item.size} | Color: ${item.color}`,
+            metadata: {
+              productId: product._id.toString(),
+              size: item.size,
+              color: item.color,
+            },
           },
+
           unit_amount: Math.round(product.price * 100),
         },
         quantity: item.quantity,
@@ -92,6 +107,9 @@ export const createCheckoutSession = async (
       mode: "payment",
       ui_mode: "hosted_page",
       line_items: lineItems,
+      metadata: {
+        userId: userId.toString(),
+      },
       success_url: `${clientUrl}/stripe-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${clientUrl}/stripe-cancel`,
     });
@@ -136,6 +154,10 @@ export const stripewebhook = (req: Request, res: Response) => {
 
       console.log("Checkout completed:", session.id);
       console.log("Payment status:", session.payment_status);
+      console.log(event);
+      console.log(session);
+      
+      
 
       if (session.payment_status === "paid") {
         console.log("Payment successful");

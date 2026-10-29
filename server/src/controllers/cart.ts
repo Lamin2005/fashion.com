@@ -65,7 +65,9 @@ export const addCartItem = async (req: AuthenticatedRequest, res: Response) => {
     const userId = getUserId(req);
 
     if (!userId) {
-      return res.status(401).json({ message: "Please login first." });
+      return res.status(401).json({
+        message: "Please login first.",
+      });
     }
 
     const { product_id, quantity = 1, size, color } = req.body;
@@ -87,7 +89,9 @@ export const addCartItem = async (req: AuthenticatedRequest, res: Response) => {
     const product = await Product.findById(product_id);
 
     if (!product) {
-      return res.status(404).json({ message: "Product not found." });
+      return res.status(404).json({
+        message: "Product not found.",
+      });
     }
 
     if (!product.sizes?.includes(size) || !product.colors?.includes(color)) {
@@ -99,10 +103,14 @@ export const addCartItem = async (req: AuthenticatedRequest, res: Response) => {
     const stock = Number(product.instock_count);
 
     if (!Number.isFinite(stock) || stock < 0) {
-      return res.status(400).json({ message: "Invalid product stock." });
+      return res.status(400).json({
+        message: "Invalid product stock.",
+      });
     }
 
-    let cart = await Cart.findOne({ user_id: userId });
+    let cart = await Cart.findOne({
+      user_id: userId,
+    });
 
     if (!cart) {
       cart = await Cart.create({
@@ -119,7 +127,6 @@ export const addCartItem = async (req: AuthenticatedRequest, res: Response) => {
 
     const existingItem = cart.items.find((item) => item.key === key);
 
-    const quantityAlreadyInThisItem = existingItem?.quantity ?? 0;
     const quantityToAdd = Math.min(
       quantity,
       Math.max(0, stock - totalProductQuantity),
@@ -143,6 +150,8 @@ export const addCartItem = async (req: AuthenticatedRequest, res: Response) => {
       });
     }
 
+    cart.expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
     await cart.save();
 
     const populatedCart = await Cart.findById(cart._id)
@@ -155,7 +164,10 @@ export const addCartItem = async (req: AuthenticatedRequest, res: Response) => {
     });
   } catch (error) {
     console.error("Add cart item error:", error);
-    return res.status(500).json({ message: "Failed to add item." });
+
+    return res.status(500).json({
+      message: "Failed to add item.",
+    });
   }
 };
 

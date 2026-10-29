@@ -22,6 +22,8 @@ app.use(
   }),
 );
 app.use(cookieParser());
+app.use("/api/stripe/webhook", express.raw({ type: "application/json" }));
+
 app.use(express.json({ limit: "40mb" }));
 
 const PORT = process.env.PORT || 8000;

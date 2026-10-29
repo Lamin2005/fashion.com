@@ -67,7 +67,7 @@ const ProductDetail = () => {
 
     await addCartItem({
       product_id: data._id,
-      quantity: 1,
+      quantity,
       size: activeSize,
       color: activeColor,
     }).unwrap();

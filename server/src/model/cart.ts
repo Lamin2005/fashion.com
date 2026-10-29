@@ -11,8 +11,7 @@ export interface ICartItem {
 export interface ICart extends Document {
   user_id: Types.ObjectId;
   items: ICartItem[];
-  createdAt: Date;
-  updatedAt: Date;
+  expiresAt: Date;
 }
 
 const cartItemSchema = new Schema<ICartItem>(
@@ -56,8 +55,13 @@ const cartSchema = new Schema<ICart>(
       type: [cartItemSchema],
       default: [],
     },
+    expiresAt: {
+      type: Date,
+      default: () => new Date(Date.now() + 15 * 60 * 1000),
+      expires: 0,
+    },
   },
-  { timestamps: true },
+  { timestamps: false },
 );
 
 const Cart = mongoose.model<ICart>("cart", cartSchema);

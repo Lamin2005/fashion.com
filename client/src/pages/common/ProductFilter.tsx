@@ -474,7 +474,7 @@ function ProductFilter() {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-10 sm:gap-x-6">
                 {productList.map((product: Product) => (
-                  <div className="group relative flex flex-col justify-between">
+                  <div className="group relative flex flex-col justify-between" key={product._id}>
                     <div className="relative w-full aspect-3/4 bg-zinc-50 overflow-hidden border border-zinc-100 shadow-sm mb-4">
                       {product.is_new_arrival && (
                         <span className="absolute top-2.5 left-2.5 bg-zinc-900 text-white text-[9px] font-bold tracking-wider uppercase px-2 py-0.5 z-10">

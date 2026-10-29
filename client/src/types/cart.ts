@@ -12,8 +12,7 @@ export interface Cart {
   _id: string;
   user_id: string;
   items: CartItem[];
-  createdAt?: string;
-  updatedAt?: string;
+  expiresAt: Date;
 }
 
 export interface CartResponse {
