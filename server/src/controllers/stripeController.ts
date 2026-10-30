@@ -2,7 +2,10 @@ import type { Request, Response } from "express";
 import Product from "../model/product";
 import stripe from "../config/stripe";
 import Stripe from "stripe";
+import Order from "../model/order";
 import { AuthenticatedRequest } from "../middlewares/authmiddleware";
+import mongoose from "mongoose";
+import Cart from "../model/cart";
 
 interface CheckoutItem {
   productId: string;
@@ -87,19 +90,28 @@ export const createCheckoutSession = async (
       return {
         price_data: {
           currency: "usd",
+
           product_data: {
-            name: product.name,
+            name: String(product.name),
             description: `Size: ${item.size} | Color: ${item.color}`,
+            images: product.images
+              .map((image) => (typeof image === "string" ? image : image.url))
+              .filter(
+                (url) => typeof url === "string" && url.startsWith("https://"),
+              )
+              .slice(0, 8),
+
             metadata: {
               productId: product._id.toString(),
-              size: item.size,
-              color: item.color,
+              size: String(item.size),
+              color: String(item.color),
             },
           },
 
-          unit_amount: Math.round(product.price * 100),
+          unit_amount: Math.round(Number(product.price) * 100),
         },
-        quantity: item.quantity,
+
+        quantity: Number(item.quantity),
       };
     });
 
@@ -130,7 +142,7 @@ export const createCheckoutSession = async (
   }
 };
 
-export const stripewebhook = (req: Request, res: Response) => {
+export const stripewebhook = async (req: Request, res: Response) => {
   const signature = req.headers["stripe-signature"];
 
   if (!signature) {
@@ -148,27 +160,147 @@ export const stripewebhook = (req: Request, res: Response) => {
     return;
   }
 
-  switch (event.type) {
-    case "checkout.session.completed": {
-      const session = event.data.object as Stripe.Checkout.Session;
+  try {
+    switch (event.type) {
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
 
-      console.log("Checkout completed:", session.id);
-      console.log("Payment status:", session.payment_status);
-      console.log(event);
-      console.log(session);
-      
-      
+        if (session.payment_status !== "paid") {
+          break;
+        }
 
-      if (session.payment_status === "paid") {
-        console.log("Payment successful");
+        const userId = session.metadata?.userId;
+
+        if (!userId || !mongoose.isValidObjectId(userId) || !session.id) {
+          console.error("Invalid checkout session metadata:", session.id);
+          res.status(400).send("Invalid checkout metadata");
+          return;
+        }
+
+        console.log("STEP 1: Checkout session completed");
+        console.log("Session ID:", session.id);
+        console.log("User ID:", userId);
+
+        // Prevent duplicate orders if Stripe retries this event.
+        const existingOrder = await Order.findOne({
+          stripe_session_id: session.id,
+        });
+
+        if (existingOrder) {
+          break;
+        }
+
+        // Retrieve the purchased line items from Stripe.
+        const lineItems = await stripe.checkout.sessions.listLineItems(
+          session.id,
+          {
+            expand: ["data.price.product"],
+          },
+        );
+
+        const orderItems = [];
+
+        for (const lineItem of lineItems.data) {
+          const stripeProduct = lineItem.price?.product;
+
+          if (
+            !stripeProduct ||
+            typeof stripeProduct === "string" ||
+            "deleted" in stripeProduct ||
+            !lineItem.quantity
+          ) {
+            throw new Error("Missing Stripe product information");
+          }
+
+          console.log("STEP 2: Line items retrieved");
+          console.log("Line items:", JSON.stringify(lineItems.data, null, 2));
+          const { productId, size, color } = stripeProduct.metadata;
+
+          if (
+            !productId ||
+            !mongoose.isValidObjectId(productId) ||
+            !size ||
+            !color
+          ) {
+            throw new Error("Missing product, size, or color metadata");
+          }
+          console.log("STEP 3: Stripe product metadata");
+          console.log("Metadata:", stripeProduct.metadata);
+          const product = await Product.findById(productId);
+
+          if (!product) {
+            throw new Error(`Product not found: ${productId}`);
+          }
+          console.log("STEP 4: MongoDB product found:", product._id);
+          if (
+            !Number.isInteger(lineItem.quantity) ||
+            lineItem.quantity < 1 ||
+            !Number.isFinite(lineItem.price?.unit_amount)
+          ) {
+            throw new Error("Invalid purchased quantity or price");
+          }
+
+          orderItems.push({
+            product_id: product._id,
+            name: product.name,
+            quantity: lineItem.quantity,
+            price: lineItem.price!.unit_amount! / 100,
+            size,
+            color,
+            image: product.images?.map((img) => img.url) ?? [],
+          });
+        }
+
+        if (orderItems.length === 0) {
+          throw new Error("No purchased items found");
+        }
+
+        const order = await Order.findOneAndUpdate(
+          { stripe_session_id: session.id },
+          {
+            $setOnInsert: {
+              user_id: new mongoose.Types.ObjectId(userId),
+              items: orderItems,
+              total_price: (session.amount_total ?? 0) / 100,
+              status: "pending",
+              payment_method: "card",
+              payment_status: "paid",
+              stripe_session_id: session.id,
+            },
+          },
+          {
+            upsert: true,
+            new: true,
+            runValidators: true,
+          },
+        );
+
+        console.log("Order created/confirmed:", order?._id);
+
+        await Cart.deleteOne({ user_id: userId });
+        const deletedCart = await Cart.deleteOne({ user_id: userId });
+
+        console.log("STEP 6: Cart deletion result:", deletedCart);
+
+        console.log("Cart deleted for user:", userId);
+        break;
       }
 
-      break;
+      default:
+        console.log("Unhandled event:", event.type);
     }
 
-    default:
-      console.log("Unhandled event:", event.type);
-  }
+    res.status(200).json({ received: true });
+  } catch (error) {
+    console.error("Stripe webhook processing error:", error);
 
-  res.status(200).json({ received: true });
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+      console.error("Stack:", error.stack);
+    }
+
+    res.status(500).json({
+      message: "Webhook processing failed",
+    });
+  }
 };
