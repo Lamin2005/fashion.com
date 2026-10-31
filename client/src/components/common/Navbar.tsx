@@ -56,7 +56,7 @@ const Navbar = () => {
     },
   );
 
-  const products = cartResponse?.cart.items ?? [];
+  const products = userInfo ? (cartResponse?.cart?.items ?? []) : [];
   const [updateCartItem] = useUpdateCartItemMutation();
   const [removeCartItem] = useRemoveCartItemMutation();
   const [clearMyCart] = useClearMyCartMutation();
@@ -154,6 +154,8 @@ const Navbar = () => {
     try {
       const response = await logoutMutation({}).unwrap();
       dispatch(clearUserInfo());
+      setIsCartOpen(false);
+      navigate("/");
       toast.success(`${response.message}`);
     } catch (error) {
       console.log("Logout Error : ", error);

@@ -55,24 +55,27 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = async () => {
-    if (!data || stock < 1 || quantity > stock) {
-      toast.error("Not enough stock available");
-      return;
+    try {
+      if (!data || stock < 1 || quantity > stock) {
+        toast.error("Not enough stock available");
+        return;
+      }
+
+      if (!activeSize || !activeColor) {
+        toast.error("Please select a size and color");
+        return;
+      }
+      await addCartItem({
+        product_id: data._id,
+        quantity,
+        size: activeSize,
+        color: activeColor,
+      }).unwrap();
+
+      toast.success(`${data.name} added to cart`);
+    } catch (error) {
+      toast.error(`${(error as { data: { message: string } }).data.message}`);
     }
-
-    if (!activeSize || !activeColor) {
-      toast.error("Please select a size and color");
-      return;
-    }
-
-    await addCartItem({
-      product_id: data._id,
-      quantity,
-      size: activeSize,
-      color: activeColor,
-    }).unwrap();
-
-    toast.success(`${data.name} added to cart`);
   };
 
   const formatPrice = (price: number) =>

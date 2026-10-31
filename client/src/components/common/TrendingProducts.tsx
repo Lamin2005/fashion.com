@@ -10,22 +10,25 @@ const TrendingProducts = () => {
   const [addCartItem] = useAddCartItemMutation();
 
   const handleAddToCart = async (product: Product) => {
-    if (!product._id) {
-      toast.error("Product not found.");
-      return;
+    try {
+      if (!product._id) {
+        toast.error("Product not found.");
+        return;
+      }
+
+      const size = product.sizes?.[0] ?? "";
+      const color = product.colors?.[0] ?? "";
+      await addCartItem({
+        product_id: product._id,
+        quantity: 1,
+        size,
+        color,
+      }).unwrap();
+
+      toast.success(`${product.name} added to cart`);
+    } catch (error) {
+      toast.error(`${(error as { data: { message: string } }).data.message}`);
     }
-
-    const size = product.sizes?.[0] ?? "";
-    const color = product.colors?.[0] ?? "";
-
-    const response = await addCartItem({
-      product_id: product._id,
-      quantity: 1,
-      size,
-      color,
-    }).unwrap();
-
-    toast.success(`${product.name} is ${response.message} `);
   };
 
   return (

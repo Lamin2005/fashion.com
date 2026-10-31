@@ -9,7 +9,7 @@ import Aboutpage from "./pages/common/Aboutpage.tsx";
 import Login from "./pages/common/Login.tsx";
 import Register from "./pages/common/Register.tsx";
 import ProductDetail from "./pages/common/ProductDetail.tsx";
-import { store,persistor } from "./store/index.ts";
+import { store, persistor } from "./store/index.ts";
 import { Provider } from "react-redux";
 import { Toaster } from "sonner";
 import Profile from "./pages/common/Profile.tsx";
@@ -24,6 +24,7 @@ import ProductEdit from "./pages/admin/ProductEdit.tsx";
 import ProductsPage from "./pages/admin/Products.tsx";
 import OrderPage from "./pages/admin/Orders.tsx";
 import { PersistGate } from "redux-persist/integration/react";
+import OrderConfirmed from "./pages/admin/OrderConfirmed.tsx";
 
 const router = createBrowserRouter([
   {
@@ -84,6 +85,10 @@ const router = createBrowserRouter([
         element: <ResetPasswordForm />,
       },
     ],
+  },
+  {
+    path: "/stripe-success",
+    element: <OrderConfirmed />,
   },
 
   {

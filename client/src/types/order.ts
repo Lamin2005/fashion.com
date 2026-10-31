@@ -3,6 +3,8 @@ export interface OrderItem {
   name: string;
   quantity: number;
   price: number;
+  size: string;
+  color: string;
   image: string[];
 }
 
@@ -15,7 +17,7 @@ export interface Order {
   payment_method: "cod" | "kpay" | "wavepay" | "card";
   payment_status: "pending" | "paid" | "failed" | "refunded";
   shipping_address: string;
-  phone: string;
+  phone?: string;
   createdAt: string;
   updatedAt: string;
 }
