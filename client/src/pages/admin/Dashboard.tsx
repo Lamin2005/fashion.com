@@ -5,9 +5,11 @@ import ProductStatusCard from "@/components/admin/ProductStatusCard";
 import DailyProductChart from "@/components/admin/DailyProductChart";
 import type { Product } from "@/types/product";
 import StockLevel from "@/components/admin/StockLevel";
-import { fakeOrders } from "@/lib/utils";
 import type { Order } from "@/types/order";
 import { formatRelativeTime } from "@/lib/utils";
+import { useGetAllOrdersQuery } from "@/store/slices/api/orderApi";
+import { TableCell, TableRow } from "@/components/ui/table";
+import { Skeleton } from "../../components/ui/skeleton";
 
 const statusStyles: Record<Order["status"], string> = {
   delivered: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
@@ -33,7 +35,10 @@ const paymentStatusStyles: Record<Order["payment_status"], string> = {
 
 function Dashboard() {
   const { data: product, isLoading } = useGetProductsQuery({});
+  const { data: order, isLoading: isOrderLoading } = useGetAllOrdersQuery();
   const products = product?.products || [];
+  const orders = order?.orders || [];
+
   return (
     <div className="space-y-6 overflow-y-auto scrollbar-none">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -151,42 +156,85 @@ function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {fakeOrders.map((o: Order) => (
-                <tr
-                  key={o._id}
-                  className="border-b border-zinc-800/40 transition-colors last:border-0 hover:bg-zinc-900/50"
-                >
-                  <td className="px-5 py-4 font-mono text-sm font-medium text-white sm:px-6">
-                    {o._id}
-                  </td>
-                  <td className="px-5 py-4 text-sm text-zinc-300 sm:px-6">
-                    {o.user_id}
-                  </td>
-                  <td className="px-5 py-4 font-mono text-sm font-semibold text-amber-400 sm:px-6">
-                    {o.total_price} MMK
-                  </td>
-                  <td className="px-5 py-4">
-                    <span
-                      className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium capitalize ${
-                        paymentStatusStyles[o.payment_status]
-                      }`}
-                    >
-                      {o.payment_status}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4 sm:px-6">
-                    <span
-                      className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${statusStyles[o.status]}`}
-                    >
-                      {o.status}
-                    </span>
-                  </td>
+              {isOrderLoading ? (
+                Array.from({ length: 5 }).map((_, index) => (
+                  <TableRow
+                    key={index}
+                    className="border-zinc-800/40 hover:bg-transparent"
+                  >
+                    <TableCell className="px-5 py-4 sm:px-6">
+                      <Skeleton className="h-4 w-28 bg-zinc-800 sm:w-36" />
+                    </TableCell>
 
-                  <td className="px-5 py-4 text-right text-xs text-zinc-500 sm:px-6">
-                    {formatRelativeTime(o.createdAt)}
-                  </td>
-                </tr>
-              ))}
+                    <TableCell className="px-5 py-4 sm:px-6">
+                      <Skeleton className="h-4 w-24 bg-zinc-800 sm:w-32" />
+                    </TableCell>
+
+                    <TableCell className="px-5 py-4 sm:px-6">
+                      <Skeleton className="h-5 w-24 bg-zinc-800" />
+                    </TableCell>
+
+                    <TableCell className="px-5 py-4">
+                      <Skeleton className="h-6 w-20 rounded-full bg-zinc-800" />
+                    </TableCell>
+
+                    <TableCell className="px-5 py-4 sm:px-6">
+                      <Skeleton className="h-6 w-24 rounded-full bg-zinc-800" />
+                    </TableCell>
+
+                    <TableCell className="px-5 py-4 sm:px-6">
+                      <div className="flex justify-end">
+                        <Skeleton className="h-4 w-20 bg-zinc-800" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <>
+                  {orders?.slice(0, 7).map((o: Order) => (
+                    <TableRow
+                      key={o._id}
+                      className="border-b border-zinc-800/40 transition-colors last:border-0 hover:bg-zinc-900/50"
+                    >
+                      <TableCell className="px-5 py-4 font-mono text-sm font-medium text-white sm:px-6">
+                        {o._id}
+                      </TableCell>
+
+                      <TableCell className="px-5 py-4 text-sm text-zinc-300 sm:px-6">
+                        {o.user_id?.name}
+                      </TableCell>
+
+                      <TableCell className="px-5 py-4 font-mono text-sm font-semibold text-amber-400 sm:px-6">
+                        {o.total_price} MMK
+                      </TableCell>
+
+                      <TableCell className="px-5 py-4">
+                        <span
+                          className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium capitalize ${
+                            paymentStatusStyles[o.payment_status]
+                          }`}
+                        >
+                          {o.payment_status}
+                        </span>
+                      </TableCell>
+
+                      <TableCell className="px-5 py-4 sm:px-6">
+                        <span
+                          className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${
+                            statusStyles[o.status]
+                          }`}
+                        >
+                          {o.status}
+                        </span>
+                      </TableCell>
+
+                      <TableCell className="px-5 py-4 text-right text-xs text-zinc-500 sm:px-6">
+                        {formatRelativeTime(o.createdAt)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </>
+              )}
             </tbody>
           </table>
         </div>

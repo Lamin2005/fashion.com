@@ -24,7 +24,8 @@ import ProductEdit from "./pages/admin/ProductEdit.tsx";
 import ProductsPage from "./pages/admin/Products.tsx";
 import OrderPage from "./pages/admin/Orders.tsx";
 import { PersistGate } from "redux-persist/integration/react";
-import OrderConfirmed from "./pages/admin/OrderConfirmed.tsx";
+import OrderConfirmed from "./pages/common/OrderConfirmed.tsx";
+import OrderCancel from "./pages/common/OrderCancle.tsx";
 
 const router = createBrowserRouter([
   {
@@ -89,6 +90,10 @@ const router = createBrowserRouter([
   {
     path: "/stripe-success",
     element: <OrderConfirmed />,
+  },
+  {
+    path: "/stripe-cancel",
+    element: <OrderCancel />,
   },
 
   {

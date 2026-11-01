@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   CheckCircle2,
   Package,
@@ -10,11 +10,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useGetOrderBySessionQuery } from "@/store/slices/api/orderApi";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store";
 
 export default function OrderConfirmed() {
   const [searchParams] = useSearchParams();
-
+  const { userInfo } = useSelector((state: RootState) => state.auth);
   const sessionId = searchParams.get("session_id");
+  const navigate = useNavigate();
 
   const { data, isLoading, isError, refetch } = useGetOrderBySessionQuery(
     sessionId ?? "",
@@ -23,6 +27,10 @@ export default function OrderConfirmed() {
       pollingInterval: 3000,
     },
   );
+
+  useEffect(() => {
+    if (!userInfo) navigate("/");
+  }, [userInfo, navigate]);
 
   if (!sessionId) {
     return (
