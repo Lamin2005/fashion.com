@@ -197,7 +197,7 @@ function Dashboard() {
                       className="border-b border-zinc-800/40 transition-colors last:border-0 hover:bg-zinc-900/50"
                     >
                       <TableCell className="px-5 py-4 font-mono text-sm font-medium text-white sm:px-6">
-                        {o._id}
+                        ORD-{o._id.slice(0,5)}...
                       </TableCell>
 
                       <TableCell className="px-5 py-4 text-sm text-zinc-300 sm:px-6">

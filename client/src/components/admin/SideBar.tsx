@@ -1,6 +1,5 @@
-// src/pages/admin/SideBar.jsx
 import { useEffect, useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -16,6 +15,7 @@ import {
 } from "lucide-react";
 import useLowStockCount from "@/components/hooks/useLowStockCount";
 import type { LucideIcon } from "lucide-react";
+import { useProfileQuery } from "@/store/slices/api/userApi";
 
 type MenuItem = {
   path: string;
@@ -35,6 +35,10 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
   const { lowStockCount, isLoading, isError } = useLowStockCount();
+  const { data } = useProfileQuery();
+  const userInfo = data?.user;
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     onClose();
@@ -216,7 +220,7 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
                         {item.label}
                       </span>
 
-                      {item.badge && (
+                      {item.badge && item.badge !== "0" && (
                         <span
                           className={`
                             ml-auto shrink-0 rounded-full px-2.5 py-1 text-[11px] leading-none
@@ -246,30 +250,40 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
             ${isCollapsed ? "lg:justify-center lg:gap-0 lg:p-2" : ""}
           `}
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-sm font-semibold text-white">
-            AD
-          </div>
+          {userInfo?.avatar ? (
+            <img
+              src={userInfo?.avatar?.image_url}
+              alt={userInfo?.name}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-sm object-cover"
+            />
+          ) : (
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-sm font-semibold text-white">
+              {userInfo?.name.slice(0, 2)}
+            </div>
+          )}
 
           <div
             className={`min-w-0 flex-1 overflow-hidden ${hideWhenCollapsed}`}
           >
             <p className="truncate text-sm font-medium text-white">
-              Administrator
+              {userInfo?.name || `Loading...`}
             </p>
-            <p className="truncate text-xs text-zinc-500">admin@fashion.com</p>
+            <p className="truncate text-xs text-zinc-500">{userInfo?.email}</p>
           </div>
         </div>
 
         <button
           type="button"
           className={`
+            cursor-pointer
             flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium
             text-zinc-400 transition-colors hover:bg-red-500/10 hover:text-red-400
             ${isCollapsed ? "lg:justify-center lg:gap-0 lg:px-0" : ""}
           `}
+          onClick={() => navigate("/")}
         >
           <LogOut size={20} className="shrink-0" />
-          <span className={hideWhenCollapsed}>Logout</span>
+          <span className={hideWhenCollapsed}>Back to Homepage</span>
         </button>
       </div>
     </aside>

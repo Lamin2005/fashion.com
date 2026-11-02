@@ -10,12 +10,18 @@ export interface OrderItem {
 
 export interface Order {
   _id: string;
-  user_id: { name: string; email: string; };
+  user_id: {
+    name: string;
+    email: string;
+    avatar: {
+      image_url: string;
+    };
+  };
   items: OrderItem[];
   total_price: number;
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
   payment_method: "cod" | "kpay" | "wavepay" | "card";
-  payment_status: "pending" | "paid" | "failed" | "refunded";
+  payment_status: "pending" | "paid" | "refunded" | "failed";
   shipping_address: string;
   phone?: string;
   createdAt: string;

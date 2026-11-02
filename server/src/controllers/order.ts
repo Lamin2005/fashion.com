@@ -95,7 +95,7 @@ export const getAllOrders = async (
   try {
     const orders = await Order.find()
       .sort({ createdAt: -1 })
-      .populate("user_id", "name email phone")
+      .populate("user_id", "name email phone avatar")
       .lean();
 
     res.status(200).json({

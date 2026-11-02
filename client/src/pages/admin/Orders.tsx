@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useGetAllOrdersQuery } from "@/store/slices/api/orderApi";
+import { type Order } from "@/types/order";
 
 import {
   Table,
@@ -28,100 +30,27 @@ import {
 } from "@/components/ui/table";
 
 type OrderStatus =
-  | "Pending"
-  | "Processing"
-  | "Shipped"
-  | "Delivered"
-  | "Cancelled";
+  | "pending"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled";
 
-type PaymentStatus = "Paid" | "Unpaid" | "Refunded";
-
-interface Order {
-  _id: string;
-  customer: string;
-  email: string;
-  date: string;
-  items: number;
-  total: number;
-  paymentStatus: PaymentStatus;
-  status: OrderStatus;
-}
-
-const orders: Order[] = [
-  {
-    _id: "ORD-1001",
-    customer: "Aung Min",
-    email: "aungmin@example.com",
-    date: "Oct 22, 2026",
-    items: 3,
-    total: 125000,
-    paymentStatus: "Paid",
-    status: "Delivered",
-  },
-  {
-    _id: "ORD-1002",
-    customer: "Su Mon",
-    email: "sumon@example.com",
-    date: "Oct 22, 2026",
-    items: 2,
-    total: 85000,
-    paymentStatus: "Paid",
-    status: "Processing",
-  },
-  {
-    _id: "ORD-1003",
-    customer: "Kyaw Zin",
-    email: "kyawzin@example.com",
-    date: "Oct 21, 2026",
-    items: 1,
-    total: 45000,
-    paymentStatus: "Unpaid",
-    status: "Pending",
-  },
-  {
-    _id: "ORD-1004",
-    customer: "May Thu",
-    email: "maythu@example.com",
-    date: "Oct 21, 2026",
-    items: 4,
-    total: 210000,
-    paymentStatus: "Paid",
-    status: "Shipped",
-  },
-  {
-    _id: "ORD-1005",
-    customer: "Htet Aung",
-    email: "htetaung@example.com",
-    date: "Oct 20, 2026",
-    items: 2,
-    total: 65000,
-    paymentStatus: "Refunded",
-    status: "Cancelled",
-  },
-  {
-    _id: "ORD-1006",
-    customer: "Thiri Win",
-    email: "thiri@example.com",
-    date: "Oct 20, 2026",
-    items: 3,
-    total: 150000,
-    paymentStatus: "Paid",
-    status: "Processing",
-  },
-];
+type PaymentStatus = "paid" | "refunded" | "pending" | "failed";
 
 const statusStyles: Record<OrderStatus, string> = {
-  Pending: "border-amber-500/20 bg-amber-500/10 text-amber-400",
-  Processing: "border-blue-500/20 bg-blue-500/10 text-blue-400",
-  Shipped: "border-violet-500/20 bg-violet-500/10 text-violet-400",
-  Delivered: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
-  Cancelled: "border-red-500/20 bg-red-500/10 text-red-400",
+  pending: "border-amber-500/20 bg-amber-500/10 text-amber-400",
+  processing: "border-blue-500/20 bg-blue-500/10 text-blue-400",
+  shipped: "border-violet-500/20 bg-violet-500/10 text-violet-400",
+  delivered: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+  cancelled: "border-red-500/20 bg-red-500/10 text-red-400",
 };
 
 const paymentStyles: Record<PaymentStatus, string> = {
-  Paid: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
-  Unpaid: "border-amber-500/20 bg-amber-500/10 text-amber-400",
-  Refunded: "border-zinc-700 bg-zinc-800 text-zinc-400",
+  paid: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+  pending: "border-amber-500/20 bg-amber-500/10 text-amber-400",
+  failed: "bg-red-500/10 text-red-400 border-red-500/20",
+  refunded: "border-zinc-700 bg-zinc-800 text-zinc-400",
 };
 
 const stats = [
@@ -136,21 +65,21 @@ const stats = [
     icon: Clock,
     color: "bg-amber-500/10 text-amber-400",
     getCount: (data: Order[]) =>
-      data.filter((order) => order.status === "Pending").length,
+      data.filter((order) => order.status === "pending").length,
   },
   {
     title: "Processing Orders",
     icon: PackageCheck,
     color: "bg-blue-500/10 text-blue-400",
     getCount: (data: Order[]) =>
-      data.filter((order) => order.status === "Processing").length,
+      data.filter((order) => order.status === "processing").length,
   },
   {
     title: "Completed Orders",
     icon: CircleCheck,
     color: "bg-emerald-500/10 text-emerald-400",
     getCount: (data: Order[]) =>
-      data.filter((order) => order.status === "Delivered").length,
+      data.filter((order) => order.status === "delivered").length,
   },
 ];
 
@@ -158,19 +87,21 @@ function OrderPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("All Status");
   const [payment, setPayment] = useState("All Payments");
+  const { data: order } = useGetAllOrdersQuery();
+  const orders = order?.orders || [];
 
   const filteredOrders = orders.filter((order) => {
     const searchTerm = search.toLowerCase();
 
     const matchesSearch =
       order._id.toLowerCase().includes(searchTerm) ||
-      order.customer.toLowerCase().includes(searchTerm) ||
-      order.email.toLowerCase().includes(searchTerm);
+      order.user_id?.name.toLowerCase().includes(searchTerm) ||
+      order.user_id?.email.toLowerCase().includes(searchTerm);
 
     const matchesStatus = status === "All Status" || order.status === status;
 
     const matchesPayment =
-      payment === "All Payments" || order.paymentStatus === payment;
+      payment === "All Payments" || order.payment_status === payment;
 
     return matchesSearch && matchesStatus && matchesPayment;
   });
@@ -315,7 +246,6 @@ function OrderPage() {
             </select>
           </div>
 
-          {/* Table */}
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
@@ -361,48 +291,53 @@ function OrderPage() {
                     className="border-zinc-800/80 transition-colors hover:bg-zinc-800/30"
                   >
                     <TableCell className="whitespace-nowrap px-5 font-medium text-white">
-                      {order._id}
+                      ORD-{order._id.slice(0, 5)}...
                     </TableCell>
 
                     <TableCell>
                       <div className="flex min-w-40 items-center gap-3">
-                        <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-xs font-semibold text-zinc-300">
-                          {order.customer
-                            .split(" ")
-                            .map((part) => part[0])
-                            .join("")}
-                        </div>
+                        {order.user_id?.avatar ? (
+                          <img
+                            src={order.user_id?.avatar?.image_url}
+                            alt={order.user_id?.name}
+                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-sm object-cover"
+                          />
+                        ) : (
+                          <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-xs font-semibold text-zinc-300">
+                            {order.user_id?.name.slice(0, 2)}
+                          </div>
+                        )}
 
                         <div className="min-w-0">
                           <p className="font-medium text-zinc-200">
-                            {order.customer}
+                            {order.user_id?.name}
                           </p>
 
                           <p className="max-w-44 truncate text-xs text-zinc-500">
-                            {order.email}
+                            {order.user_id?.email}
                           </p>
                         </div>
                       </div>
                     </TableCell>
 
                     <TableCell className="whitespace-nowrap text-sm text-zinc-400">
-                      {order.date}
+                      {order.createdAt}
                     </TableCell>
 
                     <TableCell className="whitespace-nowrap text-sm text-zinc-400">
-                      {order.items} items
+                      {order.items.length} items
                     </TableCell>
 
                     <TableCell className="whitespace-nowrap font-medium text-zinc-200">
-                      {formatPrice(order.total)}
+                      {formatPrice(order.total_price)}
                     </TableCell>
 
                     <TableCell>
                       <Badge
                         variant="outline"
-                        className={`whitespace-nowrap ${paymentStyles[order.paymentStatus]}`}
+                        className={`whitespace-nowrap ${paymentStyles[order.payment_status]}`}
                       >
-                        {order.paymentStatus}
+                        {order.payment_status}
                       </Badge>
                     </TableCell>
 
@@ -450,7 +385,6 @@ function OrderPage() {
             </Table>
           </div>
 
-          {/* Footer */}
           <div className="flex flex-col gap-3 border-t border-zinc-800 p-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-zinc-500">
               Showing{" "}

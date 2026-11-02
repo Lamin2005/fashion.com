@@ -181,7 +181,6 @@ export const stripewebhook = async (req: Request, res: Response) => {
         console.log("Session ID:", session.id);
         console.log("User ID:", userId);
 
-        // Prevent duplicate orders if Stripe retries this event.
         const existingOrder = await Order.findOne({
           stripe_session_id: session.id,
         });
@@ -190,7 +189,6 @@ export const stripewebhook = async (req: Request, res: Response) => {
           break;
         }
 
-        // Retrieve the purchased line items from Stripe.
         const lineItems = await stripe.checkout.sessions.listLineItems(
           session.id,
           {
@@ -274,6 +272,29 @@ export const stripewebhook = async (req: Request, res: Response) => {
             runValidators: true,
           },
         );
+
+        for (const item of orderItems) {
+          const updatedProduct = await Product.findOneAndUpdate(
+            {
+              _id: item.product_id,
+              instock_count: { $gte: item.quantity },
+            },
+            {
+              $inc: {
+                instock_count: -item.quantity,
+              },
+            },
+            {
+              new: true,
+            },
+          );
+
+          if (!updatedProduct) {
+            throw new Error(
+              `Insufficient stock for product: ${item.product_id}`,
+            );
+          }
+        }
 
         console.log("Order created/confirmed:", order?._id);
 

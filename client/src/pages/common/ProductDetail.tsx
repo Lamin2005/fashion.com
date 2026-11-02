@@ -22,6 +22,7 @@ const ProductDetail = () => {
 
   const { data, isLoading, isError } = useGetProductDetailQuery(id ?? "", {
     skip: !id,
+    pollingInterval: 3000,
   });
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -71,6 +72,8 @@ const ProductDetail = () => {
         size: activeSize,
         color: activeColor,
       }).unwrap();
+
+      setQuantity(1);
 
       toast.success(`${data.name} added to cart`);
     } catch (error) {

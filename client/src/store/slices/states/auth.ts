@@ -6,6 +6,9 @@ interface AuthState {
     name: string;
     email: string;
     role: string;
+    avatar: {
+      image_url: string;
+    };
   } | null;
 }
 
