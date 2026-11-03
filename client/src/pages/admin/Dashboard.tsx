@@ -5,9 +5,9 @@ import ProductStatusCard from "@/components/admin/ProductStatusCard";
 import DailyProductChart from "@/components/admin/DailyProductChart";
 import type { Product } from "@/types/product";
 import StockLevel from "@/components/admin/StockLevel";
+import { useGetRecentOrdersQuery } from "@/store/slices/api/orderApi";
 import type { Order } from "@/types/order";
 import { formatRelativeTime } from "@/lib/utils";
-import { useGetAllOrdersQuery } from "@/store/slices/api/orderApi";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Skeleton } from "../../components/ui/skeleton";
 
@@ -35,9 +35,13 @@ const paymentStatusStyles: Record<Order["payment_status"], string> = {
 
 function Dashboard() {
   const { data: product, isLoading } = useGetProductsQuery({});
-  const { data: order, isLoading: isOrderLoading } = useGetAllOrdersQuery();
+  const { data: order, isLoading: isOrderLoading } = useGetRecentOrdersQuery();
   const products = product?.products || [];
+
   const orders = order?.orders || [];
+
+  console.log(order);
+  console.log(orders);
 
   return (
     <div className="space-y-6 overflow-y-auto scrollbar-none">
@@ -197,7 +201,7 @@ function Dashboard() {
                       className="border-b border-zinc-800/40 transition-colors last:border-0 hover:bg-zinc-900/50"
                     >
                       <TableCell className="px-5 py-4 font-mono text-sm font-medium text-white sm:px-6">
-                        ORD-{o._id.slice(0,5)}...
+                        ORD-{o._id.slice(0, 5)}...
                       </TableCell>
 
                       <TableCell className="px-5 py-4 text-sm text-zinc-300 sm:px-6">

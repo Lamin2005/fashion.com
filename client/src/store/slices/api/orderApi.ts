@@ -3,6 +3,7 @@ import {
   type Order,
   type OrdersResponse,
   type UpdateOrderPayload,
+  type GetAllOrdersParams,
 } from "@/types/order";
 
 export const orderApi = apiSlice.injectEndpoints({
@@ -14,15 +15,23 @@ export const orderApi = apiSlice.injectEndpoints({
       query: (sessionId) => `/orders/session/${sessionId}`,
     }),
 
-    getAllOrders: builder.query<OrdersResponse, void>({
-      query: () => ({
+    getAllOrders: builder.query<OrdersResponse, GetAllOrdersParams>({
+      query: (params) => ({
         url: "/orders",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Orders"],
+    }),
+
+    getRecentOrders: builder.query<OrdersResponse, void>({
+      query: () => ({
+        url: "/orders/recent",
         method: "GET",
       }),
       providesTags: ["Orders"],
     }),
 
-    // Get current user's orders
     getMyOrders: builder.query<OrdersResponse, void>({
       query: () => ({
         url: "/orders/my-orders",
@@ -71,4 +80,5 @@ export const {
   useGetMyOrdersQuery,
   useGetOrderByIdQuery,
   useUpdateOrderMutation,
+  useGetRecentOrdersQuery,
 } = orderApi;

@@ -8,10 +8,19 @@ import {
   CalendarDays,
   Download,
   Eye,
+  Package,
   ChevronLeft,
   ChevronRight,
-  Package,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+import {
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  Select,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -84,33 +93,55 @@ const stats = [
 ];
 
 function OrderPage() {
+  const [currentPage, setCurrentPage] = useState(1);
+
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("All Status");
-  const [payment, setPayment] = useState("All Payments");
-  const { data: order } = useGetAllOrdersQuery();
-  const orders = order?.orders || [];
 
-  const filteredOrders = orders.filter((order) => {
-    const searchTerm = search.toLowerCase();
+  const [status, setStatus] = useState("all");
 
-    const matchesSearch =
-      order._id.toLowerCase().includes(searchTerm) ||
-      order.user_id?.name.toLowerCase().includes(searchTerm) ||
-      order.user_id?.email.toLowerCase().includes(searchTerm);
+  const [payment, setPayment] = useState("all");
 
-    const matchesStatus = status === "All Status" || order.status === status;
+  const [sort, setSort] = useState("newest");
 
-    const matchesPayment =
-      payment === "All Payments" || order.payment_status === payment;
+  const itemsPerPage = 3;
 
-    return matchesSearch && matchesStatus && matchesPayment;
+  const { data, isFetching } = useGetAllOrdersQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+    keyword: search.trim(),
+    status,
+    payment_status: payment,
+    sort,
   });
+
+  const orders = data?.orders ?? [];
+
+  const pagination = data?.pagination;
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (value: string) => {
+    setStatus(value);
+    setCurrentPage(1);
+  };
+
+  const handlePaymentChange = (value: string) => {
+    setPayment(value);
+    setCurrentPage(1);
+  };
+
+  const handleSortChange = (value: string) => {
+    setSort(value);
+    setCurrentPage(1);
+  };
 
   const formatPrice = (price: number) => `${price.toLocaleString("en-US")} MMK`;
 
   return (
     <div className="min-w-0 space-y-6 pb-6">
-      {/* Page Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-serif text-2xl font-semibold tracking-tight text-white sm:text-3xl">
@@ -138,7 +169,6 @@ function OrderPage() {
         </div>
       </div>
 
-      {/* Statistics Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
@@ -184,7 +214,6 @@ function OrderPage() {
         })}
       </div>
 
-      {/* Orders Table Card */}
       <Card className="overflow-hidden border-zinc-800/80 bg-zinc-900/40 text-white shadow-sm">
         <CardHeader className="flex flex-col gap-3 space-y-0 border-b border-zinc-800 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -201,49 +230,62 @@ function OrderPage() {
             variant="outline"
             className="w-fit border-zinc-700 bg-zinc-800/50 text-zinc-400"
           >
-            {filteredOrders.length} orders
+            {orders.length} orders
           </Badge>
         </CardHeader>
 
         <CardContent className="p-0">
-          {/* Search and Filters */}
           <div className="flex flex-col gap-3 border-b border-zinc-800 p-4 md:flex-row md:items-center">
             <div className="relative min-w-0 flex-1">
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-500" />
 
               <Input
+                placeholder="Search customer, email, phone..."
                 value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search order ID or customer..."
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="h-10 border-zinc-800 bg-zinc-950/60 pl-9 text-sm text-white placeholder:text-zinc-500 focus-visible:ring-amber-500/40"
               />
             </div>
 
-            <select
-              value={status}
-              onChange={(event) => setStatus(event.target.value)}
-              className="h-10 rounded-md border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-300 outline-none transition-colors focus:border-amber-500/50"
-              aria-label="Filter by order status"
-            >
-              <option>All Status</option>
-              <option>Pending</option>
-              <option>Processing</option>
-              <option>Shipped</option>
-              <option>Delivered</option>
-              <option>Cancelled</option>
-            </select>
+            <Select value={status} onValueChange={handleStatusChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Order Status" />
+              </SelectTrigger>
 
-            <select
-              value={payment}
-              onChange={(event) => setPayment(event.target.value)}
-              className="h-10 rounded-md border border-zinc-800 bg-zinc-950 px-3 text-sm text-zinc-300 outline-none transition-colors focus:border-amber-500/50"
-              aria-label="Filter by payment status"
-            >
-              <option>All Payments</option>
-              <option>Paid</option>
-              <option>Unpaid</option>
-              <option>Refunded</option>
-            </select>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="processing">Processing</SelectItem>
+                <SelectItem value="shipped">Shipped</SelectItem>
+                <SelectItem value="delivered">Delivered</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={payment} onValueChange={handlePaymentChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Payment Status" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="all">All Payments</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="failed">Failed</SelectItem>
+                <SelectItem value="refunded">Refunded</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={sort} onValueChange={handleSortChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sort By" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="oldest">Oldest First</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="overflow-x-auto">
@@ -285,7 +327,7 @@ function OrderPage() {
               </TableHeader>
 
               <TableBody>
-                {filteredOrders.map((order) => (
+                {orders.map((order) => (
                   <TableRow
                     key={order._id}
                     className="border-zinc-800/80 transition-colors hover:bg-zinc-800/30"
@@ -364,7 +406,7 @@ function OrderPage() {
                   </TableRow>
                 ))}
 
-                {filteredOrders.length === 0 && (
+                {orders.length === 0 && (
                   <TableRow className="border-zinc-800 hover:bg-transparent">
                     <TableCell colSpan={8} className="h-32 text-center">
                       <div className="flex flex-col items-center gap-2 text-zinc-500">
@@ -385,40 +427,71 @@ function OrderPage() {
             </Table>
           </div>
 
-          <div className="flex flex-col gap-3 border-t border-zinc-800 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-zinc-800 px-5 py-4">
+            {/* Showing Orders */}
             <p className="text-sm text-zinc-500">
               Showing{" "}
-              <span className="font-medium text-zinc-300">
-                {filteredOrders.length}
+              <span className="font-medium text-zinc-200">
+                {pagination && pagination.totalOrders > 0
+                  ? (currentPage - 1) * itemsPerPage + 1
+                  : 0}
+                {" - "}
+                {Math.min(
+                  currentPage * itemsPerPage,
+                  pagination?.totalOrders ?? 0,
+                )}
               </span>{" "}
               of{" "}
-              <span className="font-medium text-zinc-300">{orders.length}</span>{" "}
+              <span className="font-medium text-zinc-200">
+                {pagination?.totalOrders ?? 0}
+              </span>{" "}
               orders
             </p>
 
-            <div className="flex items-center gap-2">
+            {/* Pagination Buttons */}
+            <div className="flex items-center gap-1.5">
               <Button
                 variant="outline"
-                disabled
-                className="h-9 gap-2 border-zinc-800 bg-transparent px-3 text-zinc-400 disabled:pointer-events-none disabled:opacity-30"
+                size="sm"
+                disabled={!pagination?.hasPrevPage || isFetching}
+                onClick={() => setCurrentPage((prev) => prev - 1)}
+                className="h-9 gap-1 border-zinc-800 bg-zinc-950 px-3 text-zinc-400 hover:bg-zinc-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
               >
-                <ChevronLeft className="size-4" />
-                Previous
+                <ChevronLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">Previous</span>
               </Button>
+
+              {Array.from(
+                { length: pagination?.totalPages ?? 0 },
+                (_, index) => index + 1,
+              ).map((page) => (
+                <Button
+                  key={page}
+                  variant="outline"
+                  size="sm"
+                  disabled={isFetching}
+                  onClick={() => setCurrentPage(page)}
+                  className={cn(
+                    "h-9 min-w-9 border-zinc-800 bg-zinc-950 px-3 text-sm font-medium transition-all",
+                    "hover:border-zinc-600 hover:bg-zinc-800 hover:text-white",
+                    currentPage === page &&
+                      currentPage === page &&
+                      "border-yellow-400 bg-yellow-400 text-black hover:border-yellow-300 hover:bg-yellow-300 hover:text-black",
+                  )}
+                >
+                  {page}
+                </Button>
+              ))}
 
               <Button
                 variant="outline"
-                className="h-9 min-w-9 border-amber-500/30 bg-amber-500/10 px-3 text-amber-400 hover:bg-amber-500/20 hover:text-amber-300"
+                size="sm"
+                disabled={!pagination?.hasNextPage || isFetching}
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+                className="h-9 gap-1 border-yellow-500/30 bg-zinc-950 px-3 text-yellow-400 hover:border-yellow-400 hover:bg-yellow-500 hover:text-black disabled:cursor-not-allowed disabled:opacity-30"
               >
-                1
-              </Button>
-
-              <Button
-                variant="outline"
-                className="h-9 gap-2 border-zinc-800 bg-transparent px-3 text-zinc-400 hover:bg-zinc-800 hover:text-white"
-              >
-                Next
-                <ChevronRight className="size-4" />
+                <span className="hidden sm:inline">Next</span>
+                <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           </div>

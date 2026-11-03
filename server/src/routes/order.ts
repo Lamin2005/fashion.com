@@ -6,7 +6,8 @@ import {
   getAllOrders,
   getOrderById,
   updateOrder,
-  deleteOrder,
+  // deleteOrder,
+  getRecentOrders,
 } from "../controllers/order";
 
 import { authMiddleware, isAdmin } from "../middlewares/authmiddleware";
@@ -32,6 +33,11 @@ router.get(
 
 router.get("/my-orders", authMiddleware, getMyOrders);
 
+// isAdmin routes
+router.get("/", authMiddleware, isAdmin, asyncHandler(getAllOrders));
+
+router.get("/recent", authMiddleware, asyncHandler(getRecentOrders));
+
 router.get(
   "/:id",
   authMiddleware,
@@ -40,25 +46,22 @@ router.get(
   getOrderById,
 );
 
-// isAdmin routes
-router.get("/", authMiddleware, isAdmin, getAllOrders);
-
 router.put(
   "/:id",
   authMiddleware,
   isAdmin,
   updateOrderValidator,
   validateRequest,
-  updateOrder,
+  asyncHandler(updateOrder),
 );
 
-router.delete(
-  "/:id",
-  authMiddleware,
-  isAdmin,
-  orderIdValidator,
-  validateRequest,
-  deleteOrder,
-);
+// router.delete(
+//   "/:id",
+//   authMiddleware,
+//   isAdmin,
+//   orderIdValidator,
+//   validateRequest,
+//   deleteOrder,
+// );
 
 export default router;

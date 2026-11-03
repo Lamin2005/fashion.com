@@ -21,10 +21,16 @@ export const updateOrderValidator = [
     .isIn(["pending", "processing", "shipped", "delivered", "cancelled"])
     .withMessage("Invalid order status"),
 
+  body("payment_status")
+    .optional()
+    .isIn(["pending", "paid", "failed", "refunded"])
+    .withMessage("Invalid payment status"),
+
   body("shipping_address")
     .optional()
     .isString()
     .withMessage("Shipping address must be a string")
+    .bail()
     .trim()
     .notEmpty()
     .withMessage("Shipping address cannot be empty"),
@@ -33,6 +39,7 @@ export const updateOrderValidator = [
     .optional()
     .isString()
     .withMessage("Phone must be a string")
+    .bail()
     .trim()
     .notEmpty()
     .withMessage("Phone cannot be empty"),

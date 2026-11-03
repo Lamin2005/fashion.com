@@ -34,10 +34,20 @@ export interface OrderSessionResponse {
   order: Order;
 }
 
+export interface OrderPagination {
+  currentPage: number;
+  limit: number;
+  totalOrders: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
 export interface OrdersResponse {
   success: boolean;
   count: number;
   orders: Order[];
+  pagination?: OrderPagination;
 }
 
 export interface UpdateOrderPayload {
@@ -50,4 +60,13 @@ export interface UpdateOrderPayload {
 export interface DeleteOrderResponse {
   success: boolean;
   message: string;
+}
+
+export interface GetAllOrdersParams {
+  page: number;
+  limit: number;
+  status?: string;
+  payment_status?: string;
+  keyword?: string;
+  sort?: string;
 }
