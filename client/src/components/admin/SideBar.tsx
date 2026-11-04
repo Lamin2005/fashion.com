@@ -16,6 +16,7 @@ import {
 import useLowStockCount from "@/components/hooks/useLowStockCount";
 import type { LucideIcon } from "lucide-react";
 import { useProfileQuery } from "@/store/slices/api/userApi";
+import { useGetOrderStatusQuery } from "@/store/slices/api/orderApi";
 
 type MenuItem = {
   path: string;
@@ -35,6 +36,10 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
   const { lowStockCount, isLoading, isError } = useLowStockCount();
+  const { data: orderstats, isLoading: isStatusLoading } =
+    useGetOrderStatusQuery("", {
+      pollingInterval: 3000,
+    });
   const { data } = useProfileQuery();
   const userInfo = data?.user;
 
@@ -69,8 +74,15 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
           path: "/admin/orders",
           label: "Orders",
           icon: ShoppingCart,
-          badge: "5 New",
-          badgeColor: "bg-amber-500 text-zinc-950 font-bold",
+          badge: isStatusLoading
+            ? "..."
+            : isError
+              ? "!"
+              : String(orderstats?.stats?.pendingOrders ?? 0),
+          badgeColor:
+            orderstats?.stats?.totalOrders && orderstats.stats.pendingOrders > 0
+              ? "border border-yellow-500/30 bg-yellow-500/10 text-yellow-400"
+              : "border border-zinc-700 bg-zinc-800 text-zinc-400",
         },
         {
           path: "/admin/customers",
@@ -200,7 +212,6 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
                 >
                   {({ isActive }) => (
                     <>
-                      {/* Active accent bar */}
                       {isActive && (
                         <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-amber-400" />
                       )}
@@ -232,6 +243,14 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
                           `}
                         >
                           {item.badge}
+                          {lowStockCount > 0 && item.label === "Products" && (
+                            <span className="ml-1">low</span>
+                          )}
+                          {orderstats?.stats?.pendingOrders &&
+                            orderstats.stats.pendingOrders > 0 &&
+                            item.label === "Orders" && (
+                              <span className="ml-1">new</span>
+                            )}
                         </span>
                       )}
                     </>

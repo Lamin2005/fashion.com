@@ -43,16 +43,25 @@ export interface OrderPagination {
   hasPrevPage: boolean;
 }
 
+export interface Orderstats {
+  completedOrders: number;
+  pendingOrders: number;
+  processingOrders: number;
+  totalOrders: number;
+}
+
 export interface OrdersResponse {
   success: boolean;
   count: number;
   orders: Order[];
   pagination?: OrderPagination;
+  stats?: Orderstats;
 }
 
 export interface UpdateOrderPayload {
   id: string;
   status?: Order["status"];
+  payment_status?: Order["payment_status"];
   shipping_address?: string;
   phone?: string;
 }

@@ -21,12 +21,16 @@ import {
   Select,
   SelectValue,
 } from "@/components/ui/select";
+import ProductStatusCard from "@/components/admin/ProductStatusCard";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useGetAllOrdersQuery } from "@/store/slices/api/orderApi";
+import {
+  useGetAllOrdersQuery,
+  useGetOrderStatusQuery,
+} from "@/store/slices/api/orderApi";
 import { type Order } from "@/types/order";
 
 import {
@@ -37,6 +41,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import OrderUpdateDialog from "@/components/admin/OrderUpdateDialog";
 
 type OrderStatus =
   | "pending"
@@ -62,36 +67,6 @@ const paymentStyles: Record<PaymentStatus, string> = {
   refunded: "border-zinc-700 bg-zinc-800 text-zinc-400",
 };
 
-const stats = [
-  {
-    title: "Total Orders",
-    icon: ShoppingCart,
-    color: "bg-amber-500/10 text-amber-400",
-    getCount: (data: Order[]) => data.length,
-  },
-  {
-    title: "Pending Orders",
-    icon: Clock,
-    color: "bg-amber-500/10 text-amber-400",
-    getCount: (data: Order[]) =>
-      data.filter((order) => order.status === "pending").length,
-  },
-  {
-    title: "Processing Orders",
-    icon: PackageCheck,
-    color: "bg-blue-500/10 text-blue-400",
-    getCount: (data: Order[]) =>
-      data.filter((order) => order.status === "processing").length,
-  },
-  {
-    title: "Completed Orders",
-    icon: CircleCheck,
-    color: "bg-emerald-500/10 text-emerald-400",
-    getCount: (data: Order[]) =>
-      data.filter((order) => order.status === "delivered").length,
-  },
-];
-
 function OrderPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -103,16 +78,31 @@ function OrderPage() {
 
   const [sort, setSort] = useState("newest");
 
-  const itemsPerPage = 3;
+  const itemsPerPage = 10;
 
-  const { data, isFetching } = useGetAllOrdersQuery({
-    page: currentPage,
-    limit: itemsPerPage,
-    keyword: search.trim(),
-    status,
-    payment_status: payment,
-    sort,
-  });
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [open, setOpen] = useState(false);
+
+  const { data, isFetching } = useGetAllOrdersQuery(
+    {
+      page: currentPage,
+      limit: itemsPerPage,
+      keyword: search.trim(),
+      status,
+      payment_status: payment,
+      sort,
+    },
+    {
+      pollingInterval: 3000,
+    },
+  );
+
+  const { data: orderstats, isLoading: isStatusLoading } =
+    useGetOrderStatusQuery("", {
+      pollingInterval: 3000,
+    });
+
+  console.log(orderstats);
 
   const orders = data?.orders ?? [];
 
@@ -168,50 +158,38 @@ function OrderPage() {
           </Button>
         </div>
       </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <ProductStatusCard
+          title="Total Orders"
+          count={orderstats?.stats?.totalOrders ?? 0}
+          icon={<ShoppingCart className="size-6" />}
+          status="Total Orders"
+          isLoading={isStatusLoading}
+        />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
+        <ProductStatusCard
+          title="Pending Orders"
+          count={orderstats?.stats?.pendingOrders ?? 0}
+          icon={<Clock className="size-6" />}
+          status="Pending Orders"
+          isLoading={isStatusLoading}
+        />
 
-          return (
-            <Card
-              key={stat.title}
-              className="group border-zinc-800/80 bg-zinc-900/40 text-white shadow-sm transition-all duration-300 hover:border-zinc-700 hover:bg-zinc-900/70"
-            >
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between">
-                  <div
-                    className={`flex size-11 items-center justify-center rounded-xl ${stat.color}`}
-                  >
-                    <Icon className="size-5" />
-                  </div>
+        <ProductStatusCard
+          title="Processing Orders"
+          count={orderstats?.stats?.processingOrders ?? 0}
+          icon={<PackageCheck className="size-6" />}
+          status="Processing Orders"
+          isLoading={isStatusLoading}
+        />
 
-                  <span className="rounded-md border border-zinc-800 bg-zinc-950/50 px-2 py-1 text-xs text-zinc-500">
-                    Orders
-                  </span>
-                </div>
-
-                <p className="mt-4 text-sm font-medium text-zinc-500">
-                  {stat.title}
-                </p>
-
-                <p className="mt-1 font-serif text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                  {stat.getCount(orders).toLocaleString()}
-                </p>
-
-                <p className="mt-2 text-xs text-zinc-500">
-                  {stat.title === "Total Orders"
-                    ? "All customer orders"
-                    : stat.title === "Pending Orders"
-                      ? "Awaiting confirmation"
-                      : stat.title === "Processing Orders"
-                        ? "Currently being prepared"
-                        : "Successfully delivered"}
-                </p>
-              </CardContent>
-            </Card>
-          );
-        })}
+        <ProductStatusCard
+          title="Shipped Orders"
+          count={orderstats?.stats?.completedOrders ?? 0}
+          icon={<CircleCheck className="size-6" />}
+          status="Shipped Orders"
+          isLoading={isStatusLoading}
+        />
       </div>
 
       <Card className="overflow-hidden border-zinc-800/80 bg-zinc-900/40 text-white shadow-sm">
@@ -230,7 +208,7 @@ function OrderPage() {
             variant="outline"
             className="w-fit border-zinc-700 bg-zinc-800/50 text-zinc-400"
           >
-            {orders.length} orders
+            {orderstats?.stats?.totalOrders || 0} orders
           </Badge>
         </CardHeader>
 
@@ -395,6 +373,10 @@ function OrderPage() {
 
                     <TableCell className="px-5 text-right">
                       <Button
+                        onClick={() => {
+                          setSelectedOrder(order);
+                          setOpen(true);
+                        }}
                         variant="ghost"
                         size="icon"
                         aria-label={`View order ${order._id}`}
@@ -427,8 +409,16 @@ function OrderPage() {
             </Table>
           </div>
 
+          {selectedOrder && (
+            <OrderUpdateDialog
+              key={selectedOrder._id}
+              order={selectedOrder}
+              open={open}
+              onOpenChange={setOpen}
+            />
+          )}
+
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-zinc-800 px-5 py-4">
-            {/* Showing Orders */}
             <p className="text-sm text-zinc-500">
               Showing{" "}
               <span className="font-medium text-zinc-200">
@@ -448,7 +438,6 @@ function OrderPage() {
               orders
             </p>
 
-            {/* Pagination Buttons */}
             <div className="flex items-center gap-1.5">
               <Button
                 variant="outline"

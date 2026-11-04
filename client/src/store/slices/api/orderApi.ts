@@ -32,6 +32,14 @@ export const orderApi = apiSlice.injectEndpoints({
       providesTags: ["Orders"],
     }),
 
+    getOrderStatus: builder.query<OrdersResponse, string>({
+      query: () => ({
+        url: "/orders/stats",
+        method: "GET",
+      }),
+      providesTags: ["Orders"],
+    }),
+
     getMyOrders: builder.query<OrdersResponse, void>({
       query: () => ({
         url: "/orders/my-orders",
@@ -81,4 +89,5 @@ export const {
   useGetOrderByIdQuery,
   useUpdateOrderMutation,
   useGetRecentOrdersQuery,
+  useGetOrderStatusQuery
 } = orderApi;

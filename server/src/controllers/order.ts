@@ -198,7 +198,7 @@ export const getOrderStats = async (
 
           completedOrders: {
             $sum: {
-              $cond: [{ $eq: ["$status", "delivered"] }, 1, 0],
+              $cond: [{ $eq: ["$status", "shipped"] }, 1, 0],
             },
           },
         },

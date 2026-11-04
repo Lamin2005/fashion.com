@@ -8,6 +8,7 @@ import {
   updateOrder,
   // deleteOrder,
   getRecentOrders,
+  getOrderStats,
 } from "../controllers/order";
 
 import { authMiddleware, isAdmin } from "../middlewares/authmiddleware";
@@ -38,6 +39,8 @@ router.get("/", authMiddleware, isAdmin, asyncHandler(getAllOrders));
 
 router.get("/recent", authMiddleware, asyncHandler(getRecentOrders));
 
+router.get("/stats", authMiddleware, isAdmin, asyncHandler(getOrderStats));
+
 router.get(
   "/:id",
   authMiddleware,
@@ -46,7 +49,7 @@ router.get(
   getOrderById,
 );
 
-router.put(
+router.patch(
   "/:id",
   authMiddleware,
   isAdmin,
