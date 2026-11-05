@@ -5,7 +5,6 @@ import {
   PackageCheck,
   CircleCheck,
   Search,
-  CalendarDays,
   Download,
   Eye,
   Package,
@@ -30,6 +29,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   useGetAllOrdersQuery,
   useGetOrderStatusQuery,
+  useLazyExportOrdersQuery,
 } from "@/store/slices/api/orderApi";
 import { type Order } from "@/types/order";
 
@@ -42,6 +42,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import OrderUpdateDialog from "@/components/admin/OrderUpdateDialog";
+import type { DateRange } from "react-day-picker";
+import { format } from "date-fns";
+
+import OrderDateRangePicker from "@/components/admin/OrderDateRangePicker";
 
 type OrderStatus =
   | "pending"
@@ -82,20 +86,23 @@ function OrderPage() {
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [open, setOpen] = useState(false);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
-  const { data, isFetching } = useGetAllOrdersQuery(
-    {
-      page: currentPage,
-      limit: itemsPerPage,
-      keyword: search.trim(),
-      status,
-      payment_status: payment,
-      sort,
-    },
-    {
-      pollingInterval: 3000,
-    },
-  );
+  const [exportOrders, { isFetching: isExporting }] =
+    useLazyExportOrdersQuery();
+
+  const { data, isFetching } = useGetAllOrdersQuery({
+    page: currentPage,
+    limit: itemsPerPage,
+    keyword: search.trim(),
+    status,
+    payment_status: payment,
+    sort,
+    startDate: dateRange?.from
+      ? format(dateRange.from, "yyyy-MM-dd")
+      : undefined,
+    endDate: dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
+  });
 
   const { data: orderstats, isLoading: isStatusLoading } =
     useGetOrderStatusQuery("", {
@@ -128,6 +135,43 @@ function OrderPage() {
     setCurrentPage(1);
   };
 
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    setDateRange(range);
+    setCurrentPage(1);
+  };
+
+  const handleExport = async () => {
+    try {
+      const blob = await exportOrders({
+        page: 1,
+        limit: itemsPerPage,
+        keyword: search.trim(),
+        status,
+        payment_status: payment,
+        sort,
+        startDate: dateRange?.from
+          ? format(dateRange.from, "yyyy-MM-dd")
+          : undefined,
+        endDate: dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
+      }).unwrap();
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = `orders-${format(new Date(), "yyyy-MM-dd")}.csv`;
+
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Export orders error:", error);
+    }
+  };
+
   const formatPrice = (price: number) => `${price.toLocaleString("en-US")} MMK`;
 
   return (
@@ -144,17 +188,19 @@ function OrderPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <Button
-            variant="outline"
-            className="h-10 gap-2 border-zinc-800 bg-zinc-900/50 text-zinc-300 transition-colors hover:border-zinc-700 hover:bg-zinc-800 hover:text-white"
-          >
-            <CalendarDays className="size-4" />
-            Date Range
-          </Button>
+          <OrderDateRangePicker
+            dateRange={dateRange}
+            onDateRangeChange={handleDateRangeChange}
+          />
 
-          <Button className="h-10 gap-2 bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300">
+          <Button
+            onClick={handleExport}
+            disabled={isExporting}
+            className="h-10 gap-2 bg-amber-400 font-semibold text-zinc-950 hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50"
+          >
             <Download className="size-4" />
-            Export Orders
+
+            {isExporting ? "Exporting..." : "Export Orders"}
           </Button>
         </div>
       </div>

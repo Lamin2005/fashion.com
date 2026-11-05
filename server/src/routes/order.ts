@@ -9,6 +9,7 @@ import {
   // deleteOrder,
   getRecentOrders,
   getOrderStats,
+  exportOrders,
 } from "../controllers/order";
 
 import { authMiddleware, isAdmin } from "../middlewares/authmiddleware";
@@ -40,6 +41,8 @@ router.get("/", authMiddleware, isAdmin, asyncHandler(getAllOrders));
 router.get("/recent", authMiddleware, asyncHandler(getRecentOrders));
 
 router.get("/stats", authMiddleware, isAdmin, asyncHandler(getOrderStats));
+
+router.get("/export", authMiddleware, isAdmin, asyncHandler(exportOrders));
 
 router.get(
   "/:id",

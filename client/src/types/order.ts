@@ -78,4 +78,6 @@ export interface GetAllOrdersParams {
   payment_status?: string;
   keyword?: string;
   sort?: string;
+  startDate?: string;
+  endDate?: string;
 }

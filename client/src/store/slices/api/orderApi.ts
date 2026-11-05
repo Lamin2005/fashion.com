@@ -67,6 +67,15 @@ export const orderApi = apiSlice.injectEndpoints({
       invalidatesTags: ["Orders"],
     }),
 
+    exportOrders: builder.query<Blob, GetAllOrdersParams>({
+      query: (params) => ({
+        url: "/orders/export",
+        method: "GET",
+        params,
+        responseHandler: (response) => response.blob(),
+      }),
+    }),
+
     // Delete order
     // deleteOrder: builder.mutation<DeleteOrderResponse, string>({
     //   query: (id) => ({
@@ -89,5 +98,6 @@ export const {
   useGetOrderByIdQuery,
   useUpdateOrderMutation,
   useGetRecentOrdersQuery,
-  useGetOrderStatusQuery
+  useGetOrderStatusQuery,
+  useLazyExportOrdersQuery
 } = orderApi;

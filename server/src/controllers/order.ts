@@ -5,6 +5,86 @@ import Order from "../model/order";
 import type { AuthenticatedRequest } from "../middlewares/authmiddleware";
 import User from "../model/user";
 
+const buildOrderFilter = async (query: {
+  status?: unknown;
+  payment_status?: unknown;
+  keyword?: unknown;
+  startDate?: unknown;
+  endDate?: unknown;
+}) => {
+  const filter: Record<string, any> = {};
+
+  const { status, payment_status, keyword, startDate, endDate } = query;
+
+  if (typeof status === "string" && status !== "all") {
+    filter.status = status;
+  }
+
+  if (typeof payment_status === "string" && payment_status !== "all") {
+    filter.payment_status = payment_status;
+  }
+
+  if (typeof keyword === "string" && keyword.trim()) {
+    const searchRegex = new RegExp(
+      keyword.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+      "i",
+    );
+
+    const users = await User.find({
+      $or: [
+        { name: searchRegex },
+        { email: searchRegex },
+        { phone: searchRegex },
+      ],
+    }).select("_id");
+
+    const userIds = users.map((user) => user._id);
+
+    filter.$or = [
+      { stripe_session_id: searchRegex },
+      { user_id: { $in: userIds } },
+    ];
+  }
+
+  if (startDate || endDate) {
+    const dateFilter: Record<string, Date> = {};
+
+    if (typeof startDate === "string") {
+      const start = new Date(`${startDate}T00:00:00.000Z`);
+
+      if (Number.isNaN(start.getTime())) {
+        throw new Error("Invalid start date");
+      }
+
+      dateFilter.$gte = start;
+    }
+
+    if (typeof endDate === "string") {
+      const end = new Date(`${endDate}T00:00:00.000Z`);
+
+      if (Number.isNaN(end.getTime())) {
+        throw new Error("Invalid end date");
+      }
+
+      end.setUTCDate(end.getUTCDate() + 1);
+
+      dateFilter.$lt = end;
+    }
+
+    if (
+      dateFilter.$gte &&
+      dateFilter.$lt &&
+      dateFilter.$gte >= dateFilter.$lt
+    ) {
+      throw new Error("Start date must be before or equal to end date");
+    }
+
+    filter.createdAt = dateFilter;
+  }
+
+  return filter;
+};
+
 export const getOrderBySession = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -101,41 +181,9 @@ export const getAllOrders = async (
 
     const skip = (page - 1) * limit;
 
-    const { status, payment_status, keyword, sort } = req.query;
+    const filter = await buildOrderFilter(req.query);
 
-    const filter: Record<string, any> = {};
-
-    if (status && status !== "all") {
-      filter.status = status;
-    }
-
-    if (payment_status && payment_status !== "all") {
-      filter.payment_status = payment_status;
-    }
-
-    if (keyword && typeof keyword === "string") {
-      const searchRegex = new RegExp(
-        keyword.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-        "i",
-      );
-
-      const users = await User.find({
-        $or: [
-          { name: searchRegex },
-          { email: searchRegex },
-          { phone: searchRegex },
-        ],
-      }).select("_id");
-
-      const userIds = users.map((user) => user._id);
-
-      filter.$or = [
-        { stripe_session_id: searchRegex },
-        { user_id: { $in: userIds } },
-      ];
-    }
-
-    const sortOrder = sort === "oldest" ? 1 : -1;
+    const sortOrder = req.query.sort === "oldest" ? 1 : -1;
 
     const [orders, totalOrders] = await Promise.all([
       Order.find(filter)
@@ -376,6 +424,92 @@ export const updateOrder = async (req: AuthenticatedRequest, res: Response) => {
     res.status(500).json({
       success: false,
       message: "Failed to update order",
+    });
+  }
+};
+
+const escapeCSV = (value: unknown): string => {
+  const text = String(value ?? "");
+
+  return `"${text.replace(/"/g, '""')}"`;
+};
+
+export const exportOrders = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  try {
+    const filter = await buildOrderFilter(req.query);
+
+    const sortOrder = req.query.sort === "oldest" ? 1 : -1;
+
+    const orders = await Order.find(filter)
+      .populate("user_id", "name email")
+      .sort({ createdAt: sortOrder })
+      .lean();
+
+    const headers = [
+      "Order ID",
+      "Customer Name",
+      "Customer Email",
+      // "Phone",
+      "Order Date",
+      "Items",
+      "Total Price",
+      "Payment Method",
+      "Payment Status",
+      "Order Status",
+      "Shipping Address",
+    ];
+
+    const rows = orders.map((order) => {
+      const user = order.user_id as {
+        name?: string;
+        email?: string;
+        // phone?: string;
+      } | null;
+
+      const itemNames = order.items
+        .map((item) => `${item.name} x ${item.quantity}`)
+        .join(", ");
+
+      return [
+        order._id.toString(),
+        user?.name ?? "",
+        user?.email ?? "",
+        // user?.phone ?? order.phone ?? "",
+        new Date(order.createdAt).toISOString(),
+        itemNames,
+        order.total_price,
+        order.payment_method,
+        order.payment_status,
+        order.status,
+        order.shipping_address,
+      ];
+    });
+
+    const csv = [
+      headers.map(escapeCSV).join(","),
+      ...rows.map((row) => row.map(escapeCSV).join(",")),
+    ].join("\r\n");
+
+    // UTF-8 BOM helps Excel display Unicode characters correctly
+    const csvWithBOM = "\uFEFF" + csv;
+
+    const filename = `orders-${new Date().toISOString().slice(0, 10)}.csv`;
+
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+
+    res.status(200).send(csvWithBOM);
+  } catch (error) {
+    console.error("Export orders error:", error);
+
+    res.status(400).json({
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Failed to export orders",
     });
   }
 };
