@@ -26,6 +26,11 @@ import OrderPage from "./pages/admin/Orders.tsx";
 import { PersistGate } from "redux-persist/integration/react";
 import OrderConfirmed from "./pages/common/OrderConfirmed.tsx";
 import OrderCancel from "./pages/common/OrderCancle.tsx";
+import CustomerPage from "./pages/admin/Customer.tsx";
+import AIAssistantPage from "./pages/admin/Ai-assistant.tsx";
+import NotificationPage from "./pages/admin/Notification.tsx";
+import SavedAddressPage from "./pages/common/SavedAddress.tsx";
+import OrderHistoryPage from "./pages/common/OrderHistory.tsx";
 
 const router = createBrowserRouter([
   {
@@ -75,6 +80,22 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: "/orderhistory",
+        element: (
+          <ProtectedRoute>
+            <OrderHistoryPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/saveaddress",
+        element: (
+          <ProtectedRoute>
+            <SavedAddressPage />
+          </ProtectedRoute>
+        ),
+      },
 
       {
         path: "/forgot-password",
@@ -87,15 +108,6 @@ const router = createBrowserRouter([
       },
     ],
   },
-  {
-    path: "/stripe-success",
-    element: <OrderConfirmed />,
-  },
-  {
-    path: "/stripe-cancel",
-    element: <OrderCancel />,
-  },
-
   {
     path: "/admin",
     element: (
@@ -124,7 +136,27 @@ const router = createBrowserRouter([
         path: "/admin/orders",
         element: <OrderPage />,
       },
+      {
+        path: "/admin/customers",
+        element: <CustomerPage />,
+      },
+      {
+        path: "/admin/ai-assistant",
+        element: <AIAssistantPage />,
+      },
+      {
+        path: "/admin/notifications",
+        element: <NotificationPage />,
+      },
     ],
+  },
+  {
+    path: "/stripe-success",
+    element: <OrderConfirmed />,
+  },
+  {
+    path: "/stripe-cancel",
+    element: <OrderCancel />,
   },
 ]);
 

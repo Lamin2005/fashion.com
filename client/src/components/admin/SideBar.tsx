@@ -5,11 +5,10 @@ import {
   ShoppingBag,
   ShoppingCart,
   Users,
-  BarChart3,
-  Settings,
   LogOut,
   ChevronLeft,
   ChevronRight,
+  BotMessageSquare,
   Bell,
   X,
 } from "lucide-react";
@@ -95,20 +94,15 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
       groupLabel: "Management",
       items: [
         {
-          path: "/admin/analytics",
-          label: "Analytics",
-          icon: BarChart3,
+          path: "/admin/ai-assistant",
+          label: "Ai-assistant",
+          icon: BotMessageSquare,
         },
         {
           path: "/admin/notifications",
           label: "Notifications",
           icon: Bell,
           badge: "3",
-        },
-        {
-          path: "/admin/settings",
-          label: "Settings",
-          icon: Settings,
         },
       ],
     },

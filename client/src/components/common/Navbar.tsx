@@ -272,12 +272,16 @@ const Navbar = () => {
                           Profile
                         </DropdownMenuItem>
                       </Link>
+                       <Link to="/orderhistory">
                       <DropdownMenuItem className="cursor-pointer">
                         Order History
                       </DropdownMenuItem>
+                      </Link>
+                       <Link to="/saveaddress">
                       <DropdownMenuItem className="cursor-pointer">
                         Save Address
                       </DropdownMenuItem>
+                      </Link>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>

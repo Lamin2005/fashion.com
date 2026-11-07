@@ -1,4 +1,4 @@
-import { ArrowUpRight, ShoppingBag, Eye, Plus } from "lucide-react";
+import { ArrowUpRight, ShoppingBag, BotIcon, Plus } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useGetProductsQuery } from "@/store/slices/api/productApi";
 import ProductStatusCard from "@/components/admin/ProductStatusCard";
@@ -57,11 +57,11 @@ function Dashboard() {
 
         <div className="flex items-center gap-2">
           <NavLink
-            to="/admin/analytics"
+            to="/admin/ai-assistant"
             className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:border-zinc-700 hover:bg-zinc-900 hover:text-white"
           >
-            <Eye size={16} />
-            View Analytics
+            <BotIcon size={16} />
+            Ask Assistant
           </NavLink>
           <NavLink
             to="/admin/create-products"
