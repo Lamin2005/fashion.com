@@ -152,7 +152,6 @@ export const getMyOrders = async (req: AuthenticatedRequest, res: Response) => {
       user_id: userId,
     })
       .sort({ createdAt: -1 })
-      .populate("products.product_id", "name price")
       .lean();
 
     res.status(200).json({

@@ -40,9 +40,9 @@ export const orderApi = apiSlice.injectEndpoints({
       providesTags: ["Orders"],
     }),
 
-    getMyOrders: builder.query<OrdersResponse, void>({
+    getMyOrders: builder.query<OrdersResponse, string>({
       query: () => ({
-        url: "/orders/my-orders",
+        url: `/orders/my-orders`,
         method: "GET",
       }),
       providesTags: ["Orders"],
@@ -99,5 +99,5 @@ export const {
   useUpdateOrderMutation,
   useGetRecentOrdersQuery,
   useGetOrderStatusQuery,
-  useLazyExportOrdersQuery
+  useLazyExportOrdersQuery,
 } = orderApi;

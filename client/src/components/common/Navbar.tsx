@@ -37,6 +37,7 @@ import {
   useRemoveCartItemMutation,
   useUpdateCartItemMutation,
 } from "@/store/slices/api/cartApi";
+import { apiSlice } from "@/store/slices/api/api";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -154,6 +155,7 @@ const Navbar = () => {
     try {
       const response = await logoutMutation({}).unwrap();
       dispatch(clearUserInfo());
+      dispatch(apiSlice.util.resetApiState());
       setIsCartOpen(false);
       navigate("/");
       toast.success(`${response.message}`);
@@ -272,15 +274,15 @@ const Navbar = () => {
                           Profile
                         </DropdownMenuItem>
                       </Link>
-                       <Link to="/orderhistory">
-                      <DropdownMenuItem className="cursor-pointer">
-                        Order History
-                      </DropdownMenuItem>
+                      <Link to="/orderhistory">
+                        <DropdownMenuItem className="cursor-pointer">
+                          Order History
+                        </DropdownMenuItem>
                       </Link>
-                       <Link to="/saveaddress">
-                      <DropdownMenuItem className="cursor-pointer">
-                        Save Address
-                      </DropdownMenuItem>
+                      <Link to="/saveaddress">
+                        <DropdownMenuItem className="cursor-pointer">
+                          Save Address
+                        </DropdownMenuItem>
                       </Link>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Search,
   Package,
@@ -9,6 +9,7 @@ import {
   Eye,
   ShoppingBag,
   CalendarDays,
+  Loader2,
 } from "lucide-react";
 
 import {
@@ -22,127 +23,78 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { type Order } from "@/types/order";
+import { useGetMyOrdersQuery } from "@/store/slices/api/orderApi";
+import type { RootState } from "@/store";
+import { useSelector } from "react-redux";
 
 type OrderStatus =
-  | "Pending"
-  | "Processing"
-  | "Shipped"
-  | "Delivered"
-  | "Cancelled";
-
-type PaymentStatus = "Paid" | "Unpaid";
-
-interface Order {
-  _id: string;
-  orderNumber: string;
-  date: string;
-  items: number;
-  total: number;
-  paymentStatus: PaymentStatus;
-  status: OrderStatus;
-}
-
-const initialOrders: Order[] = [
-  {
-    _id: "1",
-    orderNumber: "ORD-1025",
-    date: "Nov 05, 2026",
-    items: 3,
-    total: 250,
-    paymentStatus: "Paid",
-    status: "Delivered",
-  },
-  {
-    _id: "2",
-    orderNumber: "ORD-1024",
-    date: "Nov 03, 2026",
-    items: 2,
-    total: 180,
-    paymentStatus: "Paid",
-    status: "Shipped",
-  },
-  {
-    _id: "3",
-    orderNumber: "ORD-1023",
-    date: "Oct 29, 2026",
-    items: 1,
-    total: 85,
-    paymentStatus: "Paid",
-    status: "Processing",
-  },
-  {
-    _id: "4",
-    orderNumber: "ORD-1022",
-    date: "Oct 25, 2026",
-    items: 4,
-    total: 320,
-    paymentStatus: "Unpaid",
-    status: "Pending",
-  },
-  {
-    _id: "5",
-    orderNumber: "ORD-1021",
-    date: "Oct 20, 2026",
-    items: 2,
-    total: 120,
-    paymentStatus: "Paid",
-    status: "Cancelled",
-  },
-];
+  | "pending"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled";
 
 const statusStyles: Record<OrderStatus, string> = {
-  Pending: "bg-amber-100 text-amber-700 border-amber-200",
-  Processing: "bg-blue-100 text-blue-700 border-blue-200",
-  Shipped: "bg-purple-100 text-purple-700 border-purple-200",
-  Delivered: "bg-green-100 text-green-700 border-green-200",
-  Cancelled: "bg-red-100 text-red-700 border-red-200",
+  pending: "border-amber-500/20 bg-amber-500/10 text-amber-400",
+  processing: "border-blue-500/20 bg-blue-500/10 text-blue-400",
+  shipped: "border-violet-500/20 bg-violet-500/10 text-violet-400",
+  delivered: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+  cancelled: "border-red-500/20 bg-red-500/10 text-red-400",
 };
 
 const statusIcons = {
-  Pending: Clock,
-  Processing: Package,
-  Shipped: Truck,
-  Delivered: CheckCircle2,
-  Cancelled: XCircle,
+  pending: Clock,
+  processing: Package,
+  shipped: Truck,
+  delivered: CheckCircle2,
+  cancelled: XCircle,
 };
 
 function OrderHistoryPage() {
-  const [orders] = useState<Order[]>(initialOrders);
+  const { userInfo } = useSelector((state: RootState) => state.auth);
+
+  const { data, isLoading } = useGetMyOrdersQuery(userInfo?._id ?? "", {
+    skip: !userInfo?._id,
+    refetchOnMountOrArgChange: true,
+    pollingInterval: 5000,
+  });
+
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  console.log(selectedOrder);
 
-  const filteredOrders = useMemo(() => {
-    return orders.filter((order) => {
-      const matchesSearch = order.orderNumber
-        .toLowerCase()
-        .includes(search.toLowerCase());
+  const orders = data?.orders ?? [];
 
-      const matchesFilter = filter === "All" || order.status === filter;
+  const filteredOrders = orders.filter((order) => {
+    const matchesSearch = order._id
+      .toLowerCase()
+      .includes(search.toLowerCase());
 
-      return matchesSearch && matchesFilter;
-    });
-  }, [orders, search, filter]);
+    const matchesFilter = filter === "All" || order.status === filter;
+
+    return matchesSearch && matchesFilter;
+  });
 
   const totalSpent = orders
-    .filter((order) => order.paymentStatus === "Paid")
-    .reduce((total, order) => total + order.total, 0);
+    .filter((order) => order.payment_status === "paid")
+    .reduce((total, order) => total + order.total_price, 0);
 
   const deliveredCount = orders.filter(
-    (order) => order.status === "Delivered",
+    (order) => order.status === "delivered",
   ).length;
 
   const activeCount = orders.filter(
     (order) =>
-      order.status === "Pending" ||
-      order.status === "Processing" ||
-      order.status === "Shipped",
+      order.status === "pending" ||
+      order.status === "processing" ||
+      order.status === "shipped",
   ).length;
 
   return (
     <section className="min-h-screen w-full bg-zinc-50 px-4 pb-16 pt-28 sm:px-6">
       <div className="mx-auto w-full max-w-6xl space-y-8">
-        {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-black">
@@ -162,7 +114,6 @@ function OrderHistoryPage() {
           </Button>
         </div>
 
-        {/* Statistics */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             {
@@ -210,7 +161,6 @@ function OrderHistoryPage() {
           })}
         </div>
 
-        {/* Orders */}
         <Card className="overflow-hidden rounded-2xl border-gray-200 shadow-sm">
           <CardHeader className="space-y-4 border-b border-gray-100">
             <div>
@@ -249,7 +199,14 @@ function OrderHistoryPage() {
           </CardHeader>
 
           <CardContent className="p-0">
-            {filteredOrders.length > 0 ? (
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-20">
+                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+                <p className="mt-3 text-sm text-gray-500">
+                  Loading your orders...
+                </p>
+              </div>
+            ) : filteredOrders.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-187.5 text-left">
                   <thead className="bg-gray-50">
@@ -277,35 +234,35 @@ function OrderHistoryPage() {
                         >
                           <td className="px-6 py-5">
                             <span className="font-semibold text-black">
-                              {order.orderNumber}
+                              {order._id}
                             </span>
                           </td>
 
                           <td className="px-6 py-5">
                             <div className="flex items-center gap-2 text-sm text-gray-500">
                               <CalendarDays size={14} />
-                              {order.date}
+                              {new Date(order.createdAt).toLocaleDateString()}
                             </div>
                           </td>
 
                           <td className="px-6 py-5 text-sm text-gray-600">
-                            {order.items} Items
+                            {order.items.length} Items
                           </td>
 
                           <td className="px-6 py-5 font-semibold text-black">
-                            ${order.total.toFixed(2)}
+                            ${order.total_price.toFixed(2)}
                           </td>
 
                           <td className="px-6 py-5">
                             <Badge
                               variant="outline"
                               className={
-                                order.paymentStatus === "Paid"
+                                order.payment_status === "paid"
                                   ? "border-green-200 bg-green-50 text-green-700"
                                   : "border-amber-200 bg-amber-50 text-amber-700"
                               }
                             >
-                              {order.paymentStatus}
+                              {order.payment_status}
                             </Badge>
                           </td>
 
@@ -360,7 +317,6 @@ function OrderHistoryPage() {
           </CardContent>
         </Card>
 
-        {/* Order Details */}
         {selectedOrder && (
           <Card className="rounded-2xl border-gray-200 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between">
@@ -368,7 +324,7 @@ function OrderHistoryPage() {
                 <CardTitle className="text-lg text-black">
                   Order Details
                 </CardTitle>
-                <CardDescription>{selectedOrder.orderNumber}</CardDescription>
+                <CardDescription>{selectedOrder._id}</CardDescription>
               </div>
 
               <Button
@@ -384,21 +340,44 @@ function OrderHistoryPage() {
               <div>
                 <p className="text-xs text-gray-500">Order Date</p>
                 <p className="mt-1 font-medium text-black">
-                  {selectedOrder.date}
+                  {selectedOrder.createdAt}
                 </p>
               </div>
 
               <div>
                 <p className="text-xs text-gray-500">Total Items</p>
-                <p className="mt-1 font-medium text-black">
-                  {selectedOrder.items}
-                </p>
+                {selectedOrder.items.length > 0 && (
+                  <ul className="mt-1 text-sm text-gray-700">
+                    {selectedOrder.items.map((item) => (
+                      <li
+                        key={item.product_id}
+                        className="flex items-center gap-2"
+                      >
+                        <span>
+                          <img
+                            src={item.image[0]}
+                            alt={item.name}
+                            className="h-10 w-10 object-cover rounded-2xl border border-gray-200"
+                          />
+                        </span>
+                        <span>{item.quantity}x</span>
+                        <span>{item.name}</span>| color :{" "}
+                        <span
+                          className="h-4 w-4 rounded-full border border-gray-300"
+                          style={{ backgroundColor: item.color }}
+                        ></span>
+                        <span>| size : {item.size}</span>
+                        <span>| price : ${item.price.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
               <div>
                 <p className="text-xs text-gray-500">Total Amount</p>
                 <p className="mt-1 font-semibold text-black">
-                  ${selectedOrder.total.toFixed(2)}
+                  ${selectedOrder.total_price.toFixed(2)}
                 </p>
               </div>
             </CardContent>
