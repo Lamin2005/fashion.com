@@ -9,6 +9,7 @@ import productRouter from "./routes/product";
 import cart from "./routes/cart";
 import stripeRouter from "./routes/stripeRoute";
 import orderRouter from "./routes/order";
+import addressRouter from "./routes/address";
 
 dotenv.config({
   path: "./.env",
@@ -34,6 +35,7 @@ app.use("/api/products", productRouter);
 app.use("/api/cart", cart);
 app.use("/api/stripe", stripeRouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/addresses", addressRouter);
 
 app.use(errorHandler);
 

@@ -35,10 +35,13 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
   const { lowStockCount, isLoading, isError } = useLowStockCount();
-  const { data: orderstats, isLoading: isStatusLoading } =
-    useGetOrderStatusQuery("", {
-      pollingInterval: 3000,
-    });
+  const {
+    data: orderstats,
+    isLoading: isStatusLoading,
+    isError: isStatusError,
+  } = useGetOrderStatusQuery("", {
+    pollingInterval: 3000,
+  });
   const { data } = useProfileQuery();
   const userInfo = data?.user;
 
@@ -75,11 +78,11 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
           icon: ShoppingCart,
           badge: isStatusLoading
             ? "..."
-            : isError
+            : isStatusError
               ? "!"
               : String(orderstats?.stats?.pendingOrders ?? 0),
           badgeColor:
-            orderstats?.stats?.totalOrders && orderstats.stats.pendingOrders > 0
+            (orderstats?.stats?.pendingOrders ?? 0) > 0
               ? "border border-yellow-500/30 bg-yellow-500/10 text-yellow-400"
               : "border border-zinc-700 bg-zinc-800 text-zinc-400",
         },
@@ -228,20 +231,18 @@ export default function SideBar({ mobileOpen = false, onClose = () => {} }) {
                       {item.badge && item.badge !== "0" && (
                         <span
                           className={`
-                            ml-auto shrink-0 rounded-full px-2.5 py-1 text-[11px] leading-none
-                            ${
-                              item.badgeColor ||
-                              "border border-zinc-700 bg-zinc-800 text-zinc-400"
-                            }
-                            ${hideWhenCollapsed}
-                          `}
+      ml-auto shrink-0 rounded-full px-2.5 py-1 text-[11px] leading-none
+      ${item.badgeColor || "border border-zinc-700 bg-zinc-800 text-zinc-400"}
+      ${hideWhenCollapsed}
+    `}
                         >
                           {item.badge}
+
                           {lowStockCount > 0 && item.label === "Products" && (
                             <span className="ml-1">low</span>
                           )}
-                          {orderstats?.stats?.pendingOrders &&
-                            orderstats.stats.pendingOrders > 0 &&
+
+                          {(orderstats?.stats?.pendingOrders ?? 0) > 0 &&
                             item.label === "Orders" && (
                               <span className="ml-1">new</span>
                             )}
