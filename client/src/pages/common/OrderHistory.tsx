@@ -1,55 +1,16 @@
 import { useState } from "react";
-import {
-  Search,
-  Package,
-  Clock,
-  CheckCircle2,
-  Truck,
-  XCircle,
-  Eye,
-  ShoppingBag,
-  CalendarDays,
-  Loader2,
-} from "lucide-react";
+import { Package, CheckCircle2, Truck, ShoppingBag } from "lucide-react";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+
 import { type Order } from "@/types/order";
 import { useGetMyOrdersQuery } from "@/store/slices/api/orderApi";
 import type { RootState } from "@/store";
 import { useSelector } from "react-redux";
-
-type OrderStatus =
-  | "pending"
-  | "processing"
-  | "shipped"
-  | "delivered"
-  | "cancelled";
-
-const statusStyles: Record<OrderStatus, string> = {
-  pending: "border-amber-500/20 bg-amber-500/10 text-amber-400",
-  processing: "border-blue-500/20 bg-blue-500/10 text-blue-400",
-  shipped: "border-violet-500/20 bg-violet-500/10 text-violet-400",
-  delivered: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
-  cancelled: "border-red-500/20 bg-red-500/10 text-red-400",
-};
-
-const statusIcons = {
-  pending: Clock,
-  processing: Package,
-  shipped: Truck,
-  delivered: CheckCircle2,
-  cancelled: XCircle,
-};
+import OrderDetailsDialog from "@/components/order/OrderDetailsDialog";
+import OrderTable from "@/components/order/OrderTable";
 
 function OrderHistoryPage() {
   const { userInfo } = useSelector((state: RootState) => state.auth);
@@ -161,228 +122,21 @@ function OrderHistoryPage() {
           })}
         </div>
 
-        <Card className="overflow-hidden rounded-2xl border-gray-200 shadow-sm">
-          <CardHeader className="space-y-4 border-b border-gray-100">
-            <div>
-              <CardTitle className="text-xl font-semibold text-black">
-                Order History
-              </CardTitle>
-              <CardDescription className="mt-1">
-                View and manage all your previous purchases.
-              </CardDescription>
-            </div>
+        <OrderTable
+          orders={orders}
+          filteredOrders={filteredOrders}
+          isLoading={isLoading}
+          search={search}
+          filter={filter}
+          setSearch={setSearch}
+          setFilter={setFilter}
+          setSelectedOrder={setSelectedOrder}
+        />
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
-                <Input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search order number..."
-                  className="h-10 border-gray-200 bg-white pl-9 text-black"
-                />
-              </div>
-
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="h-10 rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none focus:border-black"
-              >
-                <option value="All">All Orders</option>
-                <option value="Pending">Pending</option>
-                <option value="Processing">Processing</option>
-                <option value="Shipped">Shipped</option>
-                <option value="Delivered">Delivered</option>
-                <option value="Cancelled">Cancelled</option>
-              </select>
-            </div>
-          </CardHeader>
-
-          <CardContent className="p-0">
-            {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                <p className="mt-3 text-sm text-gray-500">
-                  Loading your orders...
-                </p>
-              </div>
-            ) : filteredOrders.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-187.5 text-left">
-                  <thead className="bg-gray-50">
-                    <tr className="border-b border-gray-100 text-xs uppercase tracking-wide text-gray-500">
-                      <th className="px-6 py-4 font-medium">Order ID</th>
-                      <th className="px-6 py-4 font-medium">Date</th>
-                      <th className="px-6 py-4 font-medium">Items</th>
-                      <th className="px-6 py-4 font-medium">Total</th>
-                      <th className="px-6 py-4 font-medium">Payment</th>
-                      <th className="px-6 py-4 font-medium">Status</th>
-                      <th className="px-6 py-4 text-right font-medium">
-                        Action
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody className="divide-y divide-gray-100">
-                    {filteredOrders.map((order) => {
-                      const StatusIcon = statusIcons[order.status];
-
-                      return (
-                        <tr
-                          key={order._id}
-                          className="transition-colors hover:bg-gray-50/80"
-                        >
-                          <td className="px-6 py-5">
-                            <span className="font-semibold text-black">
-                              {order._id}
-                            </span>
-                          </td>
-
-                          <td className="px-6 py-5">
-                            <div className="flex items-center gap-2 text-sm text-gray-500">
-                              <CalendarDays size={14} />
-                              {new Date(order.createdAt).toLocaleDateString()}
-                            </div>
-                          </td>
-
-                          <td className="px-6 py-5 text-sm text-gray-600">
-                            {order.items.length} Items
-                          </td>
-
-                          <td className="px-6 py-5 font-semibold text-black">
-                            ${order.total_price.toFixed(2)}
-                          </td>
-
-                          <td className="px-6 py-5">
-                            <Badge
-                              variant="outline"
-                              className={
-                                order.payment_status === "paid"
-                                  ? "border-green-200 bg-green-50 text-green-700"
-                                  : "border-amber-200 bg-amber-50 text-amber-700"
-                              }
-                            >
-                              {order.payment_status}
-                            </Badge>
-                          </td>
-
-                          <td className="px-6 py-5">
-                            <Badge
-                              variant="outline"
-                              className={statusStyles[order.status]}
-                            >
-                              <StatusIcon size={12} className="mr-1" />
-                              {order.status}
-                            </Badge>
-                          </td>
-
-                          <td className="px-6 py-5 text-right">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setSelectedOrder(order)}
-                              className="border-gray-200 text-gray-700 hover:bg-black hover:text-white"
-                            >
-                              <Eye size={14} className="mr-2" />
-                              Details
-                            </Button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center px-5 py-20 text-center">
-                <div className="rounded-full bg-gray-100 p-5">
-                  <Package size={30} className="text-gray-400" />
-                </div>
-
-                <h3 className="mt-4 font-semibold text-black">
-                  No orders found
-                </h3>
-
-                <p className="mt-1 text-sm text-gray-500">
-                  Try another search or filter.
-                </p>
-              </div>
-            )}
-
-            <div className="flex items-center justify-between border-t border-gray-100 px-6 py-4">
-              <p className="text-xs text-gray-500">
-                Showing {filteredOrders.length} of {orders.length} orders
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {selectedOrder && (
-          <Card className="rounded-2xl border-gray-200 shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="text-lg text-black">
-                  Order Details
-                </CardTitle>
-                <CardDescription>{selectedOrder._id}</CardDescription>
-              </div>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedOrder(null)}
-              >
-                Close
-              </Button>
-            </CardHeader>
-
-            <CardContent className="grid gap-5 sm:grid-cols-3">
-              <div>
-                <p className="text-xs text-gray-500">Order Date</p>
-                <p className="mt-1 font-medium text-black">
-                  {selectedOrder.createdAt}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-500">Total Items</p>
-                {selectedOrder.items.length > 0 && (
-                  <ul className="mt-1 text-sm text-gray-700">
-                    {selectedOrder.items.map((item) => (
-                      <li
-                        key={item.product_id}
-                        className="flex items-center gap-2"
-                      >
-                        <span>
-                          <img
-                            src={item.image[0]}
-                            alt={item.name}
-                            className="h-10 w-10 object-cover rounded-2xl border border-gray-200"
-                          />
-                        </span>
-                        <span>{item.quantity}x</span>
-                        <span>{item.name}</span>| color :{" "}
-                        <span
-                          className="h-4 w-4 rounded-full border border-gray-300"
-                          style={{ backgroundColor: item.color }}
-                        ></span>
-                        <span>| size : {item.size}</span>
-                        <span>| price : ${item.price.toFixed(2)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-500">Total Amount</p>
-                <p className="mt-1 font-semibold text-black">
-                  ${selectedOrder.total_price.toFixed(2)}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        <OrderDetailsDialog
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+        />
       </div>
     </section>
   );
