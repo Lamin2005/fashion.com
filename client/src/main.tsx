@@ -31,6 +31,7 @@ import AIAssistantPage from "./pages/admin/Ai-assistant.tsx";
 import NotificationPage from "./pages/admin/Notification.tsx";
 import SavedAddressPage from "./pages/common/SavedAddress.tsx";
 import OrderHistoryPage from "./pages/common/OrderHistory.tsx";
+import WishlistPage from "./pages/common/Wishlist.tsx";
 
 const router = createBrowserRouter([
   {
@@ -93,6 +94,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <SavedAddressPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/wishlists",
+        element: (
+          <ProtectedRoute>
+            <WishlistPage />
           </ProtectedRoute>
         ),
       },

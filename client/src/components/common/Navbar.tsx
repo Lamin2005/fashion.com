@@ -38,6 +38,7 @@ import {
   useUpdateCartItemMutation,
 } from "@/store/slices/api/cartApi";
 import { apiSlice } from "@/store/slices/api/api";
+import { useGetWishlistQuery } from "@/store/slices/api/wishlistApi";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -61,6 +62,10 @@ const Navbar = () => {
   const [updateCartItem] = useUpdateCartItemMutation();
   const [removeCartItem] = useRemoveCartItemMutation();
   const [clearMyCart] = useClearMyCartMutation();
+
+  const { data: wishlistdata, isLoading: isWishlistLoading } =
+    useGetWishlistQuery();
+  const wishlists = wishlistdata?.wishlist ?? [];
 
   console.log(cartResponse);
   console.log(products);
@@ -311,10 +316,12 @@ const Navbar = () => {
               )}
 
               <button className="text-zinc-600 hover:text-zinc-900 transition-colors cursor-pointer relative">
-                <Heart size={20} strokeWidth={1.5} />
-                <span className="absolute -top-1.5 -right-1.5 bg-zinc-900 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                  2
-                </span>
+                <Link to={"/wishlists"}>
+                  <Heart size={20} strokeWidth={1.5} />
+                  <span className="absolute -top-1.5 -right-1.5 bg-zinc-900 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                    {isWishlistLoading ? "..." : wishlists.length}
+                  </span>
+                </Link>
               </button>
 
               <button

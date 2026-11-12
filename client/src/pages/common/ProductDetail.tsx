@@ -16,6 +16,11 @@ import { useGetProductDetailQuery } from "@/store/slices/api/productApi";
 import { useParams } from "react-router";
 import { toast } from "sonner";
 import { useAddCartItemMutation } from "@/store/slices/api/cartApi";
+import {
+  useAddWishlistItemMutation,
+  useGetWishlistQuery,
+  useRemoveWishlistItemMutation,
+} from "@/store/slices/api/wishlistApi";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -30,8 +35,17 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState("M");
   const [quantity, setQuantity] = useState(1);
   const [isDetailsOpen, setIsDetailsOpen] = useState(true);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [addCartItem] = useAddCartItemMutation();
+  const { data: wishlistData } = useGetWishlistQuery(undefined);
+
+  const [addWishlistItem, { isLoading: isAddingWishlist }] =
+    useAddWishlistItemMutation();
+
+  const [removeWishlistItem, { isLoading: isRemovingWishlist }] =
+    useRemoveWishlistItemMutation();
+
+  const isWishlisted =
+    wishlistData?.wishlist?.some((item) => item._id === data?._id) ?? false;
 
   const mainImage =
     data?.images?.find((img) => img.url === selectedImage)?.url ??
@@ -78,6 +92,33 @@ const ProductDetail = () => {
       toast.success(`${data.name} added to cart`);
     } catch (error) {
       toast.error(`${(error as { data: { message: string } }).data.message}`);
+    }
+  };
+
+  const handleAddToWishList = async () => {
+    try {
+      if (!data?._id) {
+        toast.error("Product not found.");
+        return;
+      }
+
+      if (isWishlisted) {
+        await removeWishlistItem(data._id).unwrap();
+
+        toast.success(`${data.name} removed from wishlist`);
+      } else {
+        await addWishlistItem({
+          productId: data._id,
+        }).unwrap();
+
+        toast.success(`${data.name} added to wishlist`);
+      }
+    } catch (error) {
+      const message =
+        (error as { data?: { message?: string } })?.data?.message ||
+        "Something went wrong.";
+
+      toast.error(message);
     }
   };
 
@@ -170,12 +211,13 @@ const ProductDetail = () => {
 
                 <button
                   type="button"
-                  onClick={() => setIsWishlisted((value) => !value)}
+                  onClick={handleAddToWishList}
+                  disabled={isAddingWishlist || isRemovingWishlist}
                   aria-label={
                     isWishlisted ? "Remove from wishlist" : "Add to wishlist"
                   }
                   aria-pressed={isWishlisted}
-                  className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full border shadow-sm backdrop-blur transition-all ${
+                  className={`absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border shadow-sm backdrop-blur transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
                     isWishlisted
                       ? "border-red-100 bg-red-50 text-red-500"
                       : "border-white/70 bg-white/90 text-zinc-700 hover:text-red-500"
@@ -374,11 +416,13 @@ const ProductDetail = () => {
 
               <button
                 type="button"
-                onClick={() => setIsWishlisted((value) => !value)}
+                onClick={handleAddToWishList}
+                disabled={isAddingWishlist || isRemovingWishlist}
                 aria-label={
                   isWishlisted ? "Remove from wishlist" : "Add to wishlist"
                 }
-                className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border transition-all ${
+                aria-pressed={isWishlisted}
+                className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
                   isWishlisted
                     ? "border-red-200 bg-red-50 text-red-500"
                     : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-900"

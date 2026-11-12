@@ -6,10 +6,7 @@ import Product from "../model/product";
 
 import { AuthenticatedRequest } from "../middlewares/authmiddleware";
 
-export const getWishlist = async (
-  req: AuthenticatedRequest,
-  res: Response,
-): Promise<void> => {
+export const getWishlist = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?._id;
 
@@ -43,7 +40,7 @@ export const getWishlist = async (
 export const addWishlistItem = async (
   req: AuthenticatedRequest,
   res: Response,
-): Promise<void> => {
+) => {
   try {
     const userId = req.user?._id;
     const { productId } = req.body;
@@ -102,7 +99,7 @@ export const addWishlistItem = async (
 export const removeWishlistItem = async (
   req: AuthenticatedRequest,
   res: Response,
-): Promise<void> => {
+) => {
   try {
     const userId = req.user?._id;
     const { productId } = req.params;
@@ -164,7 +161,7 @@ export const removeWishlistItem = async (
 export const clearWishlist = async (
   req: AuthenticatedRequest,
   res: Response,
-): Promise<void> => {
+) => {
   try {
     const userId = req.user?._id;
 

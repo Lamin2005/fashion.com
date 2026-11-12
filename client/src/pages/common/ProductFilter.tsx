@@ -11,6 +11,11 @@ import { useNavigate } from "react-router-dom";
 import type { ProductFiltersMeta } from "@/types/product";
 import { toast } from "sonner";
 import { useAddCartItemMutation } from "@/store/slices/api/cartApi";
+import {
+  useAddWishlistItemMutation,
+  useGetWishlistQuery,
+  useRemoveWishlistItemMutation,
+} from "@/store/slices/api/wishlistApi";
 
 function ProductFilter() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -30,6 +35,16 @@ function ProductFilter() {
     Initialcategory || "All",
   );
   const [addCartItem] = useAddCartItemMutation();
+  const { data: wishlistData } = useGetWishlistQuery(undefined);
+
+  const [addWishlistItem, { isLoading: isAddingWishlist }] =
+    useAddWishlistItemMutation();
+
+  const [removeWishlistItem, { isLoading: isRemovingWishlist }] =
+    useRemoveWishlistItemMutation();
+
+  const isWishlisted = (productId: string) =>
+    wishlistData?.wishlist?.some((item) => item._id === productId) ?? false;
 
   const [filter, setFilter] = useState({
     keyword: Initialkeyword,
@@ -159,6 +174,33 @@ function ProductFilter() {
       toast.success(`${product.name} added to cart`);
     } catch (error) {
       toast.error(`${(error as { data: { message: string } }).data.message}`);
+    }
+  };
+
+  const handleAddToWishList = async (product: Product) => {
+    try {
+      if (!product._id) {
+        toast.error("Product not found.");
+        return;
+      }
+
+      if (isWishlisted(product._id)) {
+        const res = await removeWishlistItem(product._id).unwrap();
+
+        toast.success(res.message || `${product.name} removed from wishlist`);
+      } else {
+        const res = await addWishlistItem({
+          productId: product._id,
+        }).unwrap();
+
+        toast.success(res.message || `${product.name} added to wishlist`);
+      }
+    } catch (error) {
+      const message =
+        (error as { data?: { message?: string } })?.data?.message ||
+        "Something went wrong.";
+
+      toast.error(message);
     }
   };
 
@@ -487,9 +529,31 @@ function ProductFilter() {
                           NEW
                         </span>
                       )}
-                      <button className="absolute top-2.5 right-2.5 p-2 bg-white/80 backdrop-blur-sm text-zinc-600 hover:text-red-500 rounded-full transition-colors z-10 shadow-sm">
-                        <Heart size={14} strokeWidth={2} />
+
+                      <button
+                        type="button"
+                        onClick={() => handleAddToWishList(product)}
+                        disabled={isAddingWishlist || isRemovingWishlist}
+                        aria-label={
+                          isWishlisted(product._id)
+                            ? "Remove from wishlist"
+                            : "Add to wishlist"
+                        }
+                        aria-pressed={isWishlisted(product._id)}
+                        className={`absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border shadow-sm backdrop-blur transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+                          isWishlisted(product._id)
+                            ? "border-red-100 bg-red-50 text-red-500"
+                            : "border-white/70 bg-white/90 text-zinc-700 hover:text-red-500"
+                        }`}
+                      >
+                        <Heart
+                          size={17}
+                          className={
+                            isWishlisted(product._id) ? "fill-current" : ""
+                          }
+                        />
                       </button>
+
                       <Link to={`/products/${product._id}`} key={product._id}>
                         <img
                           src={

@@ -1,14 +1,40 @@
 import { useGetnewProductQuery } from "@/store/slices/api/productApi";
+import {
+  useAddWishlistItemMutation,
+  useGetWishlistQuery,
+  useRemoveWishlistItemMutation,
+} from "@/store/slices/api/wishlistApi";
+import { useAddCartItemMutation } from "@/store/slices/api/cartApi";
+
 import type { Product } from "@/types/product";
 import { Heart, ShoppingBag, Star } from "lucide-react";
 import { Link } from "react-router";
 import { toast } from "sonner";
-import { useAddCartItemMutation } from "@/store/slices/api/cartApi";
 
 const TrendingProducts = () => {
+  // Products
   const { data: products = [], isLoading } = useGetnewProductQuery(undefined);
+
+  // Cart
   const [addCartItem] = useAddCartItemMutation();
 
+  // Wishlist
+  const { data: wishlistData } = useGetWishlistQuery(undefined);
+
+  const [addWishlistItem, { isLoading: isAddingWishlist }] =
+    useAddWishlistItemMutation();
+
+  const [removeWishlistItem, { isLoading: isRemovingWishlist }] =
+    useRemoveWishlistItemMutation();
+
+  const wishlist = wishlistData?.wishlist ?? [];
+
+  // Check whether product exists in wishlist
+  const isWishlisted = (productId: string) => {
+    return wishlist.some((item) => item._id === productId);
+  };
+
+  // Add to Cart
   const handleAddToCart = async (product: Product) => {
     try {
       if (!product._id) {
@@ -18,6 +44,7 @@ const TrendingProducts = () => {
 
       const size = product.sizes?.[0] ?? "";
       const color = product.colors?.[0] ?? "";
+
       await addCartItem({
         product_id: product._id,
         quantity: 1,
@@ -27,26 +54,62 @@ const TrendingProducts = () => {
 
       toast.success(`${product.name} added to cart`);
     } catch (error) {
-      toast.error(`${(error as { data: { message: string } }).data.message}`);
+      const message =
+        (error as { data?: { message?: string } })?.data?.message ||
+        "Failed to add product to cart.";
+
+      toast.error(message);
+    }
+  };
+
+  // Add / Remove Wishlist
+  const handleAddToWishList = async (product: Product) => {
+    try {
+      if (!product._id) {
+        toast.error("Product not found.");
+        return;
+      }
+
+      if (isWishlisted(product._id)) {
+        const res = await removeWishlistItem(product._id).unwrap();
+
+        toast.success(`${res.message} `);
+      } else {
+        const res = await addWishlistItem({
+          productId: product._id,
+        }).unwrap();
+
+        toast.success(`${res.message} `);
+      }
+    } catch (error) {
+      const message =
+        (error as { data?: { message?: string } })?.data?.message ||
+        "Something went wrong.";
+
+      toast.error(message);
     }
   };
 
   return (
     <section className="w-full bg-zinc-50/50 py-16 lg:py-24 border-t border-zinc-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
         <div className="text-center max-w-xl mx-auto mb-16 space-y-3">
           <p className="text-xs font-semibold text-amber-600 tracking-widest uppercase">
             Customer Favorites
           </p>
+
           <h2 className="text-3xl font-bold text-zinc-900 tracking-tight sm:text-4xl">
             Trending New Arrivals
           </h2>
+
           <p className="text-sm text-zinc-500 font-light">
             Explore our most-wanted pieces of the week, finely tailored with
             pure premium textiles.
           </p>
         </div>
 
+        {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
           {isLoading
             ? Array.from({ length: 4 }).map((_, index) => (
@@ -55,9 +118,11 @@ const TrendingProducts = () => {
                   className="flex flex-col justify-between animate-pulse"
                 >
                   <div className="relative w-full aspect-3/4 bg-zinc-200 mb-4 rounded-none" />
+
                   <div className="space-y-2 px-1">
                     <div className="h-3 bg-zinc-200 rounded w-1/3" />
                     <div className="h-4 bg-zinc-200 rounded w-3/4" />
+
                     <div className="flex items-center justify-between pt-1">
                       <div className="h-4 bg-zinc-200 rounded w-1/4" />
                       <div className="h-3 bg-zinc-200 rounded w-1/6" />
@@ -65,61 +130,97 @@ const TrendingProducts = () => {
                   </div>
                 </div>
               ))
-            : products?.slice(0, 4).map((product: Product) => (
-                <div
-                  key={product._id}
-                  className="group relative flex flex-col justify-between"
-                >
-                  <div className="relative w-full aspect-3/4 bg-zinc-100 overflow-hidden border border-zinc-200/50 shadow-sm mb-4">
-                    {product.is_new_arrival && (
-                      <span className="absolute top-3 left-3 bg-zinc-900 text-white text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 z-10">
-                        NEW
-                      </span>
-                    )}
+            : products.slice(0, 4).map((product: Product) => {
+                const wishlisted = product._id
+                  ? isWishlisted(product._id)
+                  : false;
 
-                    <button className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm text-zinc-600 hover:text-red-500 rounded-full transition-colors z-10 shadow-sm cursor-pointer">
-                      <Heart size={16} strokeWidth={2} />
-                    </button>
-                    <Link to={`/products/${product._id}`}>
-                      <img
-                        src={`${product.images[0].url}`}
-                        alt={product.name}
-                        className="w-full h-full object-cover object-center transform transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </Link>
-                    <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-linear-to-t from-zinc-900/40 to-transparent">
-                      <button
-                        className="w-full bg-zinc-900 text-white text-xs font-medium py-3 px-4 flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors shadow-lg cursor-pointer"
-                        onClick={() => handleAddToCart(product)}
-                      >
-                        <ShoppingBag size={14} />
-                        Quick Add to Bag
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1 px-1">
-                    <p className="text-xs text-zinc-400 font-medium tracking-wide">
-                      {product.category}
-                    </p>
-                    <h3 className="text-sm font-semibold text-zinc-800 group-hover:text-zinc-900 transition-colors line-clamp-1">
-                      {product.name}
-                    </h3>
-
-                    <div className="flex items-center justify-between pt-1">
-                      <span className="text-sm font-bold text-zinc-900">
-                        ${product.price.toFixed(2)}
-                      </span>
-                      <div className="flex items-center gap-1 text-amber-500">
-                        <Star size={12} fill="currentColor" />
-                        <span className="text-xs font-medium text-zinc-600">
-                          {product.rating_count}
+                return (
+                  <div
+                    key={product._id}
+                    className="group relative flex flex-col justify-between"
+                  >
+                    {/* Product Image */}
+                    <div className="relative w-full aspect-3/4 bg-zinc-100 overflow-hidden border border-zinc-200/50 shadow-sm mb-4">
+                      {/* New Badge */}
+                      {product.is_new_arrival && (
+                        <span className="absolute top-3 left-3 bg-zinc-900 text-white text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 z-10">
+                          NEW
                         </span>
+                      )}
+
+                    
+                      <button
+                        type="button"
+                        onClick={() => handleAddToWishList(product)}
+                        disabled={isAddingWishlist || isRemovingWishlist}
+                        aria-label={
+                          wishlisted
+                            ? "Remove from wishlist"
+                            : "Add to wishlist"
+                        }
+                        aria-pressed={wishlisted}
+                        className={`absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border shadow-sm backdrop-blur transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                          wishlisted
+                            ? "border-red-100 bg-red-50 text-red-500"
+                            : "border-white/70 bg-white/90 text-zinc-700 hover:text-red-500"
+                        }`}
+                      >
+                        <Heart
+                          size={17}
+                          className={wishlisted ? "fill-current" : ""}
+                        />
+                      </button>
+
+                      {/* Product Link */}
+                      <Link to={`/products/${product._id}`}>
+                        <img
+                          src={product.images?.[0]?.url}
+                          alt={product.name}
+                          className="w-full h-full object-cover object-center transform transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </Link>
+
+                      {/* Quick Add to Cart */}
+                      <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-linear-to-t from-zinc-900/40 to-transparent">
+                        <button
+                          type="button"
+                          className="w-full bg-zinc-900 text-white text-xs font-medium py-3 px-4 flex items-center justify-center gap-2 hover:bg-zinc-800 transition-colors shadow-lg cursor-pointer"
+                          onClick={() => handleAddToCart(product)}
+                        >
+                          <ShoppingBag size={14} />
+                          Quick Add to Bag
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Product Information */}
+                    <div className="space-y-1 px-1">
+                      <p className="text-xs text-zinc-400 font-medium tracking-wide">
+                        {product.category}
+                      </p>
+
+                      <h3 className="text-sm font-semibold text-zinc-800 group-hover:text-zinc-900 transition-colors line-clamp-1">
+                        {product.name}
+                      </h3>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-sm font-bold text-zinc-900">
+                          ${product.price.toFixed(2)}
+                        </span>
+
+                        <div className="flex items-center gap-1 text-amber-500">
+                          <Star size={12} fill="currentColor" />
+
+                          <span className="text-xs font-medium text-zinc-600">
+                            {product.rating_count}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
         </div>
       </div>
     </section>
