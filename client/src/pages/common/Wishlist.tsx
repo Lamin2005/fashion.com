@@ -24,6 +24,8 @@ const WishlistPage = () => {
     null,
   );
 
+  const [addingProductId, setAddingProductId] = useState<string | null>(null);
+
   const { data, isLoading, isError, refetch } = useGetWishlistQuery();
 
   const [removeWishlistItem, { isLoading: isRemoving }] =
@@ -31,7 +33,7 @@ const WishlistPage = () => {
 
   const [clearWishlist, { isLoading: isClearing }] = useClearWishlistMutation();
 
-  const [addCartItem, { isLoading: isAddingToCart }] = useAddCartItemMutation();
+  const [addCartItem] = useAddCartItemMutation();
 
   const products = data?.wishlist ?? [];
   const wishlistCount = products.length;
@@ -78,6 +80,7 @@ const WishlistPage = () => {
 
   const handleAddToCart = async (product: Product) => {
     try {
+      setAddingProductId(product._id);
       await addCartItem({
         product_id: product._id,
         quantity: 1,
@@ -92,19 +95,18 @@ const WishlistPage = () => {
         "Unable to add product to bag.";
 
       toast.error(message);
+    } finally {
+      setAddingProductId(null);
     }
   };
 
   return (
     <section className="min-h-screen w-full bg-zinc-50 px-4 pb-16 pt-28 sm:px-6">
       <div className="mx-auto w-full max-w-5xl space-y-8">
-        {/* Header */}
         <WishlistHeader count={wishlistCount} />
 
-        {/* Loading */}
         {isLoading && <WishlistSkeleton />}
 
-        {/* Error */}
         {isError && !isLoading && (
           <div className="flex min-h-87.5 flex-col items-center justify-center text-center">
             <h2 className="text-lg font-semibold text-zinc-950">
@@ -126,12 +128,10 @@ const WishlistPage = () => {
           </div>
         )}
 
-        {/* Wishlist Content */}
         {!isLoading && !isError && (
           <>
             {wishlistCount > 0 ? (
               <>
-                {/* Wishlist Toolbar */}
                 <div className="mb-6 flex items-center justify-between border-b border-zinc-100 pb-4">
                   <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
                     Saved Items ({wishlistCount})
@@ -154,7 +154,7 @@ const WishlistPage = () => {
                   onRemove={handleRemove}
                   onAddToCart={handleAddToCart}
                   removingProductId={removingProductId}
-                  isAddingToCart={isAddingToCart}
+                  addingProductId={addingProductId}
                 />
               </>
             ) : (

@@ -186,7 +186,7 @@ export const getAllOrders = async (
 
     const [orders, totalOrders] = await Promise.all([
       Order.find(filter)
-        .populate("user_id", "name email phone avatar")
+        .populate("user_id", "name email avatar")
         .sort({ createdAt: sortOrder })
         .skip(skip)
         .limit(limit)
@@ -362,12 +362,10 @@ export const getOrderById = async (
 export const updateOrder = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { status, shipping_address, phone, payment_status } = req.body;
+    const { status, payment_status } = req.body;
 
     const updates: {
       status?: string;
-      shipping_address?: string;
-      phone?: string;
       payment_status?: string;
     } = {};
 
@@ -377,14 +375,6 @@ export const updateOrder = async (req: AuthenticatedRequest, res: Response) => {
 
     if (payment_status !== undefined) {
       updates.payment_status = payment_status;
-    }
-
-    if (shipping_address !== undefined) {
-      updates.shipping_address = shipping_address;
-    }
-
-    if (phone !== undefined) {
-      updates.phone = phone;
     }
 
     if (Object.keys(updates).length === 0) {
