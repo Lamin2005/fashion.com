@@ -11,6 +11,7 @@ import stripeRouter from "./routes/stripeRoute";
 import orderRouter from "./routes/order";
 import addressRouter from "./routes/address";
 import wishlistRouter from "./routes/wishlist";
+import customerRoutes from "./routes/customer";
 
 dotenv.config({
   path: "./.env",
@@ -38,6 +39,7 @@ app.use("/api/stripe", stripeRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/addresses", addressRouter);
 app.use("/api/wishlists", wishlistRouter);
+app.use("/api/customers", customerRoutes);
 
 app.use(errorHandler);
 

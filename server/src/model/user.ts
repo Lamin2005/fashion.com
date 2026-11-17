@@ -15,6 +15,7 @@ interface IUser extends Document {
   tokenExpire: Date | undefined;
   comparePassword(enteredPassword: string): Promise<boolean>;
   generateResetToken(): Promise<string>;
+  createdAt: Date;
 }
 
 const userSchema = new Schema<IUser>(
