@@ -2,45 +2,38 @@ import { Users, UserCheck, UserPlus, UserX } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 
-import type { Customer } from "@/types/customer";
+import type { CustomerStats as CustomerStatsType } from "@/types/customer";
 
 interface CustomerStatsProps {
-  customers: Customer[];
+  stats?: CustomerStatsType;
 }
 
-const CustomerStats = ({ customers }: CustomerStatsProps) => {
-  const stats = [
+const CustomerStats = ({ stats }: CustomerStatsProps) => {
+  const statsCards = [
     {
       title: "Total Customers",
-      value: customers.length,
+      value: stats?.totalCustomers ?? 0,
       description: "All registered customers",
       icon: Users,
       color: "bg-amber-500/10 text-amber-400",
     },
     {
       title: "Active Customers",
-      value: customers.filter((c) => c.status === "Active").length,
+      value: stats?.activeCustomers ?? 0,
       description: "Currently active accounts",
       icon: UserCheck,
       color: "bg-emerald-500/10 text-emerald-400",
     },
     {
       title: "New Customers",
-      value: customers.filter((c) => {
-        const joined = new Date(c.joinedAt);
-        const now = new Date();
-
-        const difference = now.getTime() - joined.getTime();
-
-        return difference <= 30 * 24 * 60 * 60 * 1000;
-      }).length,
+      value: stats?.newCustomers ?? 0,
       description: "Registered within 30 days",
       icon: UserPlus,
       color: "bg-blue-500/10 text-blue-400",
     },
     {
       title: "Inactive Customers",
-      value: customers.filter((c) => c.status === "Inactive").length,
+      value: stats?.inactiveCustomers ?? 0,
       description: "Currently inactive accounts",
       icon: UserX,
       color: "bg-red-500/10 text-red-400",
@@ -49,7 +42,7 @@ const CustomerStats = ({ customers }: CustomerStatsProps) => {
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {stats.map((stat) => {
+      {statsCards.map((stat) => {
         const Icon = stat.icon;
 
         return (

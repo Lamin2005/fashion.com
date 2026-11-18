@@ -4,10 +4,7 @@ import User from "../model/user";
 import Order from "../model/order";
 import Address from "../model/address";
 
-// ==========================================
 // GET CUSTOMER DATA
-// ==========================================
-
 const getCustomers = async () => {
   // 1. Get all users except admin
   const users = await User.find({ role: { $ne: "admin" } })
@@ -57,7 +54,7 @@ const getCustomers = async () => {
         _id: user._id,
         name: user.name,
         email: user.email,
-
+        image_url: user.avatar?.image_url,
         // Phone comes from Address database
         phone: customerAddress?.phone || "",
 
@@ -78,11 +75,8 @@ const getCustomers = async () => {
   return customers;
 };
 
-// ==========================================
 // GET ALL CUSTOMERS
 // GET /api/customers
-// ==========================================
-
 export const getAllCustomers = async (
   req: Request,
   res: Response,
@@ -164,11 +158,8 @@ export const getAllCustomers = async (
   }
 };
 
-// ==========================================
 // GET CUSTOMER STATS
 // GET /api/customers/stats
-// ==========================================
-
 export const getCustomerStats = async (
   _req: Request,
   res: Response,
@@ -214,11 +205,8 @@ export const getCustomerStats = async (
   }
 };
 
-// ==========================================
 // GET CUSTOMER DETAILS
 // GET /api/customers/:id
-// ==========================================
-
 export const getCustomerById = async (
   req: Request,
   res: Response,
@@ -273,7 +261,7 @@ export const getCustomerById = async (
         name: customer.name,
         email: customer.email,
         phone: defaultAddress?.phone || "",
-
+        image_url: customer.avatar?.image_url,
         location: defaultAddress
           ? `${defaultAddress.city}, ${defaultAddress.township}`
           : "No address",

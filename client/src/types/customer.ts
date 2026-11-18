@@ -11,10 +11,9 @@ export interface Customer {
   email: string;
   phone: string;
   location: string;
-
+  image_url: string;
   totalOrders: number;
   totalSpent: number;
-
   status: CustomerStatus;
   joinedAt: string;
 }

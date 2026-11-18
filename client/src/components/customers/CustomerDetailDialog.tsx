@@ -1,4 +1,3 @@
-
 import {
   Mail,
   Phone,
@@ -34,13 +33,7 @@ const CustomerDetailDialog = ({
 }: CustomerDetailDialogProps) => {
   if (!customer) return null;
 
-  const initials = customer.name
-    .split(" ")
-    .map((part) => part[0])
-    .join("");
-
-  const formatPrice = (price: number) =>
-    `${price.toLocaleString("en-US")} MMK`;
+  const formatPrice = (price: number) => `${price.toLocaleString("en-US")} MMK`;
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("en-US", {
@@ -63,18 +56,18 @@ const CustomerDetailDialog = ({
         </DialogHeader>
 
         <div className="flex items-center gap-4 py-4">
-          <div className="flex size-16 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-lg font-semibold text-zinc-200">
-            {initials}
-          </div>
+          <img
+            src={customer.image_url}
+            alt={customer.name}
+            className="flex size-16 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-lg font-semibold text-zinc-200"
+          />
 
           <div className="min-w-0 flex-1">
             <h3 className="text-lg font-semibold text-white">
               {customer.name}
             </h3>
 
-            <p className="mt-1 text-xs text-zinc-500">
-              {customer._id}
-            </p>
+            <p className="mt-1 text-xs text-zinc-500">{customer._id}</p>
 
             <Badge
               variant="outline"
@@ -105,16 +98,12 @@ const CustomerDetailDialog = ({
 
           <div className="flex items-center gap-3">
             <Phone className="size-4 text-zinc-500" />
-            <span className="text-sm text-zinc-300">
-              {customer.phone}
-            </span>
+            <span className="text-sm text-zinc-300">{customer.phone}</span>
           </div>
 
           <div className="flex items-center gap-3">
             <MapPin className="size-4 text-zinc-500" />
-            <span className="text-sm text-zinc-300">
-              {customer.location}
-            </span>
+            <span className="text-sm text-zinc-300">{customer.location}</span>
           </div>
 
           <div className="flex items-center gap-3">
@@ -136,9 +125,7 @@ const CustomerDetailDialog = ({
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
               <ShoppingBag className="mb-3 size-5 text-blue-400" />
 
-              <p className="text-xs text-zinc-500">
-                Total Orders
-              </p>
+              <p className="text-xs text-zinc-500">Total Orders</p>
 
               <p className="mt-1 text-xl font-semibold text-white">
                 {customer.totalOrders}
@@ -148,9 +135,7 @@ const CustomerDetailDialog = ({
             <div className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4">
               <Wallet className="mb-3 size-5 text-emerald-400" />
 
-              <p className="text-xs text-zinc-500">
-                Total Spent
-              </p>
+              <p className="text-xs text-zinc-500">Total Spent</p>
 
               <p className="mt-1 text-lg font-semibold text-white">
                 {formatPrice(customer.totalSpent)}
@@ -159,9 +144,7 @@ const CustomerDetailDialog = ({
           </div>
         </div>
 
-        <p className="text-xs text-zinc-600">
-          Customer ID: {customer._id}
-        </p>
+        <p className="text-xs text-zinc-600">Customer ID: {customer._id}</p>
       </DialogContent>
     </Dialog>
   );

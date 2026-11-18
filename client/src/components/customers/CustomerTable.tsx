@@ -1,23 +1,11 @@
-
-import {
-  Users,
-  Eye,
-  Mail,
-  Phone,
-  MapPin,
-} from "lucide-react";
+import { Users, Eye, Mail, Phone, MapPin } from "lucide-react";
 
 import type { Customer } from "@/types/customer";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import {
   Table,
@@ -33,12 +21,8 @@ interface CustomerTableProps {
   onView: (customer: Customer) => void;
 }
 
-const CustomerTable = ({
-  customers,
-  onView,
-}: CustomerTableProps) => {
-  const formatPrice = (price: number) =>
-    `${price.toLocaleString("en-US")} MMK`;
+const CustomerTable = ({ customers, onView }: CustomerTableProps) => {
+  const formatPrice = (price: number) => `${price.toLocaleString("en-US")} MMK`;
 
   return (
     <Card className="overflow-hidden border-zinc-800/80 bg-zinc-900/40 text-white shadow-sm">
@@ -70,13 +54,9 @@ const CustomerTable = ({
                   Customer
                 </TableHead>
 
-                <TableHead className="text-zinc-500">
-                  Contact
-                </TableHead>
+                <TableHead className="text-zinc-500">Contact</TableHead>
 
-                <TableHead className="text-zinc-500">
-                  Location
-                </TableHead>
+                <TableHead className="text-zinc-500">Location</TableHead>
 
                 <TableHead className="whitespace-nowrap text-zinc-500">
                   Orders
@@ -86,9 +66,7 @@ const CustomerTable = ({
                   Total Spent
                 </TableHead>
 
-                <TableHead className="text-zinc-500">
-                  Status
-                </TableHead>
+                <TableHead className="text-zinc-500">Status</TableHead>
 
                 <TableHead className="px-5 text-right text-zinc-500">
                   Action
@@ -98,11 +76,6 @@ const CustomerTable = ({
 
             <TableBody>
               {customers.map((customer) => {
-                const initials = customer.name
-                  .split(" ")
-                  .map((part) => part[0])
-                  .join("");
-
                 return (
                   <TableRow
                     key={customer._id}
@@ -110,9 +83,11 @@ const CustomerTable = ({
                   >
                     <TableCell className="px-5">
                       <div className="flex min-w-40 items-center gap-3">
-                        <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-xs font-semibold text-zinc-300">
-                          {initials}
-                        </div>
+                        <img
+                          src={customer.image_url}
+                          alt={customer.name}
+                          className="flex size-9 shrink-0 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-xs font-semibold text-zinc-300"
+                        />
 
                         <div className="min-w-0">
                           <p className="font-medium text-zinc-200">
@@ -130,9 +105,7 @@ const CustomerTable = ({
                       <div className="min-w-48 space-y-1.5">
                         <div className="flex items-center gap-2 text-xs text-zinc-400">
                           <Mail className="size-3.5 shrink-0 text-zinc-500" />
-                          <span className="truncate">
-                            {customer.email}
-                          </span>
+                          <span className="truncate">{customer.email}</span>
                         </div>
 
                         <div className="flex items-center gap-2 text-xs text-zinc-500">
